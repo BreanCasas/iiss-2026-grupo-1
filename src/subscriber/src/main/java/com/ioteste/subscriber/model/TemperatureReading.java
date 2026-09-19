@@ -9,7 +9,7 @@ import java.time.Instant;
  * @param roomId         Identificador de la habitación asociada
  * @param tempCelsius    Temperatura en grados Celsius
  * @param tempFahrenheit Temperatura en grados Fahrenheit
- * @param sourceTs       Timestamp original del mensaje (epoch segundos, con decimales de ms)
+ * @param sourceTs Timestamp original del mensaje (epoch en milisegundos)
  * @param receivedAt     Momento en que el sistema recibió y persistió la lectura
  */
 public record TemperatureReading(

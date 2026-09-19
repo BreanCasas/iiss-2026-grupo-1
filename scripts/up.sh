@@ -10,11 +10,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE_FILE="${SCRIPT_DIR}/../docker/docker-compose.yml"
 
 echo "Levantando entorno IoTEste (Mosquitto + suscriptor Java)..."
-docker compose -f "${COMPOSE_FILE}" up -d --build
+docker compose --env-file "${SCRIPT_DIR}/../.env" -f "${COMPOSE_FILE}" up -d --build
 
 echo
 echo "Entorno levantado. Servicios activos:"
-docker compose -f "${COMPOSE_FILE}" ps
+docker compose --env-file "${SCRIPT_DIR}/../.env" -f "${COMPOSE_FILE}" ps
 
 echo
 echo "Para ver los logs del suscriptor Java: docker compose -f docker/docker-compose.yml logs -f subscriber"

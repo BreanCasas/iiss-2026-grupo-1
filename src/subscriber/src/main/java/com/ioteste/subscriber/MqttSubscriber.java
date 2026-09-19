@@ -33,7 +33,7 @@ import java.util.Optional;
  *
  * El mensaje esperado tiene el formato:
  *   Topic:   ht-sim-room1/status/temperature:0
- *   Payload: {"id":0,"tC":21.4,"tF":70.5,"ts":1786840680.0}
+ *   Payload: {"id":0,"tC":21.4,"tF":70.5,"ts":1789780929572}
  *
  * Configuración vía variables de entorno:
  *   MQTT_BROKER_HOST   (default: localhost)
@@ -41,7 +41,8 @@ import java.util.Optional;
  *   MQTT_TOPIC         (default: ht-sim-+/status/temperature:+)
  *   MQTT_CLIENT_ID     (default: ioteste-subscriber)
  *   ROOMS_FILE         (default: /data/rooms.json)
- *   READINGS_DIR       (default: /data/readings)
+ *   MONGODB_URI        (obligatoria)
+ *   MONGODB_DATABASE   (default: ioteste)
  */
 public class MqttSubscriber {
 
@@ -54,12 +55,14 @@ public class MqttSubscriber {
         String topic = getEnv("MQTT_TOPIC", "+/status/#");
         String clientId = getEnv("MQTT_CLIENT_ID", "ioteste-subscriber");
         Path roomsFile = Path.of(getEnv("ROOMS_FILE", "/data/rooms.json"));
-        Path readingsDir = Path.of(getEnv("READINGS_DIR", "/data/readings"));
+
+        String mongoUri = getRequiredEnv("MONGODB_URI");
+        String mongoDatabase = getEnv("MONGODB_DATABASE", "ioteste");
 
         String brokerUrl = "tcp://" + host + ":" + port;
 
         RoomRepository roomRepository = new RoomRepository(roomsFile);
-        TemperatureReadingRepository readingRepository = new TemperatureReadingRepository(readingsDir);
+        TemperatureReadingRepository readingRepository = new TemperatureReadingRepository(mongoUri, mongoDatabase);
         List<Room> rooms = roomRepository.findAll();
 
         log.info("=== IoTEste EcoWarm - Consumidor de Eventos ===");
@@ -107,6 +110,9 @@ public class MqttSubscriber {
                     client.disconnect();
                 } catch (MqttException e) {
                     // Ignorado en el shutdown
+                } finally {
+                    log.info("Cerrando conexión MongoDB...");
+                    readingRepository.close();
                 }
             }));
 
@@ -158,8 +164,23 @@ public class MqttSubscriber {
                     Instant.now()
             );
 
-            readingRepository.append(reading);
-            log.info("Lectura persistida: room={} tC={} tF={}", room.get().id(), tC, tF);
+            boolean persisted = readingRepository.append(reading);
+
+            if (persisted) {
+                log.info(
+                        "Lectura persistida: room={} tC={} tF={}",
+                        room.get().id(),
+                        tC,
+                        tF
+                );
+            } else {
+                log.warn(
+                        "La lectura no pudo persistirse: room={} tC={} tF={}",
+                        room.get().id(),
+                        tC,
+                        tF
+                );
+            }
 
         } catch (IOException e) {
             log.error("No se pudo parsear el payload como JSON: {}", e.getMessage());
@@ -190,5 +211,17 @@ public class MqttSubscriber {
     private static String getEnv(String key, String defaultValue) {
         String value = System.getenv(key);
         return (value == null || value.isBlank()) ? defaultValue : value;
+    }
+
+    private static String getRequiredEnv(String key) {
+        String value = System.getenv(key);
+
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException(
+                    "Variable de entorno obligatoria no definida: " + key
+            );
+        }
+
+        return value;
     }
 }

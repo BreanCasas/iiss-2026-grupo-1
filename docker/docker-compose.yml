@@ -26,10 +26,10 @@ services:
       MQTT_TOPIC: "+/status/#"
       MQTT_CLIENT_ID: ioteste-subscriber
       ROOMS_FILE: /data/rooms.json
-      READINGS_DIR: /data/readings
+      MONGODB_URI: ${MONGODB_URI}
+      MONGODB_DATABASE: ${MONGODB_DATABASE}
     volumes:
       - ./data/rooms.json:/data/rooms.json:ro
-      - readings-data:/data/readings
     restart: unless-stopped
     networks:
       - ioteste-net
@@ -52,6 +52,18 @@ services:
     networks:
       - ioteste-net
 
+  #mongodb:
+    #image: mongo:8
+    #container_name: ioteste-mongodb
+      #ports:
+      #- "27017:27017"
+      #volumes:
+      #- mongodb-data:/data/db
+    #restart: unless-stopped
+      #networks:
+      #- ioteste-net
+
+
 networks:
   ioteste-net:
     driver: bridge
@@ -59,4 +71,4 @@ networks:
 volumes:
   mosquitto-data:
   mosquitto-log:
-  readings-data:
+  #mongodb-data:

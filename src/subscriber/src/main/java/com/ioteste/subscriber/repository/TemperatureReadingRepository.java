@@ -1,53 +1,70 @@
 package com.ioteste.subscriber.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ioteste.subscriber.model.TemperatureReading;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.util.Date;
 
 /**
- * Repositorio de lecturas de temperatura, persistidas en formato
- * JSON Lines (un objeto JSON por línea), un archivo por habitación.
- * Cada línea agregada representa una lectura con su fecha/hora de
- * recepción, permitiendo reconstruir el historial completo por room.
+ * Repositorio de lecturas de temperatura persistidas en MongoDB.
+ * Cada lectura se almacena como un documento en la colección
+ * temperature_readings.
  */
 public class TemperatureReadingRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(TemperatureReadingRepository.class);
+    private static final Logger log =
+            LoggerFactory.getLogger(TemperatureReadingRepository.class);
 
-    private final Path dataDir;
-    private final ObjectMapper mapper;
+    private final MongoClient mongoClient;
+    private final MongoCollection<Document> collection;
 
-    public TemperatureReadingRepository(Path dataDir) {
-        this.dataDir = dataDir;
-        this.mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    public TemperatureReadingRepository(String mongoUri, String databaseName) {
+        this.mongoClient = MongoClients.create(mongoUri);
+
+        MongoDatabase database = mongoClient.getDatabase(databaseName);
+
+        this.collection = database.getCollection("temperature_readings");
     }
 
     /**
-     * Agrega (append) una nueva lectura al archivo histórico de la
-     * habitación correspondiente. Crea el archivo y la carpeta si
-     * no existen todavía.
+     * Persiste una nueva lectura de temperatura en MongoDB.
      */
-    public void append(TemperatureReading reading) {
-        Path file = dataDir.resolve("temp-" + reading.roomId() + ".jsonl");
+    public boolean append(TemperatureReading reading) {
         try {
-            Files.createDirectories(dataDir);
-            String line = mapper.writeValueAsString(reading) + System.lineSeparator();
-            Files.writeString(
-                    file,
-                    line,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.APPEND
+            Document document = new Document()
+                    .append("roomId", reading.roomId())
+                    .append("tempCelsius", reading.tempCelsius())
+                    .append("tempFahrenheit", reading.tempFahrenheit())
+                    .append("sourceTs", reading.sourceTs())
+                    .append("receivedAt", Date.from(reading.receivedAt()));
+
+            collection.insertOne(document);
+
+            log.debug(
+                    "Lectura persistida en MongoDB: room={} tC={}",
+                    reading.roomId(),
+                    reading.tempCelsius()
             );
-            log.debug("Lectura persistida en {}: {}", file, reading);
-        } catch (IOException e) {
-            log.error("Error persistiendo lectura en {}: {}", file, e.getMessage(), e);
+
+            return true;
+
+        } catch (Exception e) {
+            log.error(
+                    "Error persistiendo lectura en MongoDB: {}",
+                    e.getMessage(),
+                    e
+            );
+
+            return false;
         }
+    }
+
+    public void close() {
+        mongoClient.close();
     }
 }
