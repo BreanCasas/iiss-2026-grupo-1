@@ -139,7 +139,7 @@ public class MqttSubscriber {
             JsonNode json = mapper.readTree(payload);
             double tC = json.get("tC").asDouble();
             double tF = json.get("tF").asDouble();
-            double ts = json.get("ts").asDouble();
+            long ts = json.get("ts").asLong();
 
             String thermostatId = extractThermostatId(receivedTopic);
             Optional<Room> room = findRoomByThermostatId(rooms, thermostatId);

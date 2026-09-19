@@ -5,9 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="110a38a3-6569-41bb-ac52-f86613ce9907" name="Changes" comment="amooor, contestame el telefono, que yo quiero estar contigo una noche mas">
-      <change afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/producto/licencias.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/receive-temp.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/receive-temp.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/send-temp.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/send-temp.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/generator/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/generator/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/generator/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/generator/src/main/java/com/ioteste/generator/EventGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/generator/src/main/java/com/ioteste/generator/EventGenerator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/subscriber/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/subscriber/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/subscriber/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/subscriber/src/main/java/com/ioteste/subscriber/MqttSubscriber.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/subscriber/src/main/java/com/ioteste/subscriber/MqttSubscriber.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/subscriber/src/main/java/com/ioteste/subscriber/model/TemperatureReading.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/subscriber/src/main/java/com/ioteste/subscriber/model/TemperatureReading.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,6 +26,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Class" />
+        <option value="HTML File" />
+        <option value="Dockerfile" />
       </list>
     </option>
   </component>
@@ -50,31 +60,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.EventGenerator.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;I do mind&quot;,
-    &quot;Shell Script.send-temp.sh.executor&quot;: &quot;Run&quot;,
-    &quot;Shell Script.stop.sh.executor&quot;: &quot;Run&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/brean/OneDrive/Escritorio/proyecto/Ingenieria-de-software&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.EventGenerator.executor": "Run",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHELLCHECK.PATH": "I do mind",
+    "Shell Script.send-temp.sh.executor": "Run",
+    "Shell Script.stop.sh.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/victor/Documentos/GitHub/iiss-2026-grupo-1",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/generator" />
@@ -97,8 +108,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-34e2839f716b-intellij.indexing.shared.core-IU-262.9437.185" />
-        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.9437.185" />
+        <option value="bundled-jdk-30f59d01ecdd-a203e0a19954-intellij.indexing.shared.core-IU-262.10968.63" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.10968.63" />
       </set>
     </attachedChunks>
   </component>

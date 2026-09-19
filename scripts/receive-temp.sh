@@ -1,21 +1,27 @@
 #!/usr/bin/env bash
 #
 # receive-temp.sh
-# Se suscribe al broker MQTT local y muestra por consola todos los
-# mensajes publicados bajo el topic "shellies/#". Sirve como
-# verificación manual, independiente del suscriptor Java.
+# Se suscribe al broker MQTT y muestra por consola todos los
+# mensajes publicados bajo el topic "shellies/#".
+# El cliente MQTT se ejecuta dentro del contenedor Mosquitto.
 #
 # Uso:
 #   ./receive-temp.sh
 #
 set -euo pipefail
 
-BROKER_HOST="${MQTT_BROKER_HOST:-localhost}"
-BROKER_PORT="${MQTT_BROKER_PORT:-1883}"
+CONTAINER_NAME="ioteste-mosquitto"
+BROKER_HOST="localhost"
+BROKER_PORT="1883"
 TOPIC="shellies/#"
 
-echo "Suscrito a ${BROKER_HOST}:${BROKER_PORT} topic=${TOPIC}"
+echo "Suscrito mediante Docker a ${BROKER_HOST}:${BROKER_PORT} topic=${TOPIC}"
 echo "Esperando mensajes... (Ctrl+C para salir)"
 echo
 
-mosquitto_sub -h "${BROKER_HOST}" -p "${BROKER_PORT}" -t "${TOPIC}" -v
+docker exec -i "${CONTAINER_NAME}" \
+  mosquitto_sub \
+  -h "${BROKER_HOST}" \
+  -p "${BROKER_PORT}" \
+  -t "${TOPIC}" \
+  -v

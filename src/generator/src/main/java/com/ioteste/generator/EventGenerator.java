@@ -94,7 +94,7 @@ public class EventGenerator {
         double variation = (random.nextDouble() - 0.5) * 0.6; // +/- 0.3 grados
         double tC = Math.round((thermostat.baseTempC() + variation) * 10.0) / 10.0;
         double tF = Math.round((tC * 9.0 / 5.0 + 32.0) * 10.0) / 10.0;
-        double ts = System.currentTimeMillis() / 1000.0;
+        long ts = System.currentTimeMillis();
 
         Map<String, Object> payload = Map.of(
                 "id", thermostat.id(),

@@ -16,7 +16,7 @@ public record TemperatureReading(
         String roomId,
         double tempCelsius,
         double tempFahrenheit,
-        double sourceTs,
+        long sourceTs,
         Instant receivedAt
 ) {
 }

@@ -14,8 +14,9 @@ services:
 
   subscriber:
     build:
-      context: ../src/subscriber
+      context: ..
       dockerfile: Dockerfile
+      target: subscriber
     container_name: ioteste-subscriber
     depends_on:
       - mosquitto
@@ -35,8 +36,9 @@ services:
 
   generator:
     build:
-      context: ../src/generator
+      context: ..
       dockerfile: Dockerfile
+      target: generator
     container_name: ioteste-generator
     depends_on:
       - mosquitto
