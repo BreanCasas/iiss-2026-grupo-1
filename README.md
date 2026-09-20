@@ -28,7 +28,7 @@ calefacción por losa radiante, optimizando el consumo según las tarifas eléct
 /docs/producto/escenarios.md Escenarios de uso de EcoWarm
 /docs/producto/historias.md Historias de usuario
 /docs/producto/caracteristicas.md Características del producto
-/docker/docker-compose.yml Orquestación: Mosquitto + subscriber + generator
+/docker/docker-compose.yml Orquestación: Mosquitto + MongoDB + subscriber + generator
 /docker/mosquitto/config/ Configuración del broker Mosquitto
 /docker/data/rooms.json Configuración predefinida de habitaciones
 /scripts/up.sh Levanta el entorno completo (build + up -d)
@@ -74,19 +74,20 @@ cd scripts
 ./up.sh
 ```
 
-Esto construye y levanta 3 servicios:
+Esto construye y levanta 4 servicios:
 
 - **ioteste-mosquitto**: broker MQTT, expuesto en `localhost:1883`
+- **ioteste-mongodb**: base de datos MongoDB local, expuesta en `localhost:27017`, con sus
+  datos en un volumen Docker (`mongodb-data`)
 - **ioteste-generator**: genera eventos de temperatura simulados cada 10 segundos (por
   defecto), para las habitaciones configuradas en `docker/data/rooms.json`
 - **ioteste-subscriber**: recibe esos eventos, los despliega en consola (vía logger, sin
-  `System.out`) y los persiste en `/data/readings/temp-<roomId>.jsonl` dentro de un volumen
-  Docker
+  `System.out`) y los persiste en MongoDB (base `ioteste`, colección `temperature_readings`)
 
 El sistema se pone a correr automáticamente al levantar el compose, generando y consumiendo
 eventos sin necesidad de intervención manual.
 
-Para confirmar que los 3 servicios están activos:
+Para confirmar que los 4 servicios están activos:
 
 ```bash
 docker compose -f ../docker/docker-compose.yml ps
@@ -122,10 +123,15 @@ Variables de entorno del **subscriber**:
 |---|---|---|
 | `MQTT_BROKER_HOST` | `localhost` | Host del broker MQTT |
 | `MQTT_BROKER_PORT` | `1883` | Puerto del broker MQTT |
-| `MQTT_TOPIC` | `ht-sim-+/status/temperature:+` | Topic al que se suscribe |
+| `MQTT_TOPIC` | `+/status/#` | Topic al que se suscribe |
 | `MQTT_CLIENT_ID` | `ioteste-subscriber` | Client ID usado en la conexión MQTT |
 | `ROOMS_FILE` | `/data/rooms.json` | Ruta al archivo de configuración de habitaciones |
-| `READINGS_DIR` | `/data/readings` | Carpeta donde se persiste el histórico de temperaturas |
+| `MONGODB_URI` | *(obligatoria)* | URI de conexión a MongoDB (en Docker: `mongodb://mongodb:27017`) |
+| `MONGODB_DATABASE` | `ioteste` | Base de datos donde se persiste el histórico de temperaturas |
+
+Para correr el subscriber fuera de Docker (por ejemplo, desde IntelliJ), con el entorno Docker
+levantado, definir `MONGODB_URI=mongodb://localhost:27017` (el compose expone ese puerto) y
+ajustar `ROOMS_FILE` a la ruta local de `rooms.json`.
 
 Variables de entorno del **generator**:
 
@@ -139,14 +145,23 @@ Variables de entorno del **generator**:
 ## Verificar la persistencia
 
 ```bash
-docker exec -it ioteste-subscriber sh
-ls /data/readings/
-cat /data/readings/temp-room1.jsonl
+docker exec -it ioteste-mongodb mongosh
+```
+
+Dentro de `mongosh`:
+
+```
+use ioteste
+show collections
+db.temperature_readings.countDocuments()
+db.temperature_readings.find().sort({receivedAt: -1}).limit(3)
 exit
 ```
 
-Debería verse un archivo `.jsonl` por habitación, con una línea JSON por cada lectura recibida,
-incluyendo el momento en que el sistema la recibió y persistió.
+Debería verse la colección `temperature_readings`, con un documento por cada lectura recibida
+(campos `roomId`, `tempCelsius`, `tempFahrenheit`, `sourceTs` y `receivedAt`, este último con
+el momento en que el sistema la recibió y persistió). El contador de documentos crece a medida
+que llegan lecturas.
 
 ## Configuración de habitaciones
 
