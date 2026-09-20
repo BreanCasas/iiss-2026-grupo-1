@@ -52,6 +52,21 @@ services:
     networks:
       - ioteste-net
 
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: api
+    container_name: ioteste-api
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+      MONGODB_DATABASE: ${MONGODB_DATABASE:-ioteste}
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    networks:
+      - ioteste-net
+
   #mongodb:
     #image: mongo:8
     #container_name: ioteste-mongodb

@@ -18,6 +18,7 @@
     <modules>
         <module>src/generator</module>
         <module>src/subscriber</module>
+        <module>src/api</module>
     </modules>
 
     <properties>
