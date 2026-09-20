@@ -7,15 +7,6 @@
     <list default="true" id="110a38a3-6569-41bb-ac52-f86613ce9907" name="Changes" comment="amooor, contestame el telefono, que yo quiero estar contigo una noche mas">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/receive-temp.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/receive-temp.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/send-temp.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/send-temp.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/generator/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/generator/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/generator/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/generator/src/main/java/com/ioteste/generator/EventGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/generator/src/main/java/com/ioteste/generator/EventGenerator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/subscriber/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/subscriber/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/subscriber/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/subscriber/src/main/java/com/ioteste/subscriber/MqttSubscriber.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/subscriber/src/main/java/com/ioteste/subscriber/MqttSubscriber.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/subscriber/src/main/java/com/ioteste/subscriber/model/TemperatureReading.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/subscriber/src/main/java/com/ioteste/subscriber/model/TemperatureReading.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,6 +27,11 @@
       <list>
         <option value="BreanCasas &lt;brean.casas@estudiantes.utec.edu.uy&gt;" />
       </list>
+    </option>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="V2" />
+      </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -72,7 +68,7 @@
     "Shell Script.send-temp.sh.executor": "Run",
     "Shell Script.stop.sh.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "Mongo-DB-local",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/home/victor/Documentos/GitHub/iiss-2026-grupo-1",

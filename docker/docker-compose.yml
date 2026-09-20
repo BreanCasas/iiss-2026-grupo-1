@@ -12,6 +12,17 @@ services:
     networks:
       - ioteste-net
 
+  mongodb:
+    image: mongo:8
+    container_name: ioteste-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    restart: unless-stopped
+    networks:
+      - ioteste-net
+
   subscriber:
     build:
       context: ..
@@ -20,14 +31,15 @@ services:
     container_name: ioteste-subscriber
     depends_on:
       - mosquitto
+      - mongodb
     environment:
       MQTT_BROKER_HOST: mosquitto
       MQTT_BROKER_PORT: 1883
       MQTT_TOPIC: "+/status/#"
       MQTT_CLIENT_ID: ioteste-subscriber
       ROOMS_FILE: /data/rooms.json
-      MONGODB_URI: ${MONGODB_URI}
-      MONGODB_DATABASE: ${MONGODB_DATABASE}
+      MONGODB_URI: mongodb://mongodb:27017
+      MONGODB_DATABASE: ioteste
     volumes:
       - ./data/rooms.json:/data/rooms.json:ro
     restart: unless-stopped
@@ -52,18 +64,6 @@ services:
     networks:
       - ioteste-net
 
-  #mongodb:
-    #image: mongo:8
-    #container_name: ioteste-mongodb
-      #ports:
-      #- "27017:27017"
-      #volumes:
-      #- mongodb-data:/data/db
-    #restart: unless-stopped
-      #networks:
-      #- ioteste-net
-
-
 networks:
   ioteste-net:
     driver: bridge
@@ -71,4 +71,4 @@ networks:
 volumes:
   mosquitto-data:
   mosquitto-log:
-  #mongodb-data:
+  mongodb-data:
