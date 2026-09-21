@@ -58,7 +58,7 @@ public class RoomRepository {
                 document.getString("name"),
                 document.getString("thermostatId"),
                 document.getString("switchId"),
-                document.getDouble("targetTempC")
+                ((Number) document.get("targetTempC")).doubleValue()
         );
     }
 

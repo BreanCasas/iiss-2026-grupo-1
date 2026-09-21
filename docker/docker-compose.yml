@@ -21,6 +21,7 @@ services:
     depends_on:
       - mosquitto
       - switch-stub
+      - mongodb
     environment:
       MQTT_BROKER_HOST: mosquitto
       MQTT_BROKER_PORT: 1883
@@ -59,6 +60,7 @@ services:
     container_name: ioteste-api
     depends_on:
       - switch-stub
+      - mongodb
     environment:
       MONGODB_URI: ${MONGODB_URI}
       MONGODB_DATABASE: ${MONGODB_DATABASE:-ioteste}
@@ -82,16 +84,17 @@ services:
     networks:
       - ioteste-net
 
-  #mongodb:
-    #image: mongo:8
-    #container_name: ioteste-mongodb
-      #ports:
-      #- "27017:27017"
-      #volumes:
-      #- mongodb-data:/data/db
-    #restart: unless-stopped
-      #networks:
-      #- ioteste-net
+  mongodb:
+    image: mongo:8
+    container_name: ioteste-mongodb
+    ports:
+        - "27017:27017"
+    volumes:
+        - mongodb-data:/data/db
+        - ./mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    restart: unless-stopped
+    networks:
+        - ioteste-net
 
 
 networks:
@@ -101,4 +104,4 @@ networks:
 volumes:
   mosquitto-data:
   mosquitto-log:
-  #mongodb-data:
+  mongodb-data:
