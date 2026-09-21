@@ -19,6 +19,7 @@
         <module>src/generator</module>
         <module>src/subscriber</module>
         <module>src/api</module>
+        <module>src/switch-stub</module>
     </modules>
 
     <properties>

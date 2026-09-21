@@ -9,213 +9,517 @@ configuración y del histórico de temperaturas.
 ## Iteraciones
 
 - **Iteración 1**: prototipo base de mensajería MQTT (broker + suscriptor mínimo en Java).
-- **Iteración 2** *(actual)*: cierre de alcance del producto (Visión v2, escenarios, historias,
+- **Iteración 2**: cierre de alcance del producto (Visión v2, escenarios, historias,
   características), metodología ágil (Kanban), generador de eventos de termostatos,
   extensión del consumidor con persistencia de habitaciones e histórico de temperaturas,
   build reproducible vía Docker, e integración continua con GitHub Actions.
+- **Iteración 3** *(actual)*: API REST con Spring Boot, persistencia en MongoDB,
+  administración de habitaciones, controlador automático de temperatura, simulación de
+  switches mediante un stub REST, comandos de inicio/parada del controlador,
+  autenticación mediante API key y especificación OpenAPI 3.0.
 
 ## Contexto del proyecto
 
 IoTEste busca posicionarse en el mercado de automatización de oficinas y hogares, integrando
-dispositivos IoT (Shelly Pro 1PM y Shelly H&T Gen 3) mediante mensajería MQTT. A partir de la
-Iteración 2, el producto se enfoca específicamente en **EcoWarm**: gestión inteligente de
-calefacción por losa radiante, optimizando el consumo según las tarifas eléctricas disponibles.
+dispositivos IoT (Shelly Pro 1PM y Shelly H&T Gen 3) mediante mensajería MQTT.
+
+A partir de la Iteración 2, el producto se enfoca específicamente en **EcoWarm**: gestión
+inteligente de calefacción por losa radiante.
+
+En la Iteración 3 se incorpora una API REST para administrar el sistema, persistencia en
+MongoDB para habitaciones, lecturas y estado del controlador, y un Switch Stub que permite
+simular el accionamiento de los dispositivos de calefacción.
 
 ## Estructura del repositorio
 
-/docs/vision.md Documento de Visión (v2)
-/docs/metodologia.md Metodología ágil adoptada (Kanban) y su justificación
-/docs/producto/escenarios.md Escenarios de uso de EcoWarm
-/docs/producto/historias.md Historias de usuario
-/docs/producto/caracteristicas.md Características del producto
-/docker/docker-compose.yml Orquestación: Mosquitto + MongoDB + subscriber + generator
-/docker/mosquitto/config/ Configuración del broker Mosquitto
-/docker/data/rooms.json Configuración predefinida de habitaciones
-/scripts/up.sh Levanta el entorno completo (build + up -d)
-/scripts/down.sh Baja y elimina los contenedores
-/scripts/stop.sh Detiene los contenedores sin eliminarlos
-/scripts/build.sh Compila todos los módulos Java vía Docker
-/scripts/send-temp.sh Publica un mensaje simulado de temperatura/humedad (manual)
-/scripts/receive-temp.sh Se suscribe por consola (verificación manual)
-/src/subscriber/ Consumidor de eventos (Java): recibe, muestra y persiste
-/src/generator/ Generador de eventos (Java): simula termostatos
-/.github/workflows/maven.yml Integración continua (GitHub Actions + Maven)
-/README.md
-
+- `/docs/vision.md` — Documento de Visión.
+- `/docs/metodologia.md` — Metodología ágil adoptada (Kanban) y su justificación.
+- `/docs/producto/` — Escenarios, historias, características y licencias del producto.
+- `/docs/api/openapi.yaml` — Especificación OpenAPI 3.0 de la API REST.
+- `/docker/docker-compose.yml` — Orquestación de los servicios del sistema.
+- `/docker/mosquitto/config/` — Configuración del broker Mosquitto.
+- `/scripts/up.sh` — Levanta el entorno.
+- `/scripts/down.sh` — Baja y elimina los contenedores.
+- `/scripts/stop.sh` — Detiene los contenedores.
+- `/scripts/build.sh` — Compila los módulos Java mediante Docker.
+- `/scripts/send-temp.sh` — Publica manualmente un evento MQTT.
+- `/scripts/receive-temp.sh` — Permite verificar mensajes MQTT desde consola.
+- `/scripts/api-example.sh` — Ejemplo de uso de la API REST mediante `curl`.
+- `/src/subscriber/` — Consumidor MQTT, persistencia y lógica del controlador automático.
+- `/src/generator/` — Generador de eventos simulados de temperatura.
+- `/src/api/` — API REST desarrollada con Spring Boot.
+- `/src/switch-stub/` — Stub REST que simula los switches.
+- `/.github/workflows/maven.yml` — Integración continua con GitHub Actions.
+- `/README.md` — Documentación principal del proyecto.
 
 ## Requisitos previos
 
 ### Linux (Fedora / Ubuntu / etc.)
 
-- Docker y Docker Compose (plugin `docker compose`)
-- `mosquitto-clients` instalado localmente, para los scripts de publish/subscribe manuales
-  (en Fedora: `sudo dnf install mosquitto` · en Ubuntu/Debian: `sudo apt install mosquitto-clients`)
-- (Opcional) [MQTT Explorer](http://mqtt-explorer.com/) o [MQTTX](https://mqttx.app/) para verificación visual cruzada
-- **Importante:** si hay un Mosquitto instalado nativamente en el sistema (como servicio),
-  detenerlo antes de levantar el entorno Docker, porque ambos compiten por el puerto 1883:
+- Docker y Docker Compose (plugin `docker compose`).
+- `curl`, para probar la API REST.
+- `mosquitto-clients` instalado localmente para los scripts de publicación/suscripción
+  manuales.
+- Opcionalmente, MQTT Explorer o MQTTX para verificación visual de los mensajes MQTT.
+
+En Ubuntu/Debian:
+
 ```bash
-  sudo systemctl stop mosquitto
-  sudo systemctl disable mosquitto
+sudo apt install mosquitto-clients
+```
+
+En Fedora:
+
+```bash
+sudo dnf install mosquitto
+```
+
+Si existe un Mosquitto instalado nativamente como servicio, detenerlo antes de levantar
+el entorno Docker para evitar conflictos con el puerto 1883:
+
+```bash
+sudo systemctl stop mosquitto
+sudo systemctl disable mosquitto
 ```
 
 ### Windows
 
-- **Docker Desktop** (con backend WSL2 habilitado): https://www.docker.com/products/docker-desktop
-- Se recomienda trabajar dentro de **WSL2 con Ubuntu** (`wsl --install` desde PowerShell como
-  administrador) para poder correr los scripts `.sh` sin modificaciones. Alternativamente,
-  **Git Bash** (incluido con Git para Windows) también permite ejecutarlos.
-- Cliente Mosquitto para Windows (si no se usa WSL2): https://mosquitto.org/download/
-- MQTTX o MQTT Explorer tienen instaladores `.exe` nativos para Windows.
+- Docker Desktop con backend WSL2 habilitado.
+- Se recomienda trabajar dentro de WSL2 con Ubuntu para ejecutar los scripts `.sh`.
+- Alternativamente puede utilizarse Git Bash.
+- Cliente Mosquitto para Windows si se desea realizar pruebas MQTT manuales.
+- MQTTX o MQTT Explorer para inspección visual de MQTT.
+
+## Configuración
+
+El sistema utiliza variables de entorno definidas en un archivo `.env` ubicado en la raíz
+del repositorio.
+
+Ejemplo:
+
+```env
+MONGODB_URI=<uri-de-conexion-a-mongodb>
+MONGODB_DATABASE=ioteste
+IOTESTE_API_KEY=<api-key>
+```
+
+`MONGODB_URI` contiene la URI utilizada para conectarse a MongoDB.
+
+`MONGODB_DATABASE` indica la base de datos utilizada por EcoWarm.
+
+`IOTESTE_API_KEY` define la clave necesaria para acceder a la API REST.
+
+El archivo `.env` puede contener credenciales y **no debe versionarse en Git**.
 
 ## Cómo levantar el sistema completo
 
-```bash
-cd scripts
-./up.sh
-```
-
-Esto construye y levanta 4 servicios:
-
-- **ioteste-mosquitto**: broker MQTT, expuesto en `localhost:1883`
-- **ioteste-mongodb**: base de datos MongoDB local, expuesta en `localhost:27017`, con sus
-  datos en un volumen Docker (`mongodb-data`)
-- **ioteste-generator**: genera eventos de temperatura simulados cada 10 segundos (por
-  defecto), para las habitaciones configuradas en `docker/data/rooms.json`
-- **ioteste-subscriber**: recibe esos eventos, los despliega en consola (vía logger, sin
-  `System.out`) y los persiste en MongoDB (base `ioteste`, colección `temperature_readings`)
-
-El sistema se pone a correr automáticamente al levantar el compose, generando y consumiendo
-eventos sin necesidad de intervención manual.
-
-Para confirmar que los 4 servicios están activos:
+Desde la raíz del repositorio:
 
 ```bash
-docker compose -f ../docker/docker-compose.yml ps
+docker compose --env-file .env -f docker/docker-compose.yml up -d --build
 ```
 
-Para ver los eventos en tiempo real (generación + recepción + persistencia):
+El entorno está compuesto por 5 servicios:
+
+- **ioteste-mosquitto**: broker MQTT, expuesto en `localhost:1883`.
+- **ioteste-generator**: genera periódicamente eventos simulados de temperatura mediante MQTT.
+- **ioteste-subscriber**: consume los eventos MQTT, persiste las lecturas en MongoDB y ejecuta
+  la lógica del controlador automático.
+- **ioteste-switch-stub**: servicio REST que simula los switches y recibe las órdenes ON/OFF,
+  expuesto en `localhost:8081`.
+- **ioteste-api**: API REST Spring Boot para administrar habitaciones, consultar lecturas,
+  controlar switches y arrancar/detener el controlador automático, expuesta en
+  `localhost:8080`.
+
+MongoDB se configura mediante las variables `MONGODB_URI` y `MONGODB_DATABASE`.
+
+Para comprobar los servicios:
 
 ```bash
-docker compose -f ../docker/docker-compose.yml logs -f
+docker compose --env-file .env -f docker/docker-compose.yml ps
 ```
 
-## Cómo compilar el sistema (build reproducible, sin Java/Maven local)
+Para ver todos los logs:
+
+```bash
+docker compose --env-file .env -f docker/docker-compose.yml logs -f
+```
+
+Para ver únicamente los eventos procesados por el subscriber:
+
+```bash
+docker compose --env-file .env -f docker/docker-compose.yml logs -f subscriber
+```
+
+Para ver las órdenes recibidas por el Switch Stub:
+
+```bash
+docker compose --env-file .env -f docker/docker-compose.yml logs -f switch-stub
+```
+
+## Cómo compilar el sistema
+
+El proyecto proporciona un build reproducible mediante Docker:
 
 ```bash
 cd scripts
 ./build.sh
 ```
 
-Este script compila ambos módulos Java (`subscriber` y `generator`) usando exclusivamente
-Docker — no depende de tener Java ni Maven instalados en el sistema anfitrión.
+De esta forma no es necesario disponer de una instalación local de Maven para realizar
+el build del proyecto.
 
-## Cómo compilar un módulo manualmente (sin Docker, para debug en IntelliJ)
+## Cómo compilar un módulo manualmente
+
+Para desarrollo o depuración también es posible utilizar Maven directamente.
+
+Por ejemplo, para el subscriber:
 
 ```bash
-cd src/subscriber   # o src/generator
+cd src/subscriber
 mvn clean package
-java -jar target/subscriber-jar-with-dependencies.jar   # ajustar nombre según el módulo
 ```
 
-Variables de entorno del **subscriber**:
+Para la API:
+
+```bash
+cd src/api
+mvn clean package
+```
+
+Para el Switch Stub:
+
+```bash
+cd src/switch-stub
+mvn clean package
+```
+
+Para el generator:
+
+```bash
+cd src/generator
+mvn clean package
+```
+
+## Variables de entorno del subscriber
 
 | Variable | Default | Descripción |
 |---|---|---|
 | `MQTT_BROKER_HOST` | `localhost` | Host del broker MQTT |
 | `MQTT_BROKER_PORT` | `1883` | Puerto del broker MQTT |
 | `MQTT_TOPIC` | `+/status/#` | Topic al que se suscribe |
-| `MQTT_CLIENT_ID` | `ioteste-subscriber` | Client ID usado en la conexión MQTT |
-| `ROOMS_FILE` | `/data/rooms.json` | Ruta al archivo de configuración de habitaciones |
-| `MONGODB_URI` | *(obligatoria)* | URI de conexión a MongoDB (en Docker: `mongodb://mongodb:27017`) |
-| `MONGODB_DATABASE` | `ioteste` | Base de datos donde se persiste el histórico de temperaturas |
+| `MQTT_CLIENT_ID` | `ioteste-subscriber` | Client ID utilizado en MQTT |
+| `MONGODB_URI` | *(obligatoria)* | URI de conexión a MongoDB |
+| `MONGODB_DATABASE` | `ioteste` | Base de datos utilizada por EcoWarm |
+| `SWITCH_STUB_URL` | `http://localhost:8081` | URL del servicio que simula los switches |
 
-Para correr el subscriber fuera de Docker (por ejemplo, desde IntelliJ), con el entorno Docker
-levantado, definir `MONGODB_URI=mongodb://localhost:27017` (el compose expone ese puerto) y
-ajustar `ROOMS_FILE` a la ruta local de `rooms.json`.
+El subscriber recibe las lecturas de temperatura mediante MQTT y busca en MongoDB la
+habitación correspondiente al termostato.
 
-Variables de entorno del **generator**:
+Las lecturas válidas se persisten en MongoDB.
+
+Cuando el controlador está habilitado, el subscriber compara la temperatura recibida con
+`targetTempC`:
+
+- Si la temperatura es menor que `targetTempC`, envía una orden **ON** al Switch Stub.
+- Si la temperatura es mayor o igual que `targetTempC`, envía una orden **OFF** al Switch Stub.
+- Si el controlador está detenido, la lectura se persiste pero no se acciona el switch.
+
+## Variables de entorno del generator
 
 | Variable | Default | Descripción |
 |---|---|---|
 | `MQTT_BROKER_HOST` | `localhost` | Host del broker MQTT |
 | `MQTT_BROKER_PORT` | `1883` | Puerto del broker MQTT |
-| `MQTT_CLIENT_ID` | `ioteste-generator` | Client ID usado en la conexión MQTT |
-| `GENERATOR_INTERVAL_MS` | `10000` | Intervalo entre publicaciones, en milisegundos |
+| `MQTT_CLIENT_ID` | `ioteste-generator` | Client ID utilizado en MQTT |
+| `GENERATOR_INTERVAL_MS` | `10000` | Intervalo entre publicaciones en milisegundos |
 
-## Verificar la persistencia
+El generator publica eventos simulados de temperatura periódicamente para permitir probar
+el comportamiento completo del sistema sin disponer de termostatos físicos.
 
-```bash
-docker exec -it ioteste-mongodb mongosh
+## Persistencia en MongoDB
+
+En la Iteración 3, MongoDB se utiliza para almacenar información persistente del sistema.
+
+Entre los datos almacenados se encuentran:
+
+- habitaciones;
+- configuración de cada habitación;
+- histórico de lecturas de temperatura;
+- estado del controlador automático.
+
+El subscriber y la API utilizan la misma base configurada mediante:
+
+```text
+MONGODB_URI
+MONGODB_DATABASE
 ```
 
-Dentro de `mongosh`:
-
-```
-use ioteste
-show collections
-db.temperature_readings.countDocuments()
-db.temperature_readings.find().sort({receivedAt: -1}).limit(3)
-exit
-```
-
-Debería verse la colección `temperature_readings`, con un documento por cada lectura recibida
-(campos `roomId`, `tempCelsius`, `tempFahrenheit`, `sourceTs` y `receivedAt`, este último con
-el momento en que el sistema la recibió y persistió). El contador de documentos crece a medida
-que llegan lecturas.
+De esta forma, los cambios realizados mediante la API pueden ser utilizados por el
+controlador sin depender de un archivo local de habitaciones.
 
 ## Configuración de habitaciones
 
-La configuración predefinida del sitio vive en `docker/data/rooms.json`, montada como volumen
-de solo lectura dentro del consumidor. Cada habitación define su termostato, su switch y su
-temperatura objetivo:
+Las habitaciones se administran mediante la API REST y se persisten en MongoDB.
+
+Una habitación contiene información como:
 
 ```json
-[
-  {
-    "id": "room1",
-    "name": "Living",
-    "thermostatId": "ht-sim-room1",
-    "switchId": "pro1pm-room1",
-    "targetTempC": 21.5
-  }
-]
+{
+  "id": "room1",
+  "name": "Living",
+  "targetTempC": 21.5,
+  "thermostatId": "ht-sim-room1",
+  "switchId": "pro1pm-room1"
+}
 ```
 
-## Verificación cruzada con un cliente MQTT externo (opcional)
+El `thermostatId` permite asociar los mensajes MQTT recibidos con una habitación.
 
-Se puede usar [MQTT Explorer](http://mqtt-explorer.com/) o [MQTTX](https://mqttx.app/):
+El `switchId` identifica el switch que debe ser accionado.
 
-1. Conectar la aplicación contra `localhost:1883` (sin autenticación, puerto 1883, sin TLS).
-2. Suscribirse al topic `ht-sim-+/status/temperature:+`.
-3. Publicar un mensaje manual con `./send-temp.sh`, o simplemente observar los eventos que ya
-   genera automáticamente el servicio `generator`.
-4. Confirmar que los mismos mensajes aparecen tanto en la interfaz del cliente MQTT como en
-   los logs del contenedor `ioteste-subscriber`.
+`targetTempC` representa la temperatura objetivo configurada para la habitación.
+
+## API REST
+
+La API se encuentra disponible localmente en:
+
+```text
+http://localhost:8080
+```
+
+Los endpoints están protegidos mediante una API key.
+
+La clave debe enviarse utilizando el header:
+
+```text
+X-API-Key
+```
+
+Por ejemplo:
+
+```bash
+curl http://localhost:8080/rooms \
+  -H "X-API-Key: ${IOTESTE_API_KEY}"
+```
+
+Sin la API key, o utilizando una clave incorrecta, la API responde con HTTP `401 Unauthorized`.
+
+### Endpoints principales
+
+#### Habitaciones
+
+```text
+GET    /rooms
+GET    /rooms/{id}
+POST   /rooms
+PUT    /rooms/{id}
+PATCH  /rooms/{id}
+DELETE /rooms/{id}
+```
+
+#### Histórico de temperatura
+
+```text
+GET /rooms/{id}/readings
+```
+
+#### Control manual del switch
+
+```text
+POST /rooms/{id}/switch/on
+POST /rooms/{id}/switch/off
+```
+
+#### Validación de habitaciones
+
+```text
+POST /rooms/validate
+```
+
+#### Controlador automático
+
+```text
+POST /controller/start
+POST /controller/stop
+GET  /controller/status
+```
+
+## Ejemplo de uso de la API
+
+Se proporciona el script:
+
+```text
+scripts/api-example.sh
+```
+
+Para ejecutarlo:
+
+```bash
+set -a
+source .env
+set +a
+
+./scripts/api-example.sh
+```
+
+El script realiza ejemplos de consulta de habitaciones, consulta del estado del controlador
+y validación de la configuración utilizando la API key definida en `.env`.
+
+## Controlador automático
+
+El controlador puede iniciarse mediante:
+
+```bash
+curl -X POST http://localhost:8080/controller/start \
+  -H "X-API-Key: ${IOTESTE_API_KEY}"
+```
+
+Consultar su estado:
+
+```bash
+curl http://localhost:8080/controller/status \
+  -H "X-API-Key: ${IOTESTE_API_KEY}"
+```
+
+Y detenerlo mediante:
+
+```bash
+curl -X POST http://localhost:8080/controller/stop \
+  -H "X-API-Key: ${IOTESTE_API_KEY}"
+```
+
+Cuando está detenido, el subscriber continúa recibiendo y persistiendo temperaturas, pero
+no envía órdenes de control al Switch Stub.
+
+## Modificar la temperatura objetivo
+
+Por ejemplo, para cambiar la temperatura objetivo de `room1`:
+
+```bash
+curl -X PATCH http://localhost:8080/rooms/room1 \
+  -H "X-API-Key: ${IOTESTE_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "targetTempC": 20.0
+  }'
+```
+
+El subscriber utiliza el nuevo valor persistido en MongoDB al procesar las siguientes
+lecturas.
+
+## Switch Stub
+
+El servicio `switch-stub` simula el comportamiento del dispositivo de calefacción.
+
+Está disponible dentro de la red Docker mediante:
+
+```text
+http://switch-stub:8081
+```
+
+y desde el host mediante:
+
+```text
+http://localhost:8081
+```
+
+El subscriber envía órdenes REST al stub cuando el controlador automático está habilitado.
+
+Las órdenes pueden observarse mediante:
+
+```bash
+docker compose --env-file .env -f docker/docker-compose.yml logs -f switch-stub
+```
+
+Ejemplo de log:
+
+```text
+Switch pro1pm-room1 -> ON
+```
+
+o:
+
+```text
+Switch pro1pm-room1 -> OFF
+```
+
+## OpenAPI
+
+La especificación de la API está documentada utilizando OpenAPI 3.0 en:
+
+```text
+docs/api/openapi.yaml
+```
+
+La especificación incluye los endpoints REST y el esquema de autenticación mediante
+`X-API-Key`.
+
+## Verificación cruzada con un cliente MQTT externo
+
+Opcionalmente se puede utilizar MQTT Explorer o MQTTX.
+
+1. Conectar el cliente contra `localhost:1883`.
+2. Suscribirse al topic utilizado por los termostatos simulados.
+3. Publicar un mensaje manual mediante `scripts/send-temp.sh` o utilizar el `generator`.
+4. Confirmar que el subscriber recibe el mensaje.
+5. Verificar que la lectura se persiste y, si el controlador está habilitado, que se genera
+   la orden correspondiente al Switch Stub.
 
 ## Metodología ágil
 
-El equipo trabaja bajo **Kanban**. La justificación completa y la configuración del tablero
-están documentadas en [`docs/metodologia.md`](docs/metodologia.md).
+El equipo trabaja bajo **Kanban**.
+
+La justificación y configuración utilizada por el equipo se encuentra documentada en:
+
+```text
+docs/metodologia.md
+```
+
+La planificación de la Iteración 3 se mantiene en el Board del equipo.
 
 ## Integración continua
 
-Cada `push` o `pull request` sobre `main` dispara el workflow definido en
-[`.github/workflows/maven.yml`](.github/workflows/maven.yml), que compila ambos módulos Java
-(`subscriber` y `generator`) con Maven sobre JDK 25.
+El repositorio utiliza GitHub Actions para integración continua.
+
+El workflow se encuentra en:
+
+```text
+.github/workflows/maven.yml
+```
+
+El objetivo es verificar automáticamente el build del proyecto ante cambios enviados al
+repositorio.
 
 ## Cómo bajar el entorno
 
+Desde la carpeta `scripts`:
+
 ```bash
-./down.sh    # elimina los contenedores (conserva volúmenes de datos)
-./stop.sh    # solo detiene los contenedores, sin eliminarlos
+./down.sh
+```
+
+Esto baja los contenedores del entorno.
+
+Para detenerlos sin eliminarlos:
+
+```bash
+./stop.sh
+```
+
+También puede utilizarse Docker Compose directamente desde la raíz:
+
+```bash
+docker compose --env-file .env -f docker/docker-compose.yml down
 ```
 
 ## Proyecto Jira
 
-Tablero del equipo: https://estudiantes-team-luofpxgu.atlassian.net/?continue=https%3A%2F%2Festudiantes-team-luofpxgu.atlassian.net%2Fwelcome%2Fsoftware%3FprojectId%3D10000&atlOrigin=eyJpIjoiOThhMjllOWZlMDUxNGE2Zjk1NGRlYTNkMWEzOTM3N2UiLCJwIjoiamlyYS1zb2Z0d2FyZSJ9
+La planificación y seguimiento del proyecto se realiza mediante el Board Kanban del equipo
+en Jira.
 
 ## Próximos pasos
 
-Iteraciones futuras incorporarán: optimización según tarifa eléctrica multihorario, ajuste
-según pronóstico climático, capacidad de simulación de consumo, y posible integración con
-GenAI/LLM.
+Las siguientes iteraciones podrán extender EcoWarm con nuevas capacidades de automatización,
+optimización del consumo y utilización de información externa para mejorar las decisiones
+del sistema.

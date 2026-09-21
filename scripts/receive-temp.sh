@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 #
 # receive-temp.sh
-# Se suscribe al broker MQTT y muestra por consola todos los
-# mensajes publicados bajo el topic "shellies/#".
-# El cliente MQTT se ejecuta dentro del contenedor Mosquitto.
+# Se suscribe a los eventos MQTT de los termostatos simulados.
 #
 # Uso:
 #   ./receive-temp.sh
@@ -13,9 +11,10 @@ set -euo pipefail
 CONTAINER_NAME="ioteste-mosquitto"
 BROKER_HOST="localhost"
 BROKER_PORT="1883"
-TOPIC="shellies/#"
+TOPIC="+/status/#"
 
-echo "Suscrito mediante Docker a ${BROKER_HOST}:${BROKER_PORT} topic=${TOPIC}"
+echo "Suscrito mediante MQTT a:"
+echo "Topic: ${TOPIC}"
 echo "Esperando mensajes... (Ctrl+C para salir)"
 echo
 

@@ -1,6 +1,0 @@
-com/ioteste/subscriber/model/TemperatureReading.class
-com/ioteste/subscriber/MqttSubscriber.class
-com/ioteste/subscriber/MqttSubscriber$1.class
-com/ioteste/subscriber/repository/TemperatureReadingRepository.class
-com/ioteste/subscriber/model/Room.class
-com/ioteste/subscriber/repository/RoomRepository.class

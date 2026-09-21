@@ -1,16 +1,21 @@
 #!/usr/bin/env bash
 #
 # stop.sh
-# Detiene los contenedores del entorno IoTEste sin eliminarlos
-# (a diferencia de down.sh). Útil para pausar el trabajo y retomarlo
-# rápido con "docker compose start".
+# Detiene los contenedores de IoTEste EcoWarm sin eliminarlos.
 #
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-COMPOSE_FILE="${SCRIPT_DIR}/../docker/docker-compose.yml"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+COMPOSE_FILE="${ROOT_DIR}/docker/docker-compose.yml"
+ENV_FILE="${ROOT_DIR}/.env"
 
-echo "Deteniendo contenedores de IoTEste..."
-docker compose -f "${COMPOSE_FILE}" stop
+echo "=== Deteniendo IoTEste EcoWarm ==="
 
+docker compose \
+  --env-file "${ENV_FILE}" \
+  -f "${COMPOSE_FILE}" \
+  stop
+
+echo
 echo "Contenedores detenidos."

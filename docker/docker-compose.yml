@@ -20,16 +20,15 @@ services:
     container_name: ioteste-subscriber
     depends_on:
       - mosquitto
+      - switch-stub
     environment:
       MQTT_BROKER_HOST: mosquitto
       MQTT_BROKER_PORT: 1883
       MQTT_TOPIC: "+/status/#"
       MQTT_CLIENT_ID: ioteste-subscriber
-      ROOMS_FILE: /data/rooms.json
       MONGODB_URI: ${MONGODB_URI}
       MONGODB_DATABASE: ${MONGODB_DATABASE}
-    volumes:
-      - ./data/rooms.json:/data/rooms.json:ro
+      SWITCH_STUB_URL: http://switch-stub:8081
     restart: unless-stopped
     networks:
       - ioteste-net
@@ -58,11 +57,27 @@ services:
       dockerfile: Dockerfile
       target: api
     container_name: ioteste-api
+    depends_on:
+      - switch-stub
     environment:
       MONGODB_URI: ${MONGODB_URI}
       MONGODB_DATABASE: ${MONGODB_DATABASE:-ioteste}
+      SWITCH_STUB_URL: http://switch-stub:8081
+      IOTESTE_API_KEY: ${IOTESTE_API_KEY}
     ports:
       - "8080:8080"
+    restart: unless-stopped
+    networks:
+      - ioteste-net
+
+  switch-stub:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: switch-stub
+    container_name: ioteste-switch-stub
+    ports:
+      - "8081:8081"
     restart: unless-stopped
     networks:
       - ioteste-net

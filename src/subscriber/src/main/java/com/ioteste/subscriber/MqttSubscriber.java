@@ -15,12 +15,11 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ioteste.subscriber.client.SwitchClient;
+import com.ioteste.subscriber.repository.ControllerStateRepository;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Consumidor de eventos de temperatura — extensión del suscriptor
@@ -40,7 +39,6 @@ import java.util.Optional;
  *   MQTT_BROKER_PORT   (default: 1883)
  *   MQTT_TOPIC         (default: ht-sim-+/status/temperature:+)
  *   MQTT_CLIENT_ID     (default: ioteste-subscriber)
- *   ROOMS_FILE         (default: /data/rooms.json)
  *   MONGODB_URI        (obligatoria)
  *   MONGODB_DATABASE   (default: ioteste)
  */
@@ -54,21 +52,21 @@ public class MqttSubscriber {
         String port = getEnv("MQTT_BROKER_PORT", "1883");
         String topic = getEnv("MQTT_TOPIC", "+/status/#");
         String clientId = getEnv("MQTT_CLIENT_ID", "ioteste-subscriber");
-        Path roomsFile = Path.of(getEnv("ROOMS_FILE", "/data/rooms.json"));
 
         String mongoUri = getRequiredEnv("MONGODB_URI");
         String mongoDatabase = getEnv("MONGODB_DATABASE", "ioteste");
+        String switchStubUrl = getEnv("SWITCH_STUB_URL", "http://localhost:8081");
 
         String brokerUrl = "tcp://" + host + ":" + port;
 
-        RoomRepository roomRepository = new RoomRepository(roomsFile);
+        RoomRepository roomRepository = new RoomRepository(mongoUri, mongoDatabase);
         TemperatureReadingRepository readingRepository = new TemperatureReadingRepository(mongoUri, mongoDatabase);
-        List<Room> rooms = roomRepository.findAll();
+        SwitchClient switchClient = new SwitchClient(switchStubUrl);
+        ControllerStateRepository controllerStateRepository = new ControllerStateRepository(mongoUri, mongoDatabase);
 
         log.info("=== IoTEste EcoWarm - Consumidor de Eventos ===");
         log.info("Broker: {}", brokerUrl);
         log.info("Topic : {}", topic);
-        log.info("Habitaciones cargadas: {}", rooms.size());
         log.info("================================================");
 
         try {
@@ -88,7 +86,7 @@ public class MqttSubscriber {
 
                 @Override
                 public void messageArrived(String receivedTopic, MqttMessage message) {
-                    handleMessage(receivedTopic, message, rooms, readingRepository);
+                    handleMessage(receivedTopic, message, roomRepository, readingRepository, controllerStateRepository, switchClient);
                 }
 
                 @Override
@@ -113,6 +111,8 @@ public class MqttSubscriber {
                 } finally {
                     log.info("Cerrando conexión MongoDB...");
                     readingRepository.close();
+                    roomRepository.close();
+                    controllerStateRepository.close();
                 }
             }));
 
@@ -135,8 +135,10 @@ public class MqttSubscriber {
     private static void handleMessage(
             String receivedTopic,
             MqttMessage message,
-            List<Room> rooms,
-            TemperatureReadingRepository readingRepository
+            RoomRepository roomRepository,
+            TemperatureReadingRepository readingRepository,
+            ControllerStateRepository controllerStateRepository,
+            SwitchClient switchClient
     ) {
         String payload = new String(message.getPayload());
         log.info("topic={} payload={}", receivedTopic, payload);
@@ -148,16 +150,20 @@ public class MqttSubscriber {
             long ts = json.get("ts").asLong();
 
             String thermostatId = extractThermostatId(receivedTopic);
-            Optional<Room> room = findRoomByThermostatId(rooms, thermostatId);
+            Room room = roomRepository.findByThermostatId(thermostatId);
 
-            if (room.isEmpty()) {
-                log.warn("No se encontró habitación asociada al termostato '{}' (topic={}). Lectura descartada.",
-                        thermostatId, receivedTopic);
+            if (room == null) {
+                log.warn(
+                        "No se encontró habitación asociada al termostato '{}' (topic={}). Lectura descartada.",
+                        thermostatId,
+                        receivedTopic
+                );
                 return;
             }
 
+            // Primero se persiste SIEMPRE la lectura recibida.
             TemperatureReading reading = new TemperatureReading(
-                    room.get().id(),
+                    room.id(),
                     tC,
                     tF,
                     ts,
@@ -169,23 +175,75 @@ public class MqttSubscriber {
             if (persisted) {
                 log.info(
                         "Lectura persistida: room={} tC={} tF={}",
-                        room.get().id(),
+                        room.id(),
                         tC,
                         tF
                 );
             } else {
                 log.warn(
                         "La lectura no pudo persistirse: room={} tC={} tF={}",
-                        room.get().id(),
+                        room.id(),
                         tC,
                         tF
                 );
             }
 
+            // El switch solo se controla si el controlador está iniciado.
+            if (!controllerStateRepository.isEnabled()) {
+                log.info(
+                        "Controlador detenido. No se acciona el switch de la habitación {}.",
+                        room.id()
+                );
+                return;
+            }
+
+            try {
+                if (tC < room.targetTempC()) {
+                    log.info(
+                            "Temperatura {}°C < objetivo {}°C. Encendiendo switch {}.",
+                            tC,
+                            room.targetTempC(),
+                            room.switchId()
+                    );
+
+                    switchClient.turnOn(room.switchId());
+
+                } else {
+                    log.info(
+                            "Temperatura {}°C >= objetivo {}°C. Apagando switch {}.",
+                            tC,
+                            room.targetTempC(),
+                            room.switchId()
+                    );
+
+                    switchClient.turnOff(room.switchId());
+                }
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error(
+                        "Interrumpido al enviar comando al switch {}",
+                        room.switchId()
+                );
+
+            } catch (IOException e) {
+                log.error(
+                        "Error enviando comando al switch {}: {}",
+                        room.switchId(),
+                        e.getMessage()
+                );
+            }
+
         } catch (IOException e) {
-            log.error("No se pudo parsear el payload como JSON: {}", e.getMessage());
+            log.error(
+                    "No se pudo parsear el payload como JSON: {}",
+                    e.getMessage()
+            );
         } catch (NullPointerException e) {
-            log.error("Payload con formato inesperado (faltan campos tC/tF/ts): {}", payload);
+            log.error(
+                    "Payload con formato inesperado (faltan campos tC/tF/ts): {}",
+                    payload
+            );
         }
     }
 
@@ -202,11 +260,6 @@ public class MqttSubscriber {
      * Busca, entre las habitaciones configuradas, aquella cuyo
      * thermostatId coincida con el identificador recibido.
      */
-    private static Optional<Room> findRoomByThermostatId(List<Room> rooms, String thermostatId) {
-        return rooms.stream()
-                .filter(r -> r.thermostatId().equals(thermostatId))
-                .findFirst();
-    }
 
     private static String getEnv(String key, String defaultValue) {
         String value = System.getenv(key);

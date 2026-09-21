@@ -10,7 +10,7 @@ public class Room {
     private String id;
 
     private String name;
-    private double targetTempC;
+    private Double targetTempC;
     private String thermostatId;
     private String switchId;
 
@@ -20,7 +20,7 @@ public class Room {
     public Room(
             String id,
             String name,
-            double targetTempC,
+            Double targetTempC,
             String thermostatId,
             String switchId
     ) {
@@ -47,11 +47,11 @@ public class Room {
         this.name = name;
     }
 
-    public double getTargetTempC() {
+    public Double getTargetTempC() {
         return targetTempC;
     }
 
-    public void setTargetTempC(double targetTempC) {
+    public void setTargetTempC(Double targetTempC) {
         this.targetTempC = targetTempC;
     }
 

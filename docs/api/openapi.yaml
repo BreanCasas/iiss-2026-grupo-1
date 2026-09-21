@@ -1,0 +1,305 @@
+openapi: 3.0.3
+
+info:
+  title: IoTEste EcoWarm API
+  version: 1.0.0
+  description: >
+    API REST para la gestión de habitaciones y el control
+    del sistema EcoWarm.
+
+servers:
+  - url: http://localhost:8080
+    description: Entorno local
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+
+  /rooms:
+    get:
+      summary: Listar habitaciones
+      responses:
+        "200":
+          description: Lista de habitaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      summary: Crear una habitación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Room"
+      responses:
+        "201":
+          description: Habitación creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /rooms/{id}:
+    parameters:
+      - $ref: "#/components/parameters/RoomId"
+
+    get:
+      summary: Consultar una habitación
+      responses:
+        "200":
+          description: Habitación encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Habitación no encontrada
+
+    put:
+      summary: Modificar completamente una habitación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Room"
+      responses:
+        "200":
+          description: Habitación modificada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Habitación no encontrada
+
+    patch:
+      summary: Modificar parcialmente una habitación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomPatch"
+      responses:
+        "200":
+          description: Habitación modificada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Habitación no encontrada
+
+    delete:
+      summary: Eliminar una habitación
+      responses:
+        "204":
+          description: Habitación eliminada
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Habitación no encontrada
+
+  /rooms/{id}/readings:
+    parameters:
+      - $ref: "#/components/parameters/RoomId"
+
+    get:
+      summary: Consultar el histórico de temperaturas de una habitación
+      responses:
+        "200":
+          description: Histórico de temperaturas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TemperatureReading"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Habitación no encontrada
+
+  /rooms/{id}/switch/on:
+    parameters:
+      - $ref: "#/components/parameters/RoomId"
+
+    post:
+      summary: Encender el switch de una habitación
+      responses:
+        "204":
+          description: Orden de encendido enviada
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Habitación no encontrada
+
+  /rooms/{id}/switch/off:
+    parameters:
+      - $ref: "#/components/parameters/RoomId"
+
+    post:
+      summary: Apagar el switch de una habitación
+      responses:
+        "204":
+          description: Orden de apagado enviada
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Habitación no encontrada
+
+  /rooms/validate:
+    post:
+      summary: Validar la configuración de habitaciones
+      responses:
+        "200":
+          description: Lista de errores de validación
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /controller/start:
+    post:
+      summary: Iniciar el controlador automático
+      responses:
+        "200":
+          description: Controlador iniciado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ControllerState"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /controller/stop:
+    post:
+      summary: Detener el controlador automático
+      responses:
+        "200":
+          description: Controlador detenido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ControllerState"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /controller/status:
+    get:
+      summary: Consultar el estado del controlador
+      responses:
+        "200":
+          description: Estado actual del controlador
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ControllerState"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  parameters:
+    RoomId:
+      name: id
+      in: path
+      required: true
+      description: Identificador de la habitación
+      schema:
+        type: string
+      example: room1
+
+  responses:
+    Unauthorized:
+      description: API key faltante o inválida
+
+  schemas:
+
+    Room:
+      type: object
+      properties:
+        id:
+          type: string
+          example: room1
+        name:
+          type: string
+          example: Living
+        targetTempC:
+          type: number
+          format: double
+          example: 21.5
+        thermostatId:
+          type: string
+          example: ht-sim-room1
+        switchId:
+          type: string
+          example: pro1pm-room1
+
+    RoomPatch:
+      type: object
+      properties:
+        name:
+          type: string
+        targetTempC:
+          type: number
+          format: double
+        thermostatId:
+          type: string
+        switchId:
+          type: string
+
+    TemperatureReading:
+      type: object
+      properties:
+        roomId:
+          type: string
+        tempCelsius:
+          type: number
+          format: double
+        tempFahrenheit:
+          type: number
+          format: double
+        sourceTs:
+          type: integer
+          format: int64
+        receivedAt:
+          type: string
+          format: date-time
+
+    ControllerState:
+      type: object
+      properties:
+        id:
+          type: string
+          example: controller
+        enabled:
+          type: boolean
+          example: true
