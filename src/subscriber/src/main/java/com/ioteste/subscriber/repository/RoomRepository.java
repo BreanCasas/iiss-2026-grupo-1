@@ -9,6 +9,7 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,8 +59,21 @@ public class RoomRepository {
                 document.getString("name"),
                 document.getString("thermostatId"),
                 document.getString("switchId"),
-                ((Number) document.get("targetTempC")).doubleValue()
+                toBigDecimal(document.get("targetTempC"))
         );
+    }
+
+    private BigDecimal toBigDecimal(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof BigDecimal bigDecimal) {
+            return bigDecimal;
+        }
+        if (value instanceof org.bson.types.Decimal128 decimal128) {
+            return decimal128.bigDecimalValue();
+        }
+        return new BigDecimal(value.toString());
     }
 
     public void close() {

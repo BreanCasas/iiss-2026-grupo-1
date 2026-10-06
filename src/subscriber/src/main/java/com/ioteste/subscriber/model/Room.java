@@ -1,5 +1,7 @@
 package com.ioteste.subscriber.model;
 
+import java.math.BigDecimal;
+
 /**
  * Representa una habitación (room) del sitio controlado por EcoWarm.
  * Cada habitación tiene un termostato (sensor Shelly H&T) y un switch
@@ -16,6 +18,6 @@ public record Room(
         String name,
         String thermostatId,
         String switchId,
-        double targetTempC
+        BigDecimal targetTempC
 ) {
 }

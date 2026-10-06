@@ -3,6 +3,7 @@ package com.ioteste.api.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Document(collection = "temperature_readings")
@@ -12,8 +13,8 @@ public class TemperatureReading {
     private String id;
 
     private String roomId;
-    private double tempCelsius;
-    private double tempFahrenheit;
+    private BigDecimal tempCelsius;
+    private BigDecimal tempFahrenheit;
     private long sourceTs;
     private Instant receivedAt;
 
@@ -36,19 +37,19 @@ public class TemperatureReading {
         this.roomId = roomId;
     }
 
-    public double getTempCelsius() {
+    public BigDecimal getTempCelsius() {
         return tempCelsius;
     }
 
-    public void setTempCelsius(double tempCelsius) {
+    public void setTempCelsius(BigDecimal tempCelsius) {
         this.tempCelsius = tempCelsius;
     }
 
-    public double getTempFahrenheit() {
+    public BigDecimal getTempFahrenheit() {
         return tempFahrenheit;
     }
 
-    public void setTempFahrenheit(double tempFahrenheit) {
+    public void setTempFahrenheit(BigDecimal tempFahrenheit) {
         this.tempFahrenheit = tempFahrenheit;
     }
 

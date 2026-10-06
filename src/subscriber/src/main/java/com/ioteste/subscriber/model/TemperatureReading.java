@@ -1,5 +1,6 @@
 package com.ioteste.subscriber.model;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 /**
@@ -14,8 +15,8 @@ import java.time.Instant;
  */
 public record TemperatureReading(
         String roomId,
-        double tempCelsius,
-        double tempFahrenheit,
+        BigDecimal tempCelsius,
+        BigDecimal tempFahrenheit,
         long sourceTs,
         Instant receivedAt
 ) {

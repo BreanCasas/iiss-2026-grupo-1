@@ -19,6 +19,7 @@ import com.ioteste.subscriber.client.SwitchClient;
 import com.ioteste.subscriber.repository.ControllerStateRepository;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.Instant;
 
 /**
@@ -145,8 +146,8 @@ public class MqttSubscriber {
 
         try {
             JsonNode json = mapper.readTree(payload);
-            double tC = json.get("tC").asDouble();
-            double tF = json.get("tF").asDouble();
+            BigDecimal tC = json.get("tC").decimalValue();
+            BigDecimal tF = json.get("tF").decimalValue();
             long ts = json.get("ts").asLong();
 
             String thermostatId = extractThermostatId(receivedTopic);
@@ -198,7 +199,7 @@ public class MqttSubscriber {
             }
 
             try {
-                if (tC < room.targetTempC()) {
+                if (tC.compareTo(room.targetTempC()) < 0) {
                     log.info(
                             "Temperatura {}°C < objetivo {}°C. Encendiendo switch {}.",
                             tC,

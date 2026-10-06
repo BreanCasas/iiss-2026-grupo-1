@@ -3,6 +3,8 @@ package com.ioteste.api.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
+
 @Document(collection = "rooms")
 public class Room {
 
@@ -10,7 +12,7 @@ public class Room {
     private String id;
 
     private String name;
-    private Double targetTempC;
+    private BigDecimal targetTempC;
     private String thermostatId;
     private String switchId;
 
@@ -20,7 +22,7 @@ public class Room {
     public Room(
             String id,
             String name,
-            Double targetTempC,
+            BigDecimal targetTempC,
             String thermostatId,
             String switchId
     ) {
@@ -47,11 +49,11 @@ public class Room {
         this.name = name;
     }
 
-    public Double getTargetTempC() {
+    public BigDecimal getTargetTempC() {
         return targetTempC;
     }
 
-    public void setTargetTempC(Double targetTempC) {
+    public void setTargetTempC(BigDecimal targetTempC) {
         this.targetTempC = targetTempC;
     }
 
