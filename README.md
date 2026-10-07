@@ -1,614 +1,369 @@
 # IoTEste EcoWarm
 
-Taller de Ingeniería de Software — Java 25
+Taller de Ingeniería de Software — Iteración 4 — Java 25.
 
-Sistema de gestión inteligente de calefacción por losa radiante, integrando dispositivos Shelly (termostatos H&T y switches Pro 1PM) mediante mensajería MQTT, con persistencia de configuración y del histórico de temperaturas.
+Control de calefacción por habitaciones mediante temperaturas recibidas
+por MQTT y switches consultados y comandados mediante REST.
 
 ## Iteraciones
 
-* **Iteración 1**: prototipo base de mensajería MQTT (broker + suscriptor mínimo en Java).
-* **Iteración 2**: cierre de alcance del producto (Visión v2, escenarios, historias, características), metodología ágil (Kanban), generador de eventos de termostatos, extensión del consumidor con persistencia de habitaciones e histórico de temperaturas, build reproducible vía Docker, e integración continua con GitHub Actions.
-* **Iteración 3** *(actual)*: API REST con Spring Boot, persistencia en MongoDB, administración de habitaciones, controlador automático de temperatura, simulación de switches mediante un stub REST, comandos de inicio/parada del controlador, autenticación mediante API key y especificación OpenAPI 3.0.
+- Iteración 1: prototipo de mensajería MQTT.
+- Iteración 2: generador de eventos, persistencia y build reproducible.
+- Iteración 3: API REST, MongoDB y simulación de switches.
+- Iteración 4: separación entre core y engine, restricciones de potencia,
+  tarifa punta, tiempo virtual e integración con el entorno externo.
 
-## Contexto del proyecto
+## Estructura
 
-IoTEste busca posicionarse en el mercado de automatización de oficinas y hogares, integrando dispositivos IoT (Shelly Pro 1PM y Shelly H&T Gen 3) mediante mensajería MQTT.
+| Ubicación | Contenido |
+|---|---|
+| `pom.xml` | Proyecto Maven padre |
+| `modules/core/` | Reglas de decisión y pruebas unitarias |
+| `modules/engine/` | API REST, tiempo virtual, MongoDB y comunicaciones |
+| `docker/control.Dockerfile` | Compilación y ejecución del controlador |
+| `docker/docker-compose.yml` | Controlador y MongoDB |
+| `scripts/` | Compilación, arranque, parada y pruebas |
+| `docs/api/openapi.yaml` | Contrato oficial de la API |
+| `docs/tests/criterio-tests.md` | Criterio de adecuación y resultados |
+| `docs/arquitectura/4mas1.md` | Vista lógica y escenarios |
+| `.github/workflows/maven.yml` | Integración continua |
 
-A partir de la Iteración 2, el producto se enfoca específicamente en **EcoWarm**: gestión inteligente de calefacción por losa radiante.
+Engine depende de core. Core no depende de Spring, MongoDB, MQTT
+ni servicios REST.
 
-En la Iteración 3 se incorpora una API REST para administrar el sistema, persistencia en MongoDB para habitaciones, lecturas y estado del controlador, y un Switch Stub que permite simular el accionamiento de los dispositivos de calefacción.
+El checker del docente proporciona el broker MQTT, los termostatos,
+los switches y el inventario del entorno de prueba.
 
-## Estructura del repositorio
+## Requisitos
 
-* `/docs/vision.md` — Documento de Visión.
-* `/docs/metodologia.md` — Metodología ágil adoptada (Kanban) y su justificación.
-* `/docs/producto/` — Escenarios, historias, características y licencias del producto.
-* `/docs/api/openapi.yaml` — Especificación OpenAPI 3.0 de la API REST.
-* `/docker/docker-compose.yml` — Orquestación de los servicios del sistema.
-* `/docker/mosquitto/config/` — Configuración del broker Mosquitto.
-* `/docker/mongodb/init-mongo.js` — Inicialización de MongoDB local con las habitaciones y el estado inicial del controlador.
-* `/scripts/up.sh` — Levanta el entorno.
-* `/scripts/down.sh` — Baja y elimina los contenedores.
-* `/scripts/stop.sh` — Detiene los contenedores.
-* `/scripts/build.sh` — Compila los módulos Java mediante Docker.
-* `/scripts/send-temp.sh` — Publica manualmente un evento MQTT.
-* `/scripts/receive-temp.sh` — Permite verificar mensajes MQTT desde consola.
-* `/scripts/api-example.sh` — Ejemplo de uso de la API REST mediante `curl`.
-* `/src/subscriber/` — Consumidor MQTT, persistencia y lógica del controlador automático.
-* `/src/generator/` — Generador de eventos simulados de temperatura.
-* `/src/api/` — API REST desarrollada con Spring Boot.
-* `/src/switch-stub/` — Stub REST que simula los switches.
-* `/.github/workflows/maven.yml` — Integración continua con GitHub Actions.
-* `/README.md` — Documentación principal del proyecto.
+- Docker y Docker Compose.
+- Java 25 para ejecutar el checker en el entorno probado.
+- `ecowarm-check.jar`, suministrado por el docente.
+- Git Bash para ejecutar los scripts en Windows.
+- `curl` para el script de ejemplo de la API.
 
-## Requisitos previos
-
-### Linux (Fedora / Ubuntu / etc.)
-
-* Docker y Docker Compose (plugin `docker compose`).
-* `curl`, para probar la API REST.
-* `mosquitto-clients` instalado localmente para los scripts de publicación/suscripción manuales.
-* Opcionalmente, MQTT Explorer o MQTTX para verificación visual de los mensajes MQTT.
-
-En Ubuntu/Debian:
-
-```bash
-sudo apt install mosquitto-clients
-```
-
-En Fedora:
-
-```bash
-sudo dnf install mosquitto
-```
-
-Si existe un Mosquitto instalado nativamente como servicio, detenerlo antes de levantar el entorno Docker para evitar conflictos con el puerto 1883:
-
-```bash
-sudo systemctl stop mosquitto
-sudo systemctl disable mosquitto
-```
-
-### Windows
-
-* Docker Desktop con backend WSL2 habilitado.
-* Se recomienda trabajar dentro de WSL2 con Ubuntu para ejecutar los scripts `.sh`.
-* Alternativamente puede utilizarse Git Bash.
-* Cliente Mosquitto para Windows si se desea realizar pruebas MQTT manuales.
-* MQTTX o MQTT Explorer para inspección visual de MQTT.
+La compilación mediante los scripts utiliza Maven y Java dentro de Docker.
 
 ## Configuración
 
-El sistema utiliza variables de entorno definidas en un archivo `.env` ubicado en la raíz del repositorio.
-
-Para ejecutar el entorno completo con MongoDB local:
+Crear `.env` en la raíz:
 
 ```env
-MONGODB_URI=mongodb://mongodb:27017
 MONGODB_DATABASE=ioteste
-IOTESTE_API_KEY=ioteste-secret
+IOTESTE_API_KEY=reemplazar-por-tu-clave
+ECOWARM_ENVIRONMENT_KEY=
 ```
 
-`MONGODB_URI` contiene la URI utilizada por los servicios para conectarse al contenedor MongoDB dentro de la red Docker.
+| Variable | Uso |
+|---|---|
+| `MONGODB_DATABASE` | Base de datos del controlador |
+| `IOTESTE_API_KEY` | Clave de acceso a la API del controlador |
+| `ECOWARM_ENVIRONMENT_KEY` | Clave del entorno externo, si la requiere |
 
-`MONGODB_DATABASE` indica la base de datos utilizada por EcoWarm.
+El archivo `.env` no se versiona.
 
-`IOTESTE_API_KEY` define la clave necesaria para acceder a la API REST.
+Compose configura MongoDB mediante `mongodb://mongodb:27017`
+y utiliza estas direcciones:
 
-El archivo `.env` puede contener credenciales y **no debe versionarse en Git**.
+| Variable | Valor |
+|---|---|
+| `ECOWARM_ENVIRONMENT_URL` | `http://host.docker.internal:9090` |
+| `ECOWARM_PUBLIC_URL` | `http://localhost:8080` |
+| `ECOWARM_LABEL` | `grupo-1` |
 
-## Cómo levantar el sistema completo
+Estas direcciones corresponden al escenario probado:
+checker en Windows y controlador en Docker Desktop.
 
-Desde la raíz del repositorio:
+## Arranque
 
-```bash
+Ejecutar desde la raíz del proyecto.
+
+Primero, iniciar el checker y dejar la terminal abierta:
+
+```powershell
+java -jar ".\ecowarm-check.jar" --anunciar host.docker.internal
+```
+
+El checker utiliza los puertos 1883 para MQTT y 9090 para REST.
+
+En otra terminal, iniciar el controlador y MongoDB:
+
+```powershell
 docker compose --env-file .env -f docker/docker-compose.yml up -d --build
 ```
 
-El entorno está compuesto por **6 servicios**:
+Consultar contenedores y logs:
 
-* **ioteste-mosquitto**: broker MQTT, expuesto en `localhost:1883`.
-* **ioteste-generator**: genera periódicamente eventos simulados de temperatura mediante MQTT.
-* **ioteste-subscriber**: consume los eventos MQTT, persiste las lecturas en MongoDB y ejecuta la lógica del controlador automático.
-* **ioteste-switch-stub**: servicio REST que simula los switches y recibe las órdenes ON/OFF, expuesto en `localhost:8081`.
-* **ioteste-api**: API REST Spring Boot para administrar habitaciones, consultar lecturas, controlar switches y arrancar/detener el controlador automático, expuesta en `localhost:8080`.
-* **ioteste-mongodb**: base de datos MongoDB local utilizada para persistir habitaciones, histórico de temperaturas y estado del controlador, expuesta en `localhost:27017`.
-
-MongoDB utiliza el volumen nombrado `mongodb-data` para conservar la información almacenada.
-
-Al crear la base de datos por primera vez, el archivo:
-
-```text
-docker/mongodb/init-mongo.js
-```
-
-inicializa la base `ioteste` con las habitaciones de prueba y el estado inicial del controlador.
-
-Para comprobar los servicios:
-
-```bash
+```powershell
 docker compose --env-file .env -f docker/docker-compose.yml ps
+docker compose --env-file .env -f docker/docker-compose.yml logs -f control
 ```
 
-Para ver todos los logs:
+El controlador se registra ante el entorno y obtiene la dirección
+del broker MQTT.
 
-```bash
-docker compose --env-file .env -f docker/docker-compose.yml logs -f
+Si se reinicia el checker después del registro, reiniciar el controlador:
+
+```powershell
+docker compose --env-file .env -f docker/docker-compose.yml restart control
 ```
-
-Para ver únicamente los eventos procesados por el subscriber:
-
-```bash
-docker compose --env-file .env -f docker/docker-compose.yml logs -f subscriber
-```
-
-Para ver las órdenes recibidas por el Switch Stub:
-
-```bash
-docker compose --env-file .env -f docker/docker-compose.yml logs -f switch-stub
-```
-
-## Cómo compilar el sistema
-
-El proyecto proporciona un build reproducible mediante Docker:
-
-```bash
-cd scripts
-./build.sh
-```
-
-De esta forma no es necesario disponer de una instalación local de Maven para realizar el build del proyecto.
-
-## Cómo compilar un módulo manualmente
-
-Para desarrollo o depuración también es posible utilizar Maven directamente.
-
-Por ejemplo, para el subscriber:
-
-```bash
-cd src/subscriber
-mvn clean package
-```
-
-Para la API:
-
-```bash
-cd src/api
-mvn clean package
-```
-
-Para el Switch Stub:
-
-```bash
-cd src/switch-stub
-mvn clean package
-```
-
-Para el generator:
-
-```bash
-cd src/generator
-mvn clean package
-```
-
-## Variables de entorno del subscriber
-
-| Variable           | Default                 | Descripción                              |
-| ------------------ | ----------------------- | ---------------------------------------- |
-| `MQTT_BROKER_HOST` | `localhost`             | Host del broker MQTT                     |
-| `MQTT_BROKER_PORT` | `1883`                  | Puerto del broker MQTT                   |
-| `MQTT_TOPIC`       | `+/status/#`            | Topic al que se suscribe                 |
-| `MQTT_CLIENT_ID`   | `ioteste-subscriber`    | Client ID utilizado en MQTT              |
-| `MONGODB_URI`      | *(obligatoria)*         | URI de conexión a MongoDB                |
-| `MONGODB_DATABASE` | `ioteste`               | Base de datos utilizada por EcoWarm      |
-| `SWITCH_STUB_URL`  | `http://localhost:8081` | URL del servicio que simula los switches |
-
-El subscriber recibe las lecturas de temperatura mediante MQTT y busca en MongoDB la habitación correspondiente al termostato.
-
-Las lecturas válidas se persisten en MongoDB.
-
-Cuando el controlador está habilitado, el subscriber compara la temperatura recibida con `targetTempC`:
-
-* Si la temperatura es menor que `targetTempC`, envía una orden **ON** al Switch Stub.
-* Si la temperatura es mayor o igual que `targetTempC`, envía una orden **OFF** al Switch Stub.
-* Si el controlador está detenido, la lectura se persiste pero no se acciona el switch.
-
-## Variables de entorno del generator
-
-| Variable                | Default             | Descripción                                   |
-| ----------------------- | ------------------- | --------------------------------------------- |
-| `MQTT_BROKER_HOST`      | `localhost`         | Host del broker MQTT                          |
-| `MQTT_BROKER_PORT`      | `1883`              | Puerto del broker MQTT                        |
-| `MQTT_CLIENT_ID`        | `ioteste-generator` | Client ID utilizado en MQTT                   |
-| `GENERATOR_INTERVAL_MS` | `10000`             | Intervalo entre publicaciones en milisegundos |
-
-El generator publica eventos simulados de temperatura periódicamente para permitir probar el comportamiento completo del sistema sin disponer de termostatos físicos.
-
-## Persistencia en MongoDB
-
-En la Iteración 3, MongoDB se utiliza como base de datos no relacional para almacenar información persistente del sistema.
-
-MongoDB se ejecuta localmente como un servicio adicional dentro del entorno Docker Compose utilizando la imagen `mongo:8`.
-
-Entre los datos almacenados se encuentran:
-
-* habitaciones;
-* configuración de cada habitación;
-* histórico de lecturas de temperatura;
-* estado del controlador automático.
-
-El subscriber y la API utilizan la misma base configurada mediante:
-
-```text
-MONGODB_URI
-MONGODB_DATABASE
-```
-
-Dentro de Docker, los servicios se conectan mediante:
-
-```text
-mongodb://mongodb:27017
-```
-
-La información de MongoDB se conserva utilizando el volumen:
-
-```text
-mongodb-data
-```
-
-De esta forma, los cambios realizados mediante la API pueden ser utilizados por el controlador sin depender de un archivo local de habitaciones.
-
-### Inicialización de MongoDB
-
-El archivo:
-
-```text
-docker/mongodb/init-mongo.js
-```
-
-se ejecuta automáticamente cuando MongoDB inicializa por primera vez su volumen de datos.
-
-El script crea la base:
-
-```text
-ioteste
-```
-
-e inserta inicialmente las habitaciones:
-
-* `room1` — Living — temperatura objetivo `21.5 °C`.
-* `room2` — Bedroom — temperatura objetivo `20.0 °C`.
-
-También crea el estado inicial del controlador:
-
-```text
-id: controller
-enabled: false
-```
-
-Por lo tanto, el controlador automático comienza detenido hasta que se inicia mediante la API REST.
-
-## Configuración de habitaciones
-
-Las habitaciones se administran mediante la API REST y se persisten en MongoDB.
-
-Una habitación contiene información como:
-
-```json
-{
-  "id": "room1",
-  "name": "Living",
-  "targetTempC": 21.5,
-  "thermostatId": "ht-sim-room1",
-  "switchId": "pro1pm-room1"
-}
-```
-
-El `thermostatId` permite asociar los mensajes MQTT recibidos con una habitación.
-
-El `switchId` identifica el switch que debe ser accionado.
-
-`targetTempC` representa la temperatura objetivo configurada para la habitación.
 
 ## API REST
 
-La API se encuentra disponible localmente en:
+Dirección: `http://localhost:8080`.
 
-```text
-http://localhost:8080
+Las solicitudes requieren el encabezado `X-API-Key`.
+
+| Método | Endpoint | Función |
+|---|---|---|
+| GET | `/sitio` | Consultar el inventario activo |
+| PUT | `/sitio` | Validar y reemplazar el inventario completo |
+| GET | `/control` | Consultar estado y tiempo virtual |
+| POST | `/control/comandos` | Ejecutar INICIAR o DETENER |
+
+- Clave ausente o incorrecta: HTTP 401.
+- Inventario inválido: HTTP 400; conserva la configuración anterior.
+- Consulta de sitio sin inventario cargado: HTTP 404.
+
+Los errores manejados por la API incluyen `timestamp`, `status`
+y `mensaje`. El timestamp utiliza tres decimales de segundo.
+
+### Encabezados en PowerShell
+
+Ejecutar en la raíz:
+
+```powershell
+$keyLine = Get-Content .env |
+    Where-Object { $_ -match '^\s*IOTESTE_API_KEY\s*=' } |
+    Select-Object -First 1
+
+$apiKey = ($keyLine -split '=', 2)[1].Trim().Trim('"').Trim("'")
+$headers = @{ "X-API-Key" = $apiKey }
 ```
 
-Los endpoints están protegidos mediante una API key.
+Las variables quedan disponibles en esa sesión de PowerShell.
 
-La clave debe enviarse utilizando el header:
+### Consultas
 
-```text
-X-API-Key
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8080/control" -Headers $headers |
+    ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8080/sitio" -Headers $headers |
+    ConvertTo-Json -Depth 10
 ```
 
-Por ejemplo:
+### Iniciar o resincronizar
 
-```bash
-curl http://localhost:8080/rooms \
-  -H "X-API-Key: ${IOTESTE_API_KEY}"
-```
-
-Sin la API key, o utilizando una clave incorrecta, la API responde con HTTP `401 Unauthorized`.
-
-### Endpoints principales
-
-#### Habitaciones
-
-```text
-GET    /rooms
-GET    /rooms/{id}
-POST   /rooms
-PUT    /rooms/{id}
-PATCH  /rooms/{id}
-DELETE /rooms/{id}
-```
-
-#### Histórico de temperatura
-
-```text
-GET /rooms/{id}/readings
-```
-
-#### Control manual del switch
-
-```text
-POST /rooms/{id}/switch/on
-POST /rooms/{id}/switch/off
-```
-
-#### Validación de habitaciones
-
-```text
-POST /rooms/validate
-```
-
-#### Controlador automático
-
-```text
-POST /controller/start
-POST /controller/stop
-GET  /controller/status
-```
-
-## Ejemplo de uso de la API
-
-Se proporciona el script:
-
-```text
-scripts/api-example.sh
-```
-
-Para ejecutarlo:
-
-```bash
-set -a
-source .env
-set +a
-
-./scripts/api-example.sh
-```
-
-El script realiza ejemplos de consulta de habitaciones, consulta del estado del controlador y validación de la configuración utilizando la API key definida en `.env`.
-
-## Controlador automático
-
-El controlador puede iniciarse mediante:
-
-```bash
-curl -X POST http://localhost:8080/controller/start \
-  -H "X-API-Key: ${IOTESTE_API_KEY}"
-```
-
-Consultar su estado:
-
-```bash
-curl http://localhost:8080/controller/status \
-  -H "X-API-Key: ${IOTESTE_API_KEY}"
-```
-
-Y detenerlo mediante:
-
-```bash
-curl -X POST http://localhost:8080/controller/stop \
-  -H "X-API-Key: ${IOTESTE_API_KEY}"
-```
-
-Cuando está detenido, el subscriber continúa recibiendo y persistiendo temperaturas, pero no envía órdenes de control al Switch Stub.
-
-Cuando está habilitado, para cada lectura válida el subscriber compara la temperatura recibida con la temperatura objetivo de la habitación.
-
-Por ejemplo:
-
-```text
-temperatura actual < targetTempC
-→ Switch ON
-```
-
-```text
-temperatura actual >= targetTempC
-→ Switch OFF
-```
-
-## Modificar la temperatura objetivo
-
-Por ejemplo, para cambiar la temperatura objetivo de `room1`:
-
-```bash
-curl -X PATCH http://localhost:8080/rooms/room1 \
-  -H "X-API-Key: ${IOTESTE_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "targetTempC": 20.0
-  }'
-```
-
-El subscriber utiliza el nuevo valor persistido en MongoDB al procesar las siguientes lecturas.
-
-## Histórico de temperaturas
-
-Las lecturas recibidas por MQTT se almacenan en MongoDB y pueden consultarse mediante la API.
-
-Por ejemplo:
-
-```bash
-curl http://localhost:8080/rooms/room1/readings \
-  -H "X-API-Key: ${IOTESTE_API_KEY}"
-```
-
-Cada lectura contiene información como:
-
-```json
+```powershell
+$inicio = @'
 {
-  "id": "identificador-generado-por-mongodb",
-  "roomId": "room1",
-  "tempCelsius": 21.0,
-  "tempFahrenheit": 69.8,
-  "sourceTs": 1789961658302,
-  "receivedAt": "2026-09-21T03:34:18.306Z"
+  "accion": "INICIAR",
+  "fechaHora": "2026-10-05T12:00:00-03:00",
+  "factorTiempo": 1
 }
+'@
+
+Invoke-RestMethod `
+    -Method Post `
+    -Uri "http://localhost:8080/control/comandos" `
+    -Headers $headers `
+    -ContentType "application/json" `
+    -Body $inicio |
+    ConvertTo-Json
 ```
 
-## Validación de habitaciones
+INICIAR establece el instante virtual, el desplazamiento horario y
+el factor. Si el control ya está en ejecución, resincroniza el reloj.
+Si se omite el factor, se utiliza 1.
 
-La configuración de las habitaciones puede validarse mediante:
+### Detener
+
+```powershell
+Invoke-RestMethod `
+    -Method Post `
+    -Uri "http://localhost:8080/control/comandos" `
+    -Headers $headers `
+    -ContentType "application/json" `
+    -Body '{"accion":"DETENER"}' |
+    ConvertTo-Json
+```
+
+DETENER cambia inmediatamente el estado a DETENIDO.
+El siguiente ciclo intenta apagar los switches activos.
+Si un apagado falla, se reintenta en ciclos posteriores.
+
+## Actualización del inventario
+
+Cuando cambia la configuración, PUT `/sitio`:
+
+1. Valida el inventario recibido.
+2. Agrega los switches anteriores a los apagados pendientes.
+3. Guarda el inventario nuevo y los pendientes en un mismo documento.
+4. Actualiza la configuración en memoria y responde.
+
+La petición no realiza llamadas REST a los switches.
+
+HeatingEngine procesa los apagados pendientes en ciclos posteriores,
+incluso si el control está detenido. No aplica nuevos encendidos
+hasta confirmar todos los apagados de esa transición.
+
+Si un switch no responde, conserva los pendientes y reintenta.
+Los pendientes se recuperan después de reiniciar el controlador.
+
+Un inventario idéntico al activo no se vuelve a guardar ni agrega
+apagados pendientes.
+
+Si falla la persistencia, no se modifica la configuración en memoria.
+
+## Reglas de calefacción
+
+- Seleccionar habitaciones con temperatura inferior al objetivo.
+- No seleccionar habitaciones durante tarifa punta.
+- Seleccionar dentro de la potencia contratada.
+- Priorizar el mayor déficit de temperatura.
+- Resolver empates por identificador de habitación.
+- Confirmar los apagados necesarios antes de enviar nuevos encendidos.
+
+Las habitaciones sin temperatura disponible no se seleccionan.
+
+## Tiempo virtual y tarifa punta
+
+El reloj calcula:
+
+`instante inicial + tiempo real transcurrido × factor`
+
+Con factor 60, un segundo real representa un minuto virtual.
+
+La franja punta incluye el inicio y excluye el final: `[desde, hasta)`.
+
+- HABILES: lunes a viernes.
+- TODOS: todos los días.
+
+La tarifa se evalúa con la hora local y el desplazamiento recibido
+en INICIAR. Por ejemplo, 17:00-03:00 se evalúa como las 17:00 locales.
+
+GET `/control` representa el instante virtual en UTC, con Z.
+El desplazamiento para evaluar la tarifa permanece fijo hasta
+el siguiente INICIAR. No se aplican cambios de horario estacional.
+
+Para probar la entrada en punta a las 17:00, iniciar a las 16:58
+con factor 10: el cambio ocurre aproximadamente 12 segundos reales después.
+
+Acelerar este reloj no acelera por sí mismo la simulación térmica
+del checker.
+
+## Persistencia
+
+MongoDB guarda el inventario y los apagados pendientes en
+la colección `site_config`, documento con `_id: active`.
+
+Ambos se recuperan al arrancar.
+
+Las temperaturas, el estado de ejecución y el reloj virtual se
+mantienen en memoria. El controlador arranca detenido hasta recibir INICIAR.
+
+MongoDB conserva los datos en el volumen `mongodb-data`.
+
+## Compilación y pruebas
+
+Desde PowerShell:
+
+```powershell
+& "C:\Program Files\Git\bin\bash.exe" ./scripts/build.sh
+& "C:\Program Files\Git\bin\bash.exe" ./scripts/test.sh
+& "C:\Program Files\Git\bin\bash.exe" ./scripts/api-example.sh
+```
+
+Desde Linux o Git Bash:
 
 ```bash
-curl -X POST http://localhost:8080/rooms/validate \
-  -H "X-API-Key: ${IOTESTE_API_KEY}"
+bash scripts/build.sh
+bash scripts/test.sh
+bash scripts/api-example.sh
 ```
 
-La validación comprueba la existencia de los identificadores necesarios y detecta valores duplicados de `thermostatId` y `switchId`.
-
-Si la configuración es válida, devuelve una lista vacía.
-
-Si existen problemas, devuelve una lista con los errores detectados.
-
-## Switch Stub
-
-El servicio `switch-stub` simula el comportamiento del dispositivo de calefacción.
-
-Está disponible dentro de la red Docker mediante:
-
-```text
-http://switch-stub:8081
-```
-
-y desde el host mediante:
-
-```text
-http://localhost:8081
-```
-
-El subscriber envía órdenes REST al stub cuando el controlador automático está habilitado.
-
-La API también permite enviar manualmente órdenes ON/OFF mediante:
-
-```text
-POST /rooms/{id}/switch/on
-POST /rooms/{id}/switch/off
-```
-
-Las órdenes pueden observarse mediante:
+Con Java 25 y Maven locales:
 
 ```bash
-docker compose --env-file .env -f docker/docker-compose.yml logs -f switch-stub
+mvn -B clean verify
 ```
 
-Ejemplo de log:
+Maven compila primero core y después engine.
 
-```text
-Switch pro1pm-room1 -> ON
-```
+El Dockerfile construye la imagen con `-DskipTests`.
+Los tests se ejecutan por separado mediante `test.sh` o Maven.
 
-o:
+## Resultados comprobados
 
-```text
-Switch pro1pm-room1 -> OFF
-```
+Validación del 6 de octubre de 2026, hora de Uruguay:
 
-## OpenAPI
+| Módulo | Pruebas | Fallos | Errores | Omitidas |
+|---|---:|---:|---:|---:|
+| core | 15 | 0 | 0 | 0 |
+| engine | 34 | 0 | 0 | 0 |
+| Total | 49 | 0 | 0 | 0 |
 
-La especificación de la API está documentada utilizando OpenAPI 3.0 en:
+Resultado: `BUILD SUCCESS`.
 
-```text
-docs/api/openapi.yaml
-```
+Checker sobre el controlador reconstruido:
 
-La especificación incluye los endpoints REST y el esquema de autenticación mediante `X-API-Key`.
+- Veredicto: 8/8.
+- PUT `/sitio`: HTTP 200.
+- GET `/sitio`, GET `/control` e INICIAR: HTTP 200.
+- Registro y suscripciones MQTT confirmados.
+- 11 comandos y 88 consultas a switches.
 
-## Verificación cruzada con un cliente MQTT externo
+En ejecuciones anteriores se comprobaron manualmente el corte a
+las 17:00 y la restitución a las 23:00 con desplazamiento -03:00,
+la temperatura objetivo y la selección con potencia limitada.
 
-Opcionalmente se puede utilizar MQTT Explorer o MQTTX.
+El checker verifica interoperabilidad en los escenarios ejecutados.
+El criterio de adecuación y los límites de la validación se encuentran
+en `docs/tests/criterio-tests.md`.
 
-1. Conectar el cliente contra `localhost:1883`.
-2. Suscribirse al topic utilizado por los termostatos simulados.
-3. Publicar un mensaje manual mediante `scripts/send-temp.sh` o utilizar el `generator`.
-4. Confirmar que el subscriber recibe el mensaje.
-5. Verificar que la lectura se persiste y, si el controlador está habilitado, que se genera la orden correspondiente al Switch Stub.
-
-## Metodología ágil
-
-El equipo trabaja bajo **Kanban**.
-
-La justificación y configuración utilizada por el equipo se encuentra documentada en:
-
-```text
-docs/metodologia.md
-```
-
-La planificación de la Iteración 3 se mantiene en el Board del equipo.
+Para obtener el veredicto del checker, pulsar Ctrl+C en su terminal.
 
 ## Integración continua
 
-El repositorio utiliza GitHub Actions para integración continua.
-
-El workflow se encuentra en:
-
-```text
-.github/workflows/maven.yml
-```
-
-El objetivo es verificar automáticamente el build del proyecto ante cambios enviados al repositorio.
-
-## Cómo bajar el entorno
-
-Desde la carpeta `scripts`:
+El workflow `.github/workflows/maven.yml` configura Java 25 y ejecuta:
 
 ```bash
-./down.sh
+mvn -B --no-transfer-progress clean verify
 ```
 
-Esto baja los contenedores del entorno.
+Se activa con push a main o iteracion-4, pull request hacia main,
+o ejecución manual. Guarda los reportes de Surefire.
 
-Para detenerlos sin eliminarlos:
+Los tests actuales no requieren un MongoDB ni un checker activos.
+La configuración del workflow no implica que ya haya sido ejecutado
+en GitHub para los cambios locales.
 
-```bash
-./stop.sh
+## Detener el entorno
+
+Detener contenedores:
+
+```powershell
+docker compose --env-file .env -f docker/docker-compose.yml stop
 ```
 
-También puede utilizarse Docker Compose directamente desde la raíz:
+Eliminar contenedores y red conservando el volumen:
 
-```bash
+```powershell
 docker compose --env-file .env -f docker/docker-compose.yml down
 ```
 
-Para eliminar también el volumen local de MongoDB y provocar que `init-mongo.js` vuelva a ejecutarse en el próximo arranque:
+Los scripts equivalentes son `scripts/stop.sh` y `scripts/down.sh`.
+El checker se detiene por separado con Ctrl+C.
 
-```bash
-docker compose --env-file .env -f docker/docker-compose.yml down -v
-```
+## Documentación y gestión
 
-**Advertencia:** `-v` elimina los volúmenes del entorno y, por lo tanto, los datos persistidos localmente.
+- Visión: `docs/vision.md`.
+- Metodología: `docs/metodologia.md`.
+- Producto: `docs/producto/`.
+- API: `docs/api/openapi.yaml`.
+- Pruebas: `docs/tests/criterio-tests.md`.
+- Arquitectura: `docs/arquitectura/4mas1.md`.
 
-## Proyecto Jira
-
-La planificación y seguimiento del proyecto se realiza mediante el Board Kanban del equipo en Jira.
-
-## Próximos pasos
-
-Las siguientes iteraciones podrán extender EcoWarm con nuevas capacidades de automatización, optimización del consumo y utilización de información externa para mejorar las decisiones del sistema.
+La metodología definida es Scrumban, con planificación al inicio
+de la iteración, seguimiento en el Board de Jira y revisiones semanales.

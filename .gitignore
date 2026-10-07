@@ -1,3 +1,9 @@
 /.idea
 .env
 target/
+
+# Checker externo del docente
+/ecowarm-check.jar
+
+# Archivos generados por Maven
+**/target/
