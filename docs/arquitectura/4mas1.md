@@ -1,187 +1,154 @@
-# Arquitectura 4+1 — Iteración 4
+# Arquitectura 4+1 - Iteración 4
 
-## Alcance
+## Alcance y vista lógica
 
-Esta iteración documenta la vista lógica y escenarios mediante
-diagramas de secuencia. Las restantes vistas se completarán
-en las siguientes iteraciones.
+Esta iteración comienza con vista lógica y secuencias de eventos.
 
-## Vista lógica
+Las restantes vistas se completarán en las iteraciones 5 y 6.
 
-El proyecto tiene dos módulos Maven:
+- core: modelo y decisión, sin comunicaciones externas.
+- engine: API, suscriptor MQTT, reloj, MongoDB y switches REST.
 
-- core: reglas de decisión, sin comunicaciones externas.
-- engine: API REST, reloj virtual, persistencia e integración MQTT/REST.
+Engine depende de core.
 
-Engine depende de core. Core no depende de engine.
+API y suscriptor se ejecutan en el mismo proceso y contenedor control.
 
 ```mermaid
 flowchart TD
-    API["API REST"]
-    SITE["SiteService"]
-    CONTROL["ControlService y reloj"]
-    ENGINE["HeatingEngine"]
-    CORE["Core"]
-    MQTT["TemperatureSubscriber"]
-    SWITCH["SwitchClient"]
-    MONGO["MongoSiteRepository"]
-    REG["EnvironmentRegistration"]
-    ENV["Entorno externo"]
-
-    API --> SITE
-    API --> CONTROL
-    SITE --> MONGO
-    ENGINE --> SITE
+    API["API REST"] --> SITE["SiteService"]
+    API --> CONTROL["ControlService y reloj"]
+    SITE --> CONFIG["MongoSiteRepository"]
+    CONFIG --> DB["MongoDB"]
+    ENGINE["HeatingEngine"] --> SITE
     ENGINE --> CONTROL
-    ENGINE --> CORE
-    ENGINE --> MQTT
-    ENGINE --> SWITCH
-    MQTT --> REG
-    REG --> ENV
+    ENGINE --> CORE["HeatingController"]
+    ENGINE --> MQTT["TemperatureSubscriber"]
+    ENGINE --> SWITCH["SwitchClient"]
+    MQTT --> READINGS["TemperatureReadingRepository"]
+    READINGS --> DB
+    MQTT --> REG["EnvironmentRegistration"]
+    REG --> ENV["Entorno externo"]
     MQTT --> ENV
     SWITCH --> ENV
 ```
 
-SiteService no depende de SwitchClient.
-Las llamadas REST a switches corresponden al motor.
-
-### Responsabilidades
+## Modelo y responsabilidades
 
 | Componente | Responsabilidad |
 |---|---|
-| HeatingController | Seleccionar habitaciones dentro de la potencia disponible |
-| PeakSchedule | Evaluar la franja punta |
-| RoomState | Representar los datos de decisión de una habitación |
-| SiteController | Exponer GET y PUT `/sitio` |
-| SiteService | Validar y persistir inventario y apagados pendientes |
-| SiteValidator | Validar la configuración recibida |
-| SiteRepository | Definir las operaciones de persistencia |
-| MongoSiteRepository | Guardar y recuperar el documento de configuración |
-| ControlController | Exponer estado y comandos del control |
-| ControlService | Administrar estado, reloj y desplazamiento horario |
-| VirtualClock | Calcular el avance del tiempo virtual |
-| EnvironmentRegistration | Registrar el controlador y obtener el broker |
-| TemperatureSubscriber | Recibir y conservar las últimas temperaturas |
-| HeatingEngine | Procesar pendientes y ejecutar las decisiones |
+| HeatingController | Decidir acciones ON/OFF |
+| PeakSchedule | Evaluar horario punta |
+| RoomState | Datos para selección por temperatura y potencia |
+| RoomConfig / SiteConfig | Configuración del core |
+| RoomObservation / ControlState | Estado observado y ejecución |
+| SwitchAction / Decision | Lista ordenada de acciones |
+| HeatingEngine | Reunir datos y ejecutar decisiones |
+| SiteController / SiteService | API y gestión del inventario |
+| SiteValidator | Validar configuración |
+| SiteRepository / MongoSiteRepository | Persistir configuración y pendientes |
+| ControlController / ControlService | Estado, comandos y reloj |
+| VirtualClock | Avance del tiempo virtual |
+| EnvironmentRegistration | Registro y broker |
+| TemperatureSubscriber | Recepción MQTT y última lectura |
+| TemperatureReadingRepository | Guardar histórico |
 | SwitchClient | Consultar y comandar switches REST |
-| SecurityConfig | Comprobar `X-API-Key` |
-| ApiExceptionHandler | Estandarizar los errores REST que maneja |
+| SecurityConfig | Protección X-API-Key |
+| ApiExceptionHandler | Errores REST gestionados |
+
+Los records del modelo completo están dentro de HeatingController.
+
+decide(configuración, hora, estado) devuelve Decision sin realizar IO.
 
 ## Decisiones de diseño
 
-### Core independiente
+La selección prioriza:
 
-El core trabaja con datos de temperatura, objetivos, potencia
-y horario. No utiliza Spring, MongoDB ni comunicaciones.
+temperatura objetivo - temperatura actual
 
-Esto permite probar las decisiones con datos controlados.
+Se ordena de mayor a menor déficit y se desempata por ID.
 
-### Selección de habitaciones
+Se selecciona una habitación si cabe su potencia en la disponible.
+Si una no cabe, se continúa con las siguientes.
 
-La prioridad se calcula por:
+Durante punta o sin lectura disponible no se selecciona la habitación.
 
-`temperatura objetivo - temperatura actual`
+La decisión compara selección y estado de switches.
 
-Se ordena por mayor déficit y se desempata por identificador.
-Una habitación se selecciona si su potencia cabe en la potencia restante.
+Evita comandos innecesarios y ordena todos los OFF antes de los ON.
 
-Durante punta no se seleccionan habitaciones.
-Las habitaciones sin temperatura disponible tampoco se seleccionan.
+Un estado desconocido requiere OFF antes de cualquier eventual ON.
 
-### Tiempo virtual y hora local
+Engine confirma los comandos y detiene el ciclo si uno falla.
 
-El reloj calcula:
+## Tiempo e inventario
 
-`instante inicial + tiempo real transcurrido × factor`
+El reloj conserva su factor numérico y calcula tiempo virtual desde
+el instante inicial y el tiempo real transcurrido.
 
-INICIAR crea o resincroniza el reloj y conserva el desplazamiento
-horario recibido.
+INICIAR resincroniza y conserva el desplazamiento para evaluar
+la hora local.
 
-La tarifa utiliza esa hora local:
-17:00-03:00 se evalúa como las 17:00.
-
-GET `/control` representa el instante en UTC, con Z.
-El desplazamiento permanece fijo hasta otro INICIAR.
-No se aplican cambios de horario estacional.
-
-La franja incluye el inicio y excluye el final: `[desde, hasta)`.
-
+La franja es [desde, hasta).
 HABILES representa lunes a viernes.
-TODOS representa todos los días.
 
-### Inventario y persistencia
+El factor del controlador no acelera la simulación térmica del checker.
 
-MongoDB conserva un documento en `site_config`, con `_id: active`.
+SiteService guarda inventory y pendingShutdowns en site_config,
+documento con _id active, antes de modificar la memoria.
 
-El documento contiene:
+Mantiene las direcciones de los switches anteriores.
 
-- `inventory`: configuración activa.
-- `pendingShutdowns`: habitaciones cuyos switches anteriores deben apagarse.
+PUT /sitio no llama a switches.
+Un inventario idéntico no agrega pendientes.
 
-Al cambiar el inventario, SiteService valida y guarda ambos campos
-en una misma escritura antes de actualizar la memoria.
+HeatingEngine procesa pendientes incluso detenido.
 
-Los pendientes existentes se conservan y se agregan los switches
-del inventario anterior. Se mantienen sus direcciones originales,
-aunque desaparezcan de la nueva configuración.
+Los conserva si falla un apagado.
+Solo retira pendientes cuando su revisión sigue vigente.
 
-PUT `/sitio` no llama a los switches.
+Inventario y pendientes se recuperan después de un reinicio.
 
-Un inventario idéntico no produce otra escritura ni agrega pendientes.
-Si falla la persistencia, el inventario en memoria permanece anterior.
+## Temperaturas y timestamp
 
-Los documentos anteriores que no contienen `pendingShutdowns`
-se interpretan con una lista vacía.
+TemperatureSubscriber conserva la última lectura por topic en memoria
+y solicita guardarla en temperature_readings.
 
-### Procesamiento de apagados pendientes
+Un método privado de TemperatureSubscriber convierte ts del protocolo
+a long en milisegundos, leyendo el decimal exactamente sin paso por double.
 
-HeatingEngine obtiene una instantánea con inventario, pendientes
-y número de revisión.
+sourceTs y payload.ts se guardan como BSON Int64.
+sourceTsUnit indica epoch_milliseconds.
 
-Primero intenta apagar los switches pendientes.
-Si alguno falla, el ciclo termina y conserva los pendientes.
+receivedAt es la fecha real de recepción.
 
-Cuando todos confirman OFF, el motor pide retirar los pendientes.
-SiteService comprueba que la revisión siga siendo actual.
+Si falla la escritura, la lectura permanece en memoria.
+No hay reintentos históricos automáticos.
 
-Si hubo otra actualización, la confirmación de la revisión anterior
-no borra los pendientes de la nueva.
+Tras reiniciar se espera una nueva lectura MQTT.
 
-Los apagados se procesan incluso con el control detenido.
-No se evalúan nuevos encendidos hasta completar esta etapa.
+## Concurrencia e integración
 
-Los pendientes sobreviven a un reinicio porque están en MongoDB.
+SiteService y ControlService sincronizan sus operaciones.
 
-### Concurrencia
+HeatingEngine evita ciclos propios simultáneos.
 
-SiteService sincroniza las operaciones que cambian inventario
-y pendientes. ControlService sincroniza estado y reloj.
+Las llamadas REST a switches no mantienen bloqueados
+los servicios de sitio y control.
 
-HeatingEngine evita ejecutar dos ciclos propios simultáneos.
+Antes de cada ON se comprueba revisión, ejecución y resincronización.
 
-Las llamadas HTTP a los switches se realizan sin mantener
-bloqueados SiteService ni ControlService.
+No es una transacción distribuida:
+los ciclos posteriores reconcilian los cambios.
 
-Antes de enviar encendidos, el motor comprueba que siga vigente
-la revisión del inventario y que no haya cambiado la ejecución.
+El registro POST /controladores obtiene el broker.
 
-Estas comprobaciones descartan ciclos anteriores, pero no convierten
-los comandos REST y las actualizaciones locales en una transacción
-distribuida. Un comando que ya está en curso puede finalizar después
-de una actualización; los ciclos siguientes realizan la reconciliación.
+Las suscripciones se adaptan al inventario.
 
-### Integración externa
+Recibir temperatura no comanda directamente el switch.
 
-El controlador se registra con POST `/controladores`.
-La respuesta indica el broker MQTT.
+El simulador docente reemplaza generator y stub para la integración.
 
-TemperatureSubscriber actualiza las suscripciones según el inventario.
-Las lecturas recibidas se conservan en memoria.
-
-Recibir una temperatura no envía directamente un comando:
-HeatingEngine consulta las últimas lecturas en su ciclo periódico.
-
-## Escenario de actualización del inventario
+## Secuencia de actualización del inventario
 
 ```mermaid
 sequenceDiagram
@@ -200,33 +167,28 @@ sequenceDiagram
     E->>S: Obtener instantánea
     S-->>E: Inventario, pendientes y revisión
 
-    loop Switches anteriores pendientes
-        E->>W: Comando OFF
+    loop Apagados pendientes
+        E->>W: OFF
         W-->>E: Confirmación OFF
     end
 
     E->>S: Confirmar pendientes de la revisión
-    S->>S: Comprobar revisión actual
 
     alt Revisión vigente
-        S->>M: Guardar inventario sin pendientes
-        M-->>S: Escritura confirmada
-        S-->>E: Continuar ciclo
-    else Hubo otra actualización
+        S->>M: Guardar sin pendientes
+        S-->>E: Continuar
+    else Otra actualización
         S-->>E: Finalizar y reintentar
     end
 ```
 
-Si un apagado falla, el motor interrumpe esa etapa sin retirar
-los pendientes ni continuar con nuevos encendidos.
-
-## Escenario de temperatura y decisión
+## Secuencia de temperatura y decisión
 
 Precondiciones:
 
 - Inventario cargado.
 - Control en ejecución.
-- MQTT conectado y suscripciones establecidas.
+- MQTT conectado.
 - Apagados pendientes procesados.
 
 ```mermaid
@@ -240,63 +202,54 @@ sequenceDiagram
     T->>S: Publicar temperatura
     S->>S: Validar y conservar lectura
 
-    E->>S: Consultar últimas temperaturas
-    S-->>E: Lecturas disponibles
-    E->>C: Evaluar horario y seleccionar
-    C-->>E: Habitaciones seleccionadas
+    E->>S: Obtener últimas temperaturas
+    S-->>E: Lecturas
 
     loop Switches del inventario
         E->>W: Consultar estado
         W-->>E: Estado actual
     end
 
-    loop Apagados necesarios
-        E->>W: Comando OFF
-        W-->>E: Confirmación OFF
+    E->>C: decide(configuración, hora, estado)
+    C-->>E: Acciones OFF antes de ON
+
+    loop Apagados
+        E->>W: OFF
+        W-->>E: Confirmación
     end
 
-    E->>E: Comprobar revisión y ejecución
+    E->>E: Verificar revisión y ejecución antes de ON
 
-    loop Encendidos necesarios
-        E->>W: Comando ON
-        W-->>E: Confirmación ON
+    loop Encendidos
+        E->>W: ON
+        W-->>E: Confirmación
     end
 ```
 
-## Otros comportamientos
-
-- DETENER cambia el estado a DETENIDO; el siguiente ciclo intenta
-  apagar los switches activos y reintenta los fallos.
-- El registro se reintenta mientras no haya respuesta válida.
-- MQTT utiliza reconexión automática.
-- Temperaturas, estado de ejecución y reloj se mantienen en memoria.
-- Inventario y apagados pendientes se recuperan desde MongoDB.
+El guardado del histórico se realiza desde el suscriptor como operación
+adicional a la actualización de la última temperatura en memoria.
 
 ## Validación
 
-El 6 de octubre de 2026, hora de Uruguay:
+Pruebas ejecutadas:
 
-| Módulo | Pruebas aprobadas |
-|---|---:|
-| core | 15 |
-| engine | 34 |
-| Total | 49 |
+- Core: 23 pruebas.
+- Engine: 43 pruebas.
+- Total: 66 pruebas.
 
-Resultado: `BUILD SUCCESS`, sin fallos, errores ni pruebas omitidas.
+Resultado comprobado con Java 25: BUILD SUCCESS,
+sin fallos ni errores.
 
-Checker sobre el controlador reconstruido:
+El 11 de octubre de 2026, hora de Uruguay, el checker obtuvo 8/8,
+con 18 comandos y 204 consultas de estado.
 
-- 8/8 comprobaciones aprobadas.
-- PUT `/sitio`: HTTP 200.
-- 11 comandos y 88 consultas a switches.
+Esta validación confirma la comunicación REST y MQTT de la versión probada.
+No reemplaza los tests del core.
 
-Las pruebas unitarias incluyen recuperación de pendientes,
-protección frente a revisiones anteriores, fallo de apagado
-y procesamiento de pendientes con control detenido.
+Las dos lecturas más recientes inspeccionadas en MongoDB tenían
+sourceTs y payload.ts de tipo long y unidad epoch_milliseconds.
 
-La recuperación de pendientes está comprobada con repositorios
-simulados; queda ampliar su validación con infraestructura real.
+La recuperación de pendientes se prueba con colaboradores simulados.
 
-El checker acredita interoperabilidad en el escenario ejecutado.
-Las pruebas de endurecimiento y las restantes vistas arquitectónicas
-se ampliarán en las siguientes iteraciones.
+Queda ampliar las pruebas con infraestructura real en la iteración 5,
+completar las restantes vistas y comprobar el histórico antiguo en MongoDB.

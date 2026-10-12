@@ -1,52 +1,49 @@
 # IoTEste EcoWarm
 
-Taller de Ingeniería de Software — Iteración 4 — Java 25.
+Taller de Ingeniería de Software - Iteración 4 - Java 25.
 
-Control de calefacción por habitaciones mediante temperaturas recibidas
-por MQTT y switches consultados y comandados mediante REST.
+Control de calefacción por habitaciones mediante MQTT y switches REST.
 
-## Iteraciones
+## Evolución y estructura
 
-- Iteración 1: prototipo de mensajería MQTT.
-- Iteración 2: generador de eventos, persistencia y build reproducible.
-- Iteración 3: API REST, MongoDB y simulación de switches.
-- Iteración 4: separación entre core y engine, restricciones de potencia,
-  tarifa punta, tiempo virtual e integración con el entorno externo.
-
-## Estructura
+La iteración 4 conserva la recepción MQTT, el control REST y la persistencia
+de las entregas anteriores y organiza el controlador en core y engine.
 
 | Ubicación | Contenido |
 |---|---|
-| `pom.xml` | Proyecto Maven padre |
-| `modules/core/` | Reglas de decisión y pruebas unitarias |
-| `modules/engine/` | API REST, tiempo virtual, MongoDB y comunicaciones |
-| `docker/control.Dockerfile` | Compilación y ejecución del controlador |
-| `docker/docker-compose.yml` | Controlador y MongoDB |
-| `scripts/` | Compilación, arranque, parada y pruebas |
-| `docs/api/openapi.yaml` | Contrato oficial de la API |
-| `docs/tests/criterio-tests.md` | Criterio de adecuación y resultados |
-| `docs/arquitectura/4mas1.md` | Vista lógica y escenarios |
-| `.github/workflows/maven.yml` | Integración continua |
+| modules/core/ | Modelo y reglas de decisión, con tests |
+| modules/engine/ | API REST, suscriptor MQTT, reloj, MongoDB y switches |
+| pom.xml | Proyecto Maven padre |
+| docker/docker-compose.yml | Controlador y MongoDB |
+| docker/control.Dockerfile | Construcción y ejecución del controlador |
+| scripts/ | Construcción, arranque, parada y tests |
+| docs/api/openapi.yaml | Contrato estandarizado de la API |
+| docs/tests/criterio-tests.md | Criterio de adecuación y resultados |
+| docs/arquitectura/4mas1.md | Vista lógica y secuencias |
+| .github/workflows/maven.yml | Integración continua |
 
-Engine depende de core. Core no depende de Spring, MongoDB, MQTT
-ni servicios REST.
+Engine depende de core.
 
-El checker del docente proporciona el broker MQTT, los termostatos,
-los switches y el inventario del entorno de prueba.
+Core no utiliza Spring ni comunicaciones externas.
 
-## Requisitos
+API y suscriptor MQTT se ejecutan juntos en el contenedor control.
+
+El simulador docente aporta broker, termostatos, switches e inventario.
+
+Reemplaza al generator y al switch-stub propios para la integración
+de esta entrega.
+
+## Requisitos y configuración
 
 - Docker y Docker Compose.
-- Java 25 para ejecutar el checker en el entorno probado.
-- `ecowarm-check.jar`, suministrado por el docente.
-- Git Bash para ejecutar los scripts en Windows.
-- `curl` para el script de ejemplo de la API.
+- Java 25 para el entorno probado.
+- ecowarm-check.jar del docente.
+- Git Bash para scripts en Windows.
+- curl para scripts/api-example.sh.
 
-La compilación mediante los scripts utiliza Maven y Java dentro de Docker.
+Conservar los valores existentes de .env.
 
-## Configuración
-
-Crear `.env` en la raíz:
+Variables utilizadas:
 
 ```env
 MONGODB_DATABASE=ioteste
@@ -54,55 +51,40 @@ IOTESTE_API_KEY=reemplazar-por-tu-clave
 ECOWARM_ENVIRONMENT_KEY=
 ```
 
-| Variable | Uso |
-|---|---|
-| `MONGODB_DATABASE` | Base de datos del controlador |
-| `IOTESTE_API_KEY` | Clave de acceso a la API del controlador |
-| `ECOWARM_ENVIRONMENT_KEY` | Clave del entorno externo, si la requiere |
+Compose conecta a mongodb://mongodb:27017 y utiliza:
 
-El archivo `.env` no se versiona.
+- ECOWARM_ENVIRONMENT_URL: http://host.docker.internal:9090
+- ECOWARM_PUBLIC_URL: http://localhost:8080
+- ECOWARM_LABEL: grupo-1
 
-Compose configura MongoDB mediante `mongodb://mongodb:27017`
-y utiliza estas direcciones:
-
-| Variable | Valor |
-|---|---|
-| `ECOWARM_ENVIRONMENT_URL` | `http://host.docker.internal:9090` |
-| `ECOWARM_PUBLIC_URL` | `http://localhost:8080` |
-| `ECOWARM_LABEL` | `grupo-1` |
-
-Estas direcciones corresponden al escenario probado:
-checker en Windows y controlador en Docker Desktop.
+Estas direcciones corresponden a checker en Windows
+y control en Docker Desktop.
 
 ## Arranque
 
-Ejecutar desde la raíz del proyecto.
-
-Primero, iniciar el checker y dejar la terminal abierta:
+Desde la raíz, iniciar el checker y dejarlo abierto:
 
 ```powershell
 java -jar ".\ecowarm-check.jar" --anunciar host.docker.internal
 ```
 
-El checker utiliza los puertos 1883 para MQTT y 9090 para REST.
-
-En otra terminal, iniciar el controlador y MongoDB:
+En otra terminal:
 
 ```powershell
 docker compose --env-file .env -f docker/docker-compose.yml up -d --build
-```
-
-Consultar contenedores y logs:
-
-```powershell
 docker compose --env-file .env -f docker/docker-compose.yml ps
 docker compose --env-file .env -f docker/docker-compose.yml logs -f control
 ```
 
-El controlador se registra ante el entorno y obtiene la dirección
-del broker MQTT.
+Puertos:
 
-Si se reinicia el checker después del registro, reiniciar el controlador:
+- MQTT: 1883.
+- REST del checker: 9090.
+- API del controlador: 8080.
+
+El controlador se registra y obtiene la dirección del broker.
+
+Si se reinicia el checker después del registro:
 
 ```powershell
 docker compose --env-file .env -f docker/docker-compose.yml restart control
@@ -110,27 +92,24 @@ docker compose --env-file .env -f docker/docker-compose.yml restart control
 
 ## API REST
 
-Dirección: `http://localhost:8080`.
+Dirección: http://localhost:8080.
 
-Las solicitudes requieren el encabezado `X-API-Key`.
+Encabezado requerido: X-API-Key.
 
 | Método | Endpoint | Función |
 |---|---|---|
-| GET | `/sitio` | Consultar el inventario activo |
-| PUT | `/sitio` | Validar y reemplazar el inventario completo |
-| GET | `/control` | Consultar estado y tiempo virtual |
-| POST | `/control/comandos` | Ejecutar INICIAR o DETENER |
+| GET | /sitio | Consultar inventario |
+| PUT | /sitio | Validar y reemplazar configuración |
+| GET | /control | Consultar estado y tiempo virtual |
+| POST | /control/comandos | INICIAR o DETENER |
 
-- Clave ausente o incorrecta: HTTP 401.
-- Inventario inválido: HTTP 400; conserva la configuración anterior.
-- Consulta de sitio sin inventario cargado: HTTP 404.
+- Clave ausente o incorrecta: 401.
+- Inventario inválido: 400.
+- Sitio todavía no cargado: 404.
 
-Los errores manejados por la API incluyen `timestamp`, `status`
-y `mensaje`. El timestamp utiliza tres decimales de segundo.
+Los errores gestionados incluyen timestamp, status y mensaje.
 
 ### Encabezados en PowerShell
-
-Ejecutar en la raíz:
 
 ```powershell
 $keyLine = Get-Content .env |
@@ -141,16 +120,12 @@ $apiKey = ($keyLine -split '=', 2)[1].Trim().Trim('"').Trim("'")
 $headers = @{ "X-API-Key" = $apiKey }
 ```
 
-Las variables quedan disponibles en esa sesión de PowerShell.
-
-### Consultas
+### Consultar
 
 ```powershell
-Invoke-RestMethod -Uri "http://localhost:8080/control" -Headers $headers |
-    ConvertTo-Json
+Invoke-RestMethod -Uri "http://localhost:8080/control" -Headers $headers | ConvertTo-Json
 
-Invoke-RestMethod -Uri "http://localhost:8080/sitio" -Headers $headers |
-    ConvertTo-Json -Depth 10
+Invoke-RestMethod -Uri "http://localhost:8080/sitio" -Headers $headers | ConvertTo-Json -Depth 10
 ```
 
 ### Iniciar o resincronizar
@@ -164,108 +139,115 @@ $inicio = @'
 }
 '@
 
-Invoke-RestMethod `
-    -Method Post `
-    -Uri "http://localhost:8080/control/comandos" `
-    -Headers $headers `
-    -ContentType "application/json" `
-    -Body $inicio |
-    ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri "http://localhost:8080/control/comandos" -Headers $headers -ContentType "application/json" -Body $inicio | ConvertTo-Json
 ```
-
-INICIAR establece el instante virtual, el desplazamiento horario y
-el factor. Si el control ya está en ejecución, resincroniza el reloj.
-Si se omite el factor, se utiliza 1.
 
 ### Detener
 
 ```powershell
-Invoke-RestMethod `
-    -Method Post `
-    -Uri "http://localhost:8080/control/comandos" `
-    -Headers $headers `
-    -ContentType "application/json" `
-    -Body '{"accion":"DETENER"}' |
-    ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri "http://localhost:8080/control/comandos" -Headers $headers -ContentType "application/json" -Body '{"accion":"DETENER"}' | ConvertTo-Json
 ```
 
-DETENER cambia inmediatamente el estado a DETENIDO.
-El siguiente ciclo intenta apagar los switches activos.
-Si un apagado falla, se reintenta en ciclos posteriores.
+DETENER cambia el estado.
+Los siguientes ciclos intentan apagar los switches.
 
-## Actualización del inventario
+## Decisión y reglas
 
-Cuando cambia la configuración, PUT `/sitio`:
+HeatingController.decide recibe configuración, hora y estado.
 
-1. Valida el inventario recibido.
-2. Agrega los switches anteriores a los apagados pendientes.
-3. Guarda el inventario nuevo y los pendientes en un mismo documento.
-4. Actualiza la configuración en memoria y responde.
+Devuelve una Decision con acciones OFF antes de ON.
 
-La petición no realiza llamadas REST a los switches.
+- Selecciona habitaciones por debajo del objetivo, fuera de punta.
+- Respeta la potencia máxima del sitio.
+- Prioriza mayor déficit y desempata por ID.
+- No selecciona habitaciones sin temperatura disponible.
+- Evita comandos si el switch ya tiene el estado correcto.
+- Para estado desconocido ordena OFF antes de un eventual ON.
 
-HeatingEngine procesa los apagados pendientes en ciclos posteriores,
-incluso si el control está detenido. No aplica nuevos encendidos
-hasta confirmar todos los apagados de esa transición.
+Engine reúne lecturas y estados, consulta al core y ejecuta los comandos.
 
-Si un switch no responde, conserva los pendientes y reintenta.
-Los pendientes se recuperan después de reiniciar el controlador.
+Confirma apagados antes de nuevos encendidos.
 
-Un inventario idéntico al activo no se vuelve a guardar ni agrega
-apagados pendientes.
+## Inventario y persistencia
 
-Si falla la persistencia, no se modifica la configuración en memoria.
+PUT /sitio valida y guarda inventario nuevo y apagados pendientes
+en un mismo documento antes de actualizar la memoria.
 
-## Reglas de calefacción
+La petición no llama a switches.
 
-- Seleccionar habitaciones con temperatura inferior al objetivo.
-- No seleccionar habitaciones durante tarifa punta.
-- Seleccionar dentro de la potencia contratada.
-- Priorizar el mayor déficit de temperatura.
-- Resolver empates por identificador de habitación.
-- Confirmar los apagados necesarios antes de enviar nuevos encendidos.
+HeatingEngine procesa pendientes aunque el control esté detenido.
 
-Las habitaciones sin temperatura disponible no se seleccionan.
+Si falla un apagado, conserva el trabajo y vuelve a intentar.
 
-## Tiempo virtual y tarifa punta
+Antes de ON comprueba revisión y ejecución vigentes.
 
-El reloj calcula:
+MongoDB conserva:
 
-`instante inicial + tiempo real transcurrido × factor`
+- site_config, documento _id active: inventory y pendingShutdowns.
+- temperature_readings: histórico de lecturas válidas.
+
+Inventario y pendientes se recuperan al arrancar.
+
+La última temperatura se conserva en memoria.
+Se espera una nueva lectura MQTT tras reiniciar.
+
+Si falla el guardado, la temperatura sigue disponible en memoria.
+Esa escritura no tiene reintentos automáticos.
+
+El histórico no se expone mediante los antiguos endpoints /rooms.
+
+Estado de ejecución y reloj están en memoria.
+El controlador arranca detenido.
+
+MongoDB utiliza el volumen mongodb-data.
+
+## Timestamp de las lecturas
+
+sourceTs y payload.ts de las lecturas nuevas utilizan BSON Int64
+en milisegundos desde Unix epoch.
+
+sourceTsUnit indica epoch_milliseconds.
+
+Los segundos decimales del protocolo se leen exactamente como BigDecimal
+y se normalizan a long sin pasar por double.
+
+Los timestamps nuevos no se redondean.
+Se rechazan valores fuera de rango o con fracción inferior al milisegundo.
+
+receivedAt sigue siendo la fecha real de recepción, no la hora virtual.
+
+Actualizar el código no convierte automáticamente los documentos antiguos.
+
+## Tiempo virtual
+
+El reloj y factorTiempo conservan su implementación y contrato numérico:
+
+instante inicial + tiempo real transcurrido × factor
 
 Con factor 60, un segundo real representa un minuto virtual.
 
-La franja punta incluye el inicio y excluye el final: `[desde, hasta)`.
+El factor es positivo y vale 1 si se omite.
 
-- HABILES: lunes a viernes.
-- TODOS: todos los días.
+INICIAR resincroniza y conserva el desplazamiento recibido.
 
-La tarifa se evalúa con la hora local y el desplazamiento recibido
-en INICIAR. Por ejemplo, 17:00-03:00 se evalúa como las 17:00 locales.
+La tarifa se evalúa con esa hora local.
+GET /control muestra el instante en UTC.
 
-GET `/control` representa el instante virtual en UTC, con Z.
-El desplazamiento para evaluar la tarifa permanece fijo hasta
-el siguiente INICIAR. No se aplican cambios de horario estacional.
+El desplazamiento permanece fijo hasta otro INICIAR.
 
-Para probar la entrada en punta a las 17:00, iniciar a las 16:58
-con factor 10: el cambio ocurre aproximadamente 12 segundos reales después.
+La franja incluye el inicio y excluye el final: [desde, hasta).
 
-Acelerar este reloj no acelera por sí mismo la simulación térmica
-del checker.
+HABILES significa lunes a viernes.
+TODOS incluye todos los días.
 
-## Persistencia
+Para probar entrada en punta a las 17:00,
+iniciar a las 16:58 con factor 10.
 
-MongoDB guarda el inventario y los apagados pendientes en
-la colección `site_config`, documento con `_id: active`.
+Se alcanza el inicio aproximadamente 12 segundos reales después.
 
-Ambos se recuperan al arrancar.
+El factor no acelera por sí mismo la simulación térmica del checker.
 
-Las temperaturas, el estado de ejecución y el reloj virtual se
-mantienen en memoria. El controlador arranca detenido hasta recibir INICIAR.
-
-MongoDB conserva los datos en el volumen `mongodb-data`.
-
-## Compilación y pruebas
+## Construcción y pruebas
 
 Desde PowerShell:
 
@@ -289,81 +271,74 @@ Con Java 25 y Maven locales:
 mvn -B clean verify
 ```
 
-Maven compila primero core y después engine.
-
-El Dockerfile construye la imagen con `-DskipTests`.
-Los tests se ejecutan por separado mediante `test.sh` o Maven.
-
-## Resultados comprobados
-
-Validación del 6 de octubre de 2026, hora de Uruguay:
+El Dockerfile construye con -DskipTests.
+Los tests se ejecutan por separado.
 
 | Módulo | Pruebas | Fallos | Errores | Omitidas |
 |---|---:|---:|---:|---:|
-| core | 15 | 0 | 0 | 0 |
-| engine | 34 | 0 | 0 | 0 |
-| Total | 49 | 0 | 0 | 0 |
+| core | 23 | 0 | 0 | 0 |
+| engine | 43 | 0 | 0 | 0 |
+| Total | 66 | 0 | 0 | 0 |
 
-Resultado: `BUILD SUCCESS`.
+Resultado de las pruebas con Java 25: BUILD SUCCESS.
 
-Checker sobre el controlador reconstruido:
+## Checker y validación
 
-- Veredicto: 8/8.
-- PUT `/sitio`: HTTP 200.
-- GET `/sitio`, GET `/control` e INICIAR: HTTP 200.
-- Registro y suscripciones MQTT confirmados.
-- 11 comandos y 88 consultas a switches.
+Validación realizada el 11 de octubre de 2026, hora de Uruguay:
 
-En ejecuciones anteriores se comprobaron manualmente el corte a
-las 17:00 y la restitución a las 23:00 con desplazamiento -03:00,
-la temperatura objetivo y la selección con potencia limitada.
+- Checker: 8/8 comprobaciones aprobadas.
+- Comandos a switches: 18.
+- Consultas de estado: 204.
+- Suite Maven: 66 tests, sin fallos, errores ni pruebas omitidas.
+- MongoDB: las dos lecturas más recientes verificadas tenían sourceTs
+  y payload.ts de tipo long, con unidad epoch_milliseconds.
 
-El checker verifica interoperabilidad en los escenarios ejecutados.
-El criterio de adecuación y los límites de la validación se encuentran
-en `docs/tests/criterio-tests.md`.
+La cantidad de comandos y consultas depende de la duración de la ejecución.
 
-Para obtener el veredicto del checker, pulsar Ctrl+C en su terminal.
+La comprobación de tipos corresponde a las lecturas nuevas inspeccionadas.
+No implica que se haya migrado el histórico anterior.
+
+Para ver el veredicto, presionar Ctrl+C en la terminal del checker.
 
 ## Integración continua
 
-El workflow `.github/workflows/maven.yml` configura Java 25 y ejecuta:
+.github/workflows/maven.yml utiliza Java 25 y ejecuta:
 
 ```bash
 mvn -B --no-transfer-progress clean verify
 ```
 
-Se activa con push a main o iteracion-4, pull request hacia main,
-o ejecución manual. Guarda los reportes de Surefire.
+Se activa por push a main o iteracion-4,
+pull request hacia main o ejecución manual.
 
-Los tests actuales no requieren un MongoDB ni un checker activos.
-La configuración del workflow no implica que ya haya sido ejecutado
-en GitHub para los cambios locales.
+Guarda reportes Surefire.
+
+Los tests no requieren MongoDB ni checker activos.
 
 ## Detener el entorno
 
-Detener contenedores:
-
 ```powershell
 docker compose --env-file .env -f docker/docker-compose.yml stop
-```
 
-Eliminar contenedores y red conservando el volumen:
-
-```powershell
 docker compose --env-file .env -f docker/docker-compose.yml down
 ```
 
-Los scripts equivalentes son `scripts/stop.sh` y `scripts/down.sh`.
-El checker se detiene por separado con Ctrl+C.
+stop detiene.
 
-## Documentación y gestión
+down elimina contenedores y red conservando el volumen.
 
-- Visión: `docs/vision.md`.
-- Metodología: `docs/metodologia.md`.
-- Producto: `docs/producto/`.
-- API: `docs/api/openapi.yaml`.
-- Pruebas: `docs/tests/criterio-tests.md`.
-- Arquitectura: `docs/arquitectura/4mas1.md`.
+No utilizar down -v si se quieren conservar los datos.
 
-La metodología definida es Scrumban, con planificación al inicio
-de la iteración, seguimiento en el Board de Jira y revisiones semanales.
+El checker se detiene aparte con Ctrl+C.
+
+## Documentación y metodología
+
+- docs/vision.md
+- docs/metodologia.md
+- docs/producto/
+- docs/api/openapi.yaml
+- docs/tests/criterio-tests.md
+- docs/arquitectura/4mas1.md
+
+La metodología es Scrumban, con planificación,
+seguimiento en Jira y revisiones semanales.

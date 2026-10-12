@@ -1,35 +1,65 @@
-# Características del Producto — EcoWarm
+# Características del producto - EcoWarm
 
-## 1. Gestión de habitaciones (rooms)
+## C1. Configuración del sitio por habitaciones
 
-El sistema modela el sitio del cliente como un conjunto de habitaciones. Cada habitación tiene
-asociado un termostato (sensor Shelly H&T), un switch (Shelly Pro 1PM) y una temperatura
-objetivo configurable (en grados Celsius, con 1 decimal). La configuración de habitaciones se
-mantiene de forma persistente.
+Asocia cada habitación con un termostato, un switch,
+una temperatura objetivo y una potencia requerida.
 
-## 2. Optimización según tarifa eléctrica multihorario
+La configuración también define el máximo eléctrico del sitio
+y la franja de tarifa punta.
 
-El sistema conoce las franjas horarias de la tarifa UTE multihorario del cliente (contemplando
-al menos las dos alternativas de tarifa disponibles) y prioriza el uso de la calefacción durante
-los horarios de menor costo, sin dejar de cumplir con la temperatura objetivo configurada.
+**Prototipo actual:** consulta y reemplazo del inventario mediante REST,
+validación de datos y persistencia de la configuración en MongoDB.
 
-## 3. Incorporación de pronóstico climático a 48 horas
+## C2. Control de calefacción con restricciones eléctricas
 
-El sistema puede consultar un servicio externo de pronóstico meteorológico para anticipar
-decisiones de calefacción, ajustando el encendido de forma proactiva ante caídas de
-temperatura previstas, en vez de reaccionar únicamente a la temperatura medida en el momento.
+Combina necesidades de temperatura, límite de potencia y horario tarifario
+para decidir qué habitaciones reciben energía.
 
-## 4. Historial de gestión y métricas de desempeño
+**Prototipo actual:** control reactivo por temperatura objetivo,
+corte durante punta, selección por mayor déficit
+y desempate determinista por ID.
 
-El sistema registra el histórico de temperaturas de cada habitación con fecha y hora,
-permitiendo evaluar el desempeño de la gestión pasada: por ejemplo, cuánto tiempo tarda una
-habitación en alcanzar su temperatura objetivo, y cuánto tarda en enfriarse una vez apagada
-la calefacción.
+El precalentamiento planificado y la optimización entre alternativas tarifarias
+forman parte de la evolución del producto; no están implementados.
 
-## 5. Simulación de configuraciones de consumo
+## C3. Anticipación mediante información meteorológica
 
-El sistema ofrece una capacidad de simulación que permite proyectar, para una potencia
-eléctrica contratada dada, qué temperaturas serían alcanzables en las distintas habitaciones
-según cuántas de ellas estén encendidas simultáneamente. Esto permite a clientes actuales o
-potenciales evaluar decisiones de contratación de potencia sin afectar el funcionamiento real
-del sistema.
+Incorpora un pronóstico externo de hasta 48 horas como información adicional
+para anticipar necesidades de calefacción.
+
+**Estado:** capacidad prevista.
+El prototipo no integra un servicio meteorológico.
+
+## C4. Histórico de temperaturas y evaluación del desempeño
+
+Conserva las mediciones por habitación y sus fechas
+para permitir el análisis del comportamiento térmico de la vivienda.
+
+**Prototipo actual:** almacenamiento de lecturas en MongoDB.
+
+El timestamp de origen y el del payload normalizado
+se guardan como Long en milisegundos.
+
+La consulta del histórico mediante API y los cálculos de tiempos de
+calentamiento, enfriamiento y otras métricas están pendientes.
+
+## C5. Simulación de alternativas de consumo
+
+Permite comparar configuraciones hipotéticas de potencia contratada
+mediante proyecciones de temperatura, sin afectar el sistema real.
+
+**Estado:** capacidad prevista.
+
+El prototipo no incluye un modelo predictivo
+ni una simulación independiente orientada al cliente.
+
+## Correspondencia con las historias
+
+| Historia | Capacidades relacionadas |
+|---|---|
+| H1. Confort con menor costo eléctrico | C1 y C2 |
+| H2. Preparación ante una ola de frío | C3 |
+| H3. Evaluación de la potencia contratada | C5 |
+
+C4 aporta datos de medición para evaluar el funcionamiento pasado.

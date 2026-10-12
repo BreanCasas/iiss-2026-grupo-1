@@ -16,7 +16,10 @@ public record ControlStatus(
 
     public static ControlStatus stopped() {
         return new ControlStatus(
-                State.DETENIDO, null, null, null
+                State.DETENIDO,
+                null,
+                null,
+                null
         );
     }
 }

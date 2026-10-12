@@ -2,7 +2,13 @@ package com.ioteste.engine.integration;
 
 import com.ioteste.core.HeatingController;
 import com.ioteste.core.PeakSchedule;
-import com.ioteste.core.RoomState;
+import com.ioteste.core.HeatingController.RoomConfig;
+import com.ioteste.core.HeatingController.RoomObservation;
+import com.ioteste.core.HeatingController.SiteConfig;
+import com.ioteste.core.HeatingController.ControlState;
+import com.ioteste.core.HeatingController.SwitchState;
+import com.ioteste.core.HeatingController.SwitchAction;
+
 import com.ioteste.engine.control.ControlService;
 import com.ioteste.engine.control.ControlStatus;
 import com.ioteste.engine.site.SiteInventory;
@@ -16,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +58,7 @@ public class HeatingEngine {
         try {
             SiteService.Snapshot snapshot = siteService.snapshot();
 
-            // Las llamadas HTTP no mantienen bloqueado SiteService.
+            // Procesar los apagados pendientes antes de nuevas decisiones.
             for (SiteInventory.Room room : snapshot.pendingShutdowns()) {
                 SwitchClient.State confirmed = switches.command(
                         room,
@@ -69,8 +74,6 @@ public class HeatingEngine {
                 log.info("Switch anterior {} -> OFF", room.idSwitch());
             }
 
-            // Si hubo otra actualización durante los apagados,
-            // conservar sus pendientes para el próximo ciclo.
             if (!siteService.confirmShutdowns(snapshot.revision())) {
                 return;
             }
@@ -84,6 +87,7 @@ public class HeatingEngine {
             }
 
             evaluate(snapshot, control, offset);
+
         } catch (Exception exception) {
             log.warn(
                     "Ciclo de control interrumpido ({}): {}. Reintentando.",
@@ -116,78 +120,79 @@ public class HeatingEngine {
                 ? LocalDateTime.ofInstant(control.fechaHora(), offset)
                 : null;
 
-        List<RoomState> measuredRooms = new ArrayList<>();
+        List<RoomConfig> configured = new ArrayList<>();
+        List<RoomObservation> observed = new ArrayList<>();
+
+        Map<String, SiteInventory.Room> roomsById = new HashMap<>();
 
         for (SiteInventory.Room room : inventory.habitaciones()) {
-            Double temperature = subscriber.temperature(
-                    room.topicTermostato()
-            );
+            roomsById.put(room.id(), room);
 
-            if (temperature != null) {
-                measuredRooms.add(new RoomState(
-                        room.id(),
-                        temperature,
-                        room.temperaturaEsperada(),
-                        room.potenciaKW()
-                ));
-            }
+            configured.add(new RoomConfig(
+                    room.id(),
+                    room.temperaturaEsperada(),
+                    room.potenciaKW()
+            ));
+
+            observed.add(new RoomObservation(
+                    room.id(),
+                    subscriber.temperature(room.topicTermostato()),
+                    SwitchState.valueOf(switches.status(room).name())
+            ));
         }
 
-        Set<String> selected = !running
-                ? Set.of()
-                : core.selectRoomsToHeat(
-                measuredRooms,
+        SiteConfig config = new SiteConfig(
+                configured,
                 inventory.sitio().potenciaContratadaKW(),
-                schedule.isPeak(virtualTime)
+                schedule
         );
 
-        Map<String, SwitchClient.State> states = new HashMap<>();
+        HeatingController.Decision decision = core.decide(
+                config,
+                virtualTime,
+                new ControlState(running, observed)
+        );
 
-        for (SiteInventory.Room room : inventory.habitaciones()) {
-            states.put(room.id(), switches.status(room));
-        }
+        for (SwitchAction action : decision.actions()) {
+            if (action.state() == SwitchState.ON) {
+                // Descartar encendidos si cambió la configuración.
+                if (!siteService.isCurrent(snapshot.revision())) {
+                    return;
+                }
 
-        // Primero confirmar los apagados necesarios.
-        for (SiteInventory.Room room : inventory.habitaciones()) {
-            SwitchClient.State state = states.get(room.id());
+                // Descartar encendidos si se detuvo o resincronizó el control.
+                ControlStatus current = controlService.status();
 
-            if (state == SwitchClient.State.DESCONOCIDO
-                    || (!selected.contains(room.id())
-                    && state != SwitchClient.State.OFF)) {
+                if (!Objects.equals(
+                        current.iniciadoEn(),
+                        control.iniciadoEn())
+                        || current.estado()
+                        != ControlStatus.State.EN_EJECUCION) {
 
-                states.put(
-                        room.id(),
-                        switches.command(room, SwitchClient.State.OFF)
+                    return;
+                }
+            }
+
+            SiteInventory.Room room =
+                    roomsById.get(action.roomId());
+
+            SwitchClient.State desired =
+                    SwitchClient.State.valueOf(action.state().name());
+
+            SwitchClient.State confirmed =
+                    switches.command(room, desired);
+
+            if (confirmed != desired) {
+                throw new IllegalStateException(
+                        "El switch no confirmó " + desired
                 );
-
-                log.info("Switch {} -> OFF", room.idSwitch());
-            }
-        }
-
-        // Descartar encendidos de un ciclo cuya configuración
-        // o estado de ejecución haya cambiado.
-        for (SiteInventory.Room room : inventory.habitaciones()) {
-            if (!siteService.isCurrent(snapshot.revision())) {
-                return;
             }
 
-            ControlStatus current = controlService.status();
-
-            if (!Objects.equals(
-                    current.iniciadoEn(),
-                    control.iniciadoEn())
-                    || current.estado()
-                    != ControlStatus.State.EN_EJECUCION) {
-
-                return;
-            }
-
-            if (selected.contains(room.id())
-                    && states.get(room.id()) != SwitchClient.State.ON) {
-
-                switches.command(room, SwitchClient.State.ON);
-                log.info("Switch {} -> ON", room.idSwitch());
-            }
+            log.info(
+                    "Switch {} -> {}",
+                    room.idSwitch(),
+                    desired
+            );
         }
     }
 }

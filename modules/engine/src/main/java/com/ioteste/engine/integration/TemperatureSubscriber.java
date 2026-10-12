@@ -1,13 +1,18 @@
 package com.ioteste.engine.integration;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import com.ioteste.engine.site.SiteInventory;
 import com.ioteste.engine.site.SiteService;
 
 import jakarta.annotation.PreDestroy;
 
+import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +33,7 @@ public class TemperatureSubscriber {
     private final EnvironmentRegistration registration;
     private final SiteService siteService;
     private final ObjectMapper mapper;
+    private final TemperatureReadingRepository readings;
 
     private final Map<String, Double> temperatures =
             new ConcurrentHashMap<>();
@@ -41,11 +47,13 @@ public class TemperatureSubscriber {
     public TemperatureSubscriber(
             EnvironmentRegistration registration,
             SiteService siteService,
-            ObjectMapper mapper) {
+            ObjectMapper mapper,
+            TemperatureReadingRepository readings) {
 
         this.registration = registration;
         this.siteService = siteService;
         this.mapper = mapper;
+        this.readings = readings;
     }
 
     @Scheduled(initialDelay = 4000, fixedDelay = 2000)
@@ -58,7 +66,6 @@ public class TemperatureSubscriber {
 
         try {
             SiteInventory inventory = siteService.get();
-
             Set<String> desiredTopics = new HashSet<>();
 
             for (SiteInventory.Room room : inventory.habitaciones()) {
@@ -79,7 +86,8 @@ public class TemperatureSubscriber {
 
                     @Override
                     public void connectComplete(
-                            boolean reconnect, String serverURI) {
+                            boolean reconnect,
+                            String serverURI) {
 
                         subscribedTopics.clear();
                         log.info("MQTT conectado: {}", serverURI);
@@ -93,13 +101,15 @@ public class TemperatureSubscriber {
 
                     @Override
                     public void messageArrived(
-                            String topic, MqttMessage message) {
+                            String topic,
+                            MqttMessage message) {
 
                         receive(topic, message);
                     }
 
                     @Override
-                    public void deliveryComplete(IMqttDeliveryToken token) {
+                    public void deliveryComplete(
+                            IMqttDeliveryToken token) {
                     }
                 });
             }
@@ -129,19 +139,33 @@ public class TemperatureSubscriber {
             }
 
         } catch (Exception exception) {
-            log.warn("No se pudo actualizar MQTT ({}). Reintentando.",
-                    exception.getClass().getSimpleName());
+            log.warn(
+                    "No se pudo actualizar MQTT ({}). Reintentando.",
+                    exception.getClass().getSimpleName()
+            );
         }
     }
 
-    private void receive(String topic, MqttMessage message) {
+    void receive(String topic, MqttMessage message) {
         if (!activeTopics.contains(topic)) {
             return;
         }
 
+        JsonNode payload;
+        List<SiteInventory.Room> rooms;
+        Instant receivedAt = Instant.now();
+
         try {
-            JsonNode payload = mapper.readTree(message.getPayload());
-            JsonNode temperature = payload == null ? null : payload.get("tC");
+            payload = mapper.reader()
+                    .with(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
+                    .readTree(message.getPayload());
+
+            if (payload instanceof ObjectNode object) {
+                normalizeTimestamp(object);
+            }
+
+            JsonNode temperature =
+                    payload == null ? null : payload.get("tC");
 
             if (temperature == null
                     || !temperature.isNumber()
@@ -151,13 +175,75 @@ public class TemperatureSubscriber {
                 return;
             }
 
-            double value = temperature.asDouble();
-            temperatures.put(topic, value);
+            rooms = siteService.get().habitaciones().stream()
+                    .filter(room -> topic.equals(room.topicTermostato()))
+                    .toList();
 
-            log.info("Temperatura recibida: {} = {} °C", topic, value);
+            if (rooms.isEmpty()) {
+                return;
+            }
 
         } catch (Exception exception) {
-            log.warn("Mensaje MQTT inválido en {}", topic);
+            log.warn(
+                    "No se pudo procesar la lectura MQTT en {} ({}).",
+                    topic,
+                    exception.getClass().getSimpleName()
+            );
+            return;
+        }
+
+        double value = payload.get("tC").asDouble();
+
+        temperatures.put(topic, value);
+
+        log.info("Temperatura recibida: {} = {} °C", topic, value);
+
+        for (SiteInventory.Room room : rooms) {
+            try {
+                readings.save(room, topic, payload, receivedAt);
+
+            } catch (Exception exception) {
+                log.error(
+                        "No se pudo guardar la lectura de {} en MongoDB ({}). "
+                                + "La temperatura sigue disponible en memoria.",
+                        room.id(),
+                        exception.getClass().getSimpleName()
+                );
+            }
+        }
+    }
+
+    private void normalizeTimestamp(ObjectNode payload) {
+        JsonNode timestamp = payload.get("ts");
+
+        if (timestamp == null || timestamp.isNull()) {
+            return;
+        }
+
+        if (!timestamp.isNumber()) {
+            throw new IllegalArgumentException(
+                    "ts debe ser un número de segundos"
+            );
+        }
+
+        if (timestamp.isDouble() || timestamp.isFloat()) {
+            throw new IllegalArgumentException(
+                    "ts debe leerse exactamente, sin coma flotante binaria"
+            );
+        }
+
+        try {
+            long epochMillis = timestamp.decimalValue()
+                    .movePointRight(3)
+                    .longValueExact();
+
+            payload.put("ts", epochMillis);
+
+        } catch (ArithmeticException exception) {
+            throw new IllegalArgumentException(
+                    "ts debe caber en long y tener precisión de milisegundos",
+                    exception
+            );
         }
     }
 
@@ -175,7 +261,9 @@ public class TemperatureSubscriber {
             if (client.isConnected()) {
                 client.disconnect();
             }
+
             client.close();
+
         } catch (MqttException exception) {
             log.warn("No se pudo cerrar limpiamente MQTT");
         }
