@@ -1,29 +1,39 @@
-name: Java CI with Maven
+name: IoTEste - Compilación y pruebas
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main", "iteracion-4"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        module: [ subscriber, generator ]
-
     steps:
-      - name: Checkout del repositorio
+      - name: Descargar el repositorio
         uses: actions/checkout@v4
 
-      - name: Configurar JDK 25
+      - name: Configurar Java 25
         uses: actions/setup-java@v4
         with:
-          java-version: '25'
-          distribution: 'temurin'
+          java-version: "25"
+          distribution: "temurin"
           cache: maven
 
-      - name: Compilar y testear módulo ${{ matrix.module }}
-        run: mvn -B clean verify --file src/${{ matrix.module }}/pom.xml
+      - name: Compilar y probar core y engine
+        run: mvn -B --no-transfer-progress clean verify
+
+      - name: Guardar reportes de pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reportes-tests
+          path: |
+            modules/core/target/surefire-reports/
+            modules/engine/target/surefire-reports/
+          if-no-files-found: ignore

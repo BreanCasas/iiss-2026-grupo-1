@@ -1,56 +1,37 @@
-# Historias de Usuario — EcoWarm
+# Historias de usuario - EcoWarm
 
-## Historia 1: Precalentar según tarifa horaria
+## H1. Confort con menor costo eléctrico
 
-**Como** usuario propietario de una vivienda con calefacción por losa radiante,
-**quiero** que EcoWarm programe el precalentamiento de mis habitaciones durante el horario
-de tarifa eléctrica más económica,
-**para** llegar a la temperatura objetivo sin haber consumido energía en horario pico y así
-reducir el costo de mi factura eléctrica.
+Como residente de una vivienda con calefacción eléctrica,
+quiero que las habitaciones se acerquen a la temperatura que necesito
+aprovechando los horarios de menor costo,
+para mantener el confort sin tener que controlar manualmente cada encendido.
 
-**Criterios de aceptación:**
-- El sistema conoce la franja horaria de tarifa reducida configurada por el usuario.
-- Si una habitación está por debajo de su temperatura objetivo antes de que finalice la franja
-  de tarifa reducida, el sistema activa su switch dentro de esa franja.
-- El usuario puede consultar en qué horario se realizó el último precalentamiento de cada
-  habitación.
+La necesidad surge cuando el usuario desea una vivienda confortable,
+pero también debe considerar el costo de la energía y la potencia contratada.
 
-**Escenario relacionado:** Escenario 1 — Optimización según tarifa multihorario.
+## H2. Preparación ante una ola de frío
 
----
+Como residente que estará fuera de casa durante el día,
+quiero que el sistema tenga en cuenta un descenso de temperatura previsto,
+para evitar encontrar la vivienda fría al regresar.
 
-## Historia 2: Anticipar frío según pronóstico
+La necesidad es anticipar una pérdida de confort que todavía no se refleja
+en las mediciones interiores.
 
-**Como** usuario que quiere mantener el confort de su hogar sin sobre-consumir energía,
-**quiero** que EcoWarm ajuste el encendido de la calefacción según el pronóstico climático de
-las próximas 48 horas,
-**para** evitar que la temperatura interior caiga antes de que el sistema reaccione, sin
-necesidad de intervenir manualmente.
+## H3. Evaluación de la potencia contratada
 
-**Criterios de aceptación:**
-- El sistema puede consultar un pronóstico climático externo a 48 hs.
-- Si el pronóstico indica una caída significativa de temperatura exterior, el sistema adelanta
-  la activación de la calefacción en las habitaciones correspondientes.
-- El usuario puede ver qué habitaciones fueron ajustadas por esta razón y en qué momento.
+Como cliente que evalúa cambiar su contrato eléctrico,
+quiero conocer cómo podría afectar una potencia menor al confort de mi vivienda,
+para decidir si el ahorro del contrato compensa las limitaciones de calefacción.
 
-**Escenario relacionado:** Escenario 2 — Ajuste por pronóstico climático.
+La necesidad es comparar alternativas antes de modificar la instalación
+o el funcionamiento habitual del sistema.
 
----
+## Relación con el producto
 
-## Historia 3: Simular consumo con distinta potencia contratada
+Las capacidades y su estado de implementación se describen en
+[caracteristicas.md](caracteristicas.md).
 
-**Como** cliente potencial evaluando qué potencia eléctrica contratar,
-**quiero** simular distintas configuraciones de habitaciones encendidas bajo una potencia
-contratada específica,
-**para** entender qué temperaturas son alcanzables antes de decidir mi contrato eléctrico, sin
-afectar el funcionamiento real de mi sistema.
-
-**Criterios de aceptación:**
-- El usuario puede indicar una potencia contratada hipotética y una cantidad de habitaciones
-  activas simultáneamente.
-- El sistema devuelve una proyección de temperatura alcanzable por habitación bajo esa
-  configuración simulada.
-- La simulación no modifica el estado real de los switches ni la configuración vigente del
-  sistema.
-
-**Escenario relacionado:** Escenario 3 — Simulación de potencia contratada.
+Los ejemplos concretos de uso se describen en
+[escenarios.md](escenarios.md).

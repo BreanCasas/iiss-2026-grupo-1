@@ -1,51 +1,41 @@
 services:
-  mosquitto:
-    image: eclipse-mosquitto:2
-    container_name: ioteste-mosquitto
+  mongodb:
+    image: mongo:8
+    container_name: ioteste-mongodb
     ports:
-      - "1883:1883"
+      - "27017:27017"
     volumes:
-      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
-      - mosquitto-data:/mosquitto/data
-      - mosquitto-log:/mosquitto/log
+      - mongodb-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "quit(db.adminCommand({ ping: 1 }).ok === 1 ? 0 : 1)"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
     restart: unless-stopped
     networks:
       - ioteste-net
 
-  subscriber:
+  control:
     build:
-      context: ../src/subscriber
-      dockerfile: Dockerfile
-    container_name: ioteste-subscriber
+      context: ..
+      dockerfile: docker/control.Dockerfile
+    container_name: ioteste-control
     depends_on:
-      - mosquitto
+      mongodb:
+        condition: service_healthy
     environment:
-      MQTT_BROKER_HOST: mosquitto
-      MQTT_BROKER_PORT: 1883
-      MQTT_TOPIC: "+/status/#"
-      MQTT_CLIENT_ID: ioteste-subscriber
-      ROOMS_FILE: /data/rooms.json
-      READINGS_DIR: /data/readings
-    volumes:
-      - ./data/rooms.json:/data/rooms.json:ro
-      - readings-data:/data/readings
-    restart: unless-stopped
-    networks:
-      - ioteste-net
-
-  generator:
-    build:
-      context: ../src/generator
-      dockerfile: Dockerfile
-    container_name: ioteste-generator
-    depends_on:
-      - mosquitto
-      - subscriber
-    environment:
-      MQTT_BROKER_HOST: mosquitto
-      MQTT_BROKER_PORT: 1883
-      MQTT_CLIENT_ID: ioteste-generator
-      GENERATOR_INTERVAL_MS: 10000
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017
+      SPRING_DATA_MONGODB_DATABASE: ${MONGODB_DATABASE:-ioteste}
+      IOTESTE_API_KEY: ${IOTESTE_API_KEY:?Definir IOTESTE_API_KEY en .env}
+      ECOWARM_ENVIRONMENT_URL: http://host.docker.internal:9090
+      ECOWARM_PUBLIC_URL: http://localhost:8080
+      ECOWARM_LABEL: grupo-1
+      ECOWARM_ENVIRONMENT_KEY: ${ECOWARM_ENVIRONMENT_KEY:-}
+    ports:
+      - "8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     networks:
       - ioteste-net
@@ -55,6 +45,4 @@ networks:
     driver: bridge
 
 volumes:
-  mosquitto-data:
-  mosquitto-log:
-  readings-data:
+  mongodb-data:

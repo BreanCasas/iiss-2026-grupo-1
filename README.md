@@ -1,206 +1,344 @@
 # IoTEste EcoWarm
 
-Taller de Ingeniería de Software — Java 25
+Taller de Ingeniería de Software - Iteración 4 - Java 25.
 
-Sistema de gestión inteligente de calefacción por losa radiante, integrando dispositivos
-Shelly (termostatos H&T y switches Pro 1PM) mediante mensajería MQTT, con persistencia de
-configuración y del histórico de temperaturas.
+Control de calefacción por habitaciones mediante MQTT y switches REST.
 
-## Iteraciones
+## Evolución y estructura
 
-- **Iteración 1**: prototipo base de mensajería MQTT (broker + suscriptor mínimo en Java).
-- **Iteración 2** *(actual)*: cierre de alcance del producto (Visión v2, escenarios, historias,
-  características), metodología ágil (Kanban), generador de eventos de termostatos,
-  extensión del consumidor con persistencia de habitaciones e histórico de temperaturas,
-  build reproducible vía Docker, e integración continua con GitHub Actions.
+La iteración 4 conserva la recepción MQTT, el control REST y la persistencia
+de las entregas anteriores y organiza el controlador en core y engine.
 
-## Contexto del proyecto
+| Ubicación | Contenido |
+|---|---|
+| modules/core/ | Modelo y reglas de decisión, con tests |
+| modules/engine/ | API REST, suscriptor MQTT, reloj, MongoDB y switches |
+| pom.xml | Proyecto Maven padre |
+| docker/docker-compose.yml | Controlador y MongoDB |
+| docker/control.Dockerfile | Construcción y ejecución del controlador |
+| scripts/ | Construcción, arranque, parada y tests |
+| docs/api/openapi.yaml | Contrato estandarizado de la API |
+| docs/tests/criterio-tests.md | Criterio de adecuación y resultados |
+| docs/arquitectura/4mas1.md | Vista lógica y secuencias |
+| .github/workflows/maven.yml | Integración continua |
 
-IoTEste busca posicionarse en el mercado de automatización de oficinas y hogares, integrando
-dispositivos IoT (Shelly Pro 1PM y Shelly H&T Gen 3) mediante mensajería MQTT. A partir de la
-Iteración 2, el producto se enfoca específicamente en **EcoWarm**: gestión inteligente de
-calefacción por losa radiante, optimizando el consumo según las tarifas eléctricas disponibles.
+Engine depende de core.
 
-## Estructura del repositorio
+Core no utiliza Spring ni comunicaciones externas.
 
-/docs/vision.md Documento de Visión (v2)
-/docs/metodologia.md Metodología ágil adoptada (Kanban) y su justificación
-/docs/producto/escenarios.md Escenarios de uso de EcoWarm
-/docs/producto/historias.md Historias de usuario
-/docs/producto/caracteristicas.md Características del producto
-/docker/docker-compose.yml Orquestación: Mosquitto + subscriber + generator
-/docker/mosquitto/config/ Configuración del broker Mosquitto
-/docker/data/rooms.json Configuración predefinida de habitaciones
-/scripts/up.sh Levanta el entorno completo (build + up -d)
-/scripts/down.sh Baja y elimina los contenedores
-/scripts/stop.sh Detiene los contenedores sin eliminarlos
-/scripts/build.sh Compila todos los módulos Java vía Docker
-/scripts/send-temp.sh Publica un mensaje simulado de temperatura/humedad (manual)
-/scripts/receive-temp.sh Se suscribe por consola (verificación manual)
-/src/subscriber/ Consumidor de eventos (Java): recibe, muestra y persiste
-/src/generator/ Generador de eventos (Java): simula termostatos
-/.github/workflows/maven.yml Integración continua (GitHub Actions + Maven)
-/README.md
+API y suscriptor MQTT se ejecutan juntos en el contenedor control.
 
+El simulador docente aporta broker, termostatos, switches e inventario.
 
-## Requisitos previos
+Reemplaza al generator y al switch-stub propios para la integración
+de esta entrega.
 
-### Linux (Fedora / Ubuntu / etc.)
+## Requisitos y configuración
 
-- Docker y Docker Compose (plugin `docker compose`)
-- `mosquitto-clients` instalado localmente, para los scripts de publish/subscribe manuales
-  (en Fedora: `sudo dnf install mosquitto` · en Ubuntu/Debian: `sudo apt install mosquitto-clients`)
-- (Opcional) [MQTT Explorer](http://mqtt-explorer.com/) o [MQTTX](https://mqttx.app/) para verificación visual cruzada
-- **Importante:** si hay un Mosquitto instalado nativamente en el sistema (como servicio),
-  detenerlo antes de levantar el entorno Docker, porque ambos compiten por el puerto 1883:
-```bash
-  sudo systemctl stop mosquitto
-  sudo systemctl disable mosquitto
+- Docker y Docker Compose.
+- Java 25 para el entorno probado.
+- ecowarm-check.jar del docente.
+- Git Bash para scripts en Windows.
+- curl para scripts/api-example.sh.
+
+Conservar los valores existentes de .env.
+
+Variables utilizadas:
+
+```env
+MONGODB_DATABASE=ioteste
+IOTESTE_API_KEY=reemplazar-por-tu-clave
+ECOWARM_ENVIRONMENT_KEY=
 ```
 
-### Windows
+Compose conecta a mongodb://mongodb:27017 y utiliza:
 
-- **Docker Desktop** (con backend WSL2 habilitado): https://www.docker.com/products/docker-desktop
-- Se recomienda trabajar dentro de **WSL2 con Ubuntu** (`wsl --install` desde PowerShell como
-  administrador) para poder correr los scripts `.sh` sin modificaciones. Alternativamente,
-  **Git Bash** (incluido con Git para Windows) también permite ejecutarlos.
-- Cliente Mosquitto para Windows (si no se usa WSL2): https://mosquitto.org/download/
-- MQTTX o MQTT Explorer tienen instaladores `.exe` nativos para Windows.
+- ECOWARM_ENVIRONMENT_URL: http://host.docker.internal:9090
+- ECOWARM_PUBLIC_URL: http://localhost:8080
+- ECOWARM_LABEL: grupo-1
 
-## Cómo levantar el sistema completo
+Estas direcciones corresponden a checker en Windows
+y control en Docker Desktop.
 
-```bash
-cd scripts
-./up.sh
+## Arranque
+
+Desde la raíz, iniciar el checker y dejarlo abierto:
+
+```powershell
+java -jar ".\ecowarm-check.jar" --anunciar host.docker.internal
 ```
 
-Esto construye y levanta 3 servicios:
+En otra terminal:
 
-- **ioteste-mosquitto**: broker MQTT, expuesto en `localhost:1883`
-- **ioteste-generator**: genera eventos de temperatura simulados cada 10 segundos (por
-  defecto), para las habitaciones configuradas en `docker/data/rooms.json`
-- **ioteste-subscriber**: recibe esos eventos, los despliega en consola (vía logger, sin
-  `System.out`) y los persiste en `/data/readings/temp-<roomId>.jsonl` dentro de un volumen
-  Docker
-
-El sistema se pone a correr automáticamente al levantar el compose, generando y consumiendo
-eventos sin necesidad de intervención manual.
-
-Para confirmar que los 3 servicios están activos:
-
-```bash
-docker compose -f ../docker/docker-compose.yml ps
+```powershell
+docker compose --env-file .env -f docker/docker-compose.yml up -d --build
+docker compose --env-file .env -f docker/docker-compose.yml ps
+docker compose --env-file .env -f docker/docker-compose.yml logs -f control
 ```
 
-Para ver los eventos en tiempo real (generación + recepción + persistencia):
+Puertos:
 
-```bash
-docker compose -f ../docker/docker-compose.yml logs -f
+- MQTT: 1883.
+- REST del checker: 9090.
+- API del controlador: 8080.
+
+El controlador se registra y obtiene la dirección del broker.
+
+Si se reinicia el checker después del registro:
+
+```powershell
+docker compose --env-file .env -f docker/docker-compose.yml restart control
 ```
 
-## Cómo compilar el sistema (build reproducible, sin Java/Maven local)
+## API REST
 
-```bash
-cd scripts
-./build.sh
-```
+Dirección: http://localhost:8080.
 
-Este script compila ambos módulos Java (`subscriber` y `generator`) usando exclusivamente
-Docker — no depende de tener Java ni Maven instalados en el sistema anfitrión.
+Encabezado requerido: X-API-Key.
 
-## Cómo compilar un módulo manualmente (sin Docker, para debug en IntelliJ)
-
-```bash
-cd src/subscriber   # o src/generator
-mvn clean package
-java -jar target/subscriber-jar-with-dependencies.jar   # ajustar nombre según el módulo
-```
-
-Variables de entorno del **subscriber**:
-
-| Variable | Default | Descripción |
+| Método | Endpoint | Función |
 |---|---|---|
-| `MQTT_BROKER_HOST` | `localhost` | Host del broker MQTT |
-| `MQTT_BROKER_PORT` | `1883` | Puerto del broker MQTT |
-| `MQTT_TOPIC` | `ht-sim-+/status/temperature:+` | Topic al que se suscribe |
-| `MQTT_CLIENT_ID` | `ioteste-subscriber` | Client ID usado en la conexión MQTT |
-| `ROOMS_FILE` | `/data/rooms.json` | Ruta al archivo de configuración de habitaciones |
-| `READINGS_DIR` | `/data/readings` | Carpeta donde se persiste el histórico de temperaturas |
+| GET | /sitio | Consultar inventario |
+| PUT | /sitio | Validar y reemplazar configuración |
+| GET | /control | Consultar estado y tiempo virtual |
+| POST | /control/comandos | INICIAR o DETENER |
 
-Variables de entorno del **generator**:
+- Clave ausente o incorrecta: 401.
+- Inventario inválido: 400.
+- Sitio todavía no cargado: 404.
 
-| Variable | Default | Descripción |
-|---|---|---|
-| `MQTT_BROKER_HOST` | `localhost` | Host del broker MQTT |
-| `MQTT_BROKER_PORT` | `1883` | Puerto del broker MQTT |
-| `MQTT_CLIENT_ID` | `ioteste-generator` | Client ID usado en la conexión MQTT |
-| `GENERATOR_INTERVAL_MS` | `10000` | Intervalo entre publicaciones, en milisegundos |
+Los errores gestionados incluyen timestamp, status y mensaje.
 
-## Verificar la persistencia
+### Encabezados en PowerShell
+
+```powershell
+$keyLine = Get-Content .env |
+    Where-Object { $_ -match '^\s*IOTESTE_API_KEY\s*=' } |
+    Select-Object -First 1
+
+$apiKey = ($keyLine -split '=', 2)[1].Trim().Trim('"').Trim("'")
+$headers = @{ "X-API-Key" = $apiKey }
+```
+
+### Consultar
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8080/control" -Headers $headers | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8080/sitio" -Headers $headers | ConvertTo-Json -Depth 10
+```
+
+### Iniciar o resincronizar
+
+```powershell
+$inicio = @'
+{
+  "accion": "INICIAR",
+  "fechaHora": "2026-10-05T12:00:00-03:00",
+  "factorTiempo": 1
+}
+'@
+
+Invoke-RestMethod -Method Post -Uri "http://localhost:8080/control/comandos" -Headers $headers -ContentType "application/json" -Body $inicio | ConvertTo-Json
+```
+
+### Detener
+
+```powershell
+Invoke-RestMethod -Method Post -Uri "http://localhost:8080/control/comandos" -Headers $headers -ContentType "application/json" -Body '{"accion":"DETENER"}' | ConvertTo-Json
+```
+
+DETENER cambia el estado.
+Los siguientes ciclos intentan apagar los switches.
+
+## Decisión y reglas
+
+HeatingController.decide recibe configuración, hora y estado.
+
+Devuelve una Decision con acciones OFF antes de ON.
+
+- Selecciona habitaciones por debajo del objetivo, fuera de punta.
+- Respeta la potencia máxima del sitio.
+- Prioriza mayor déficit y desempata por ID.
+- No selecciona habitaciones sin temperatura disponible.
+- Evita comandos si el switch ya tiene el estado correcto.
+- Para estado desconocido ordena OFF antes de un eventual ON.
+
+Engine reúne lecturas y estados, consulta al core y ejecuta los comandos.
+
+Confirma apagados antes de nuevos encendidos.
+
+## Inventario y persistencia
+
+PUT /sitio valida y guarda inventario nuevo y apagados pendientes
+en un mismo documento antes de actualizar la memoria.
+
+La petición no llama a switches.
+
+HeatingEngine procesa pendientes aunque el control esté detenido.
+
+Si falla un apagado, conserva el trabajo y vuelve a intentar.
+
+Antes de ON comprueba revisión y ejecución vigentes.
+
+MongoDB conserva:
+
+- site_config, documento _id active: inventory y pendingShutdowns.
+- temperature_readings: histórico de lecturas válidas.
+
+Inventario y pendientes se recuperan al arrancar.
+
+La última temperatura se conserva en memoria.
+Se espera una nueva lectura MQTT tras reiniciar.
+
+Si falla el guardado, la temperatura sigue disponible en memoria.
+Esa escritura no tiene reintentos automáticos.
+
+El histórico no se expone mediante los antiguos endpoints /rooms.
+
+Estado de ejecución y reloj están en memoria.
+El controlador arranca detenido.
+
+MongoDB utiliza el volumen mongodb-data.
+
+## Timestamp de las lecturas
+
+sourceTs y payload.ts de las lecturas nuevas utilizan BSON Int64
+en milisegundos desde Unix epoch.
+
+sourceTsUnit indica epoch_milliseconds.
+
+Los segundos decimales del protocolo se leen exactamente como BigDecimal
+y se normalizan a long sin pasar por double.
+
+Los timestamps nuevos no se redondean.
+Se rechazan valores fuera de rango o con fracción inferior al milisegundo.
+
+receivedAt sigue siendo la fecha real de recepción, no la hora virtual.
+
+Actualizar el código no convierte automáticamente los documentos antiguos.
+
+## Tiempo virtual
+
+El reloj y factorTiempo conservan su implementación y contrato numérico:
+
+instante inicial + tiempo real transcurrido × factor
+
+Con factor 60, un segundo real representa un minuto virtual.
+
+El factor es positivo y vale 1 si se omite.
+
+INICIAR resincroniza y conserva el desplazamiento recibido.
+
+La tarifa se evalúa con esa hora local.
+GET /control muestra el instante en UTC.
+
+El desplazamiento permanece fijo hasta otro INICIAR.
+
+La franja incluye el inicio y excluye el final: [desde, hasta).
+
+HABILES significa lunes a viernes.
+TODOS incluye todos los días.
+
+Para probar entrada en punta a las 17:00,
+iniciar a las 16:58 con factor 10.
+
+Se alcanza el inicio aproximadamente 12 segundos reales después.
+
+El factor no acelera por sí mismo la simulación térmica del checker.
+
+## Construcción y pruebas
+
+Desde PowerShell:
+
+```powershell
+& "C:\Program Files\Git\bin\bash.exe" ./scripts/build.sh
+& "C:\Program Files\Git\bin\bash.exe" ./scripts/test.sh
+& "C:\Program Files\Git\bin\bash.exe" ./scripts/api-example.sh
+```
+
+Desde Linux o Git Bash:
 
 ```bash
-docker exec -it ioteste-subscriber sh
-ls /data/readings/
-cat /data/readings/temp-room1.jsonl
-exit
+bash scripts/build.sh
+bash scripts/test.sh
+bash scripts/api-example.sh
 ```
 
-Debería verse un archivo `.jsonl` por habitación, con una línea JSON por cada lectura recibida,
-incluyendo el momento en que el sistema la recibió y persistió.
+Con Java 25 y Maven locales:
 
-## Configuración de habitaciones
-
-La configuración predefinida del sitio vive en `docker/data/rooms.json`, montada como volumen
-de solo lectura dentro del consumidor. Cada habitación define su termostato, su switch y su
-temperatura objetivo:
-
-```json
-[
-  {
-    "id": "room1",
-    "name": "Living",
-    "thermostatId": "ht-sim-room1",
-    "switchId": "pro1pm-room1",
-    "targetTempC": 21.5
-  }
-]
+```bash
+mvn -B clean verify
 ```
 
-## Verificación cruzada con un cliente MQTT externo (opcional)
+El Dockerfile construye con -DskipTests.
+Los tests se ejecutan por separado.
 
-Se puede usar [MQTT Explorer](http://mqtt-explorer.com/) o [MQTTX](https://mqttx.app/):
+| Módulo | Pruebas | Fallos | Errores | Omitidas |
+|---|---:|---:|---:|---:|
+| core | 23 | 0 | 0 | 0 |
+| engine | 43 | 0 | 0 | 0 |
+| Total | 66 | 0 | 0 | 0 |
 
-1. Conectar la aplicación contra `localhost:1883` (sin autenticación, puerto 1883, sin TLS).
-2. Suscribirse al topic `ht-sim-+/status/temperature:+`.
-3. Publicar un mensaje manual con `./send-temp.sh`, o simplemente observar los eventos que ya
-   genera automáticamente el servicio `generator`.
-4. Confirmar que los mismos mensajes aparecen tanto en la interfaz del cliente MQTT como en
-   los logs del contenedor `ioteste-subscriber`.
+Resultado de las pruebas con Java 25: BUILD SUCCESS.
 
-## Metodología ágil
+## Checker y validación
 
-El equipo trabaja bajo **Kanban**. La justificación completa y la configuración del tablero
-están documentadas en [`docs/metodologia.md`](docs/metodologia.md).
+Validación realizada el 11 de octubre de 2026, hora de Uruguay:
+
+- Checker: 8/8 comprobaciones aprobadas.
+- Comandos a switches: 18.
+- Consultas de estado: 204.
+- Suite Maven: 66 tests, sin fallos, errores ni pruebas omitidas.
+- MongoDB: las dos lecturas más recientes verificadas tenían sourceTs
+  y payload.ts de tipo long, con unidad epoch_milliseconds.
+
+La cantidad de comandos y consultas depende de la duración de la ejecución.
+
+La comprobación de tipos corresponde a las lecturas nuevas inspeccionadas.
+No implica que se haya migrado el histórico anterior.
+
+Para ver el veredicto, presionar Ctrl+C en la terminal del checker.
 
 ## Integración continua
 
-Cada `push` o `pull request` sobre `main` dispara el workflow definido en
-[`.github/workflows/maven.yml`](.github/workflows/maven.yml), que compila ambos módulos Java
-(`subscriber` y `generator`) con Maven sobre JDK 25.
-
-## Cómo bajar el entorno
+.github/workflows/maven.yml utiliza Java 25 y ejecuta:
 
 ```bash
-./down.sh    # elimina los contenedores (conserva volúmenes de datos)
-./stop.sh    # solo detiene los contenedores, sin eliminarlos
+mvn -B --no-transfer-progress clean verify
 ```
 
-## Proyecto Jira
+Se activa por push a main o iteracion-4,
+pull request hacia main o ejecución manual.
 
-Tablero del equipo: https://estudiantes-team-luofpxgu.atlassian.net/?continue=https%3A%2F%2Festudiantes-team-luofpxgu.atlassian.net%2Fwelcome%2Fsoftware%3FprojectId%3D10000&atlOrigin=eyJpIjoiOThhMjllOWZlMDUxNGE2Zjk1NGRlYTNkMWEzOTM3N2UiLCJwIjoiamlyYS1zb2Z0d2FyZSJ9
+Guarda reportes Surefire.
 
-## Próximos pasos
+Los tests no requieren MongoDB ni checker activos.
 
-Iteraciones futuras incorporarán: optimización según tarifa eléctrica multihorario, ajuste
-según pronóstico climático, capacidad de simulación de consumo, y posible integración con
-GenAI/LLM.
+## Detener el entorno
+
+```powershell
+docker compose --env-file .env -f docker/docker-compose.yml stop
+
+docker compose --env-file .env -f docker/docker-compose.yml down
+```
+
+stop detiene.
+
+down elimina contenedores y red conservando el volumen.
+
+No utilizar down -v si se quieren conservar los datos.
+
+El checker se detiene aparte con Ctrl+C.
+
+## Documentación y metodología
+
+- docs/vision.md
+- docs/metodologia.md
+- docs/producto/
+- docs/api/openapi.yaml
+- docs/tests/criterio-tests.md
+- docs/arquitectura/4mas1.md
+
+La metodología es Scrumban, con planificación,
+seguimiento en Jira y revisiones semanales.

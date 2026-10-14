@@ -1,77 +1,74 @@
-# Metodología Ágil — IoTEste EcoWarm
+# Metodología de trabajo
 
-## Metodología adoptada: Kanban
+## Evolución
 
-El equipo adopta **Kanban** como metodología ágil de trabajo a lo largo del proyecto.
+En las iteraciones anteriores se adoptó Kanban para visualizar
+y organizar el trabajo del equipo.
 
-### Justificación de la elección
+A partir de la Iteración 4, la consigna establece Scrumban:
+se mantiene el tablero y se incorporan la planificación al inicio
+de cada iteración y las revisiones semanales.
 
-- El equipo trabaja bajo un **flujo continuo de tareas** más que bajo Sprints cerrados con
-  planificación y compromiso fijo de alcance al inicio: las iteraciones de 2 semanas definidas
-  por la cátedra funcionan como **puntos de corte para entrega y evaluación**, pero el trabajo
-  interno del equipo fluye de forma continua entre iteraciones, sin necesidad de una ceremonia
-  formal de Sprint Planning ni de comprometerse a un Sprint Backlog cerrado.
-- Kanban permite **visualizar el estado del trabajo en todo momento** mediante el tablero,
-  sin la sobrecarga de ceremonias (Daily, Sprint Review, Retrospectiva formal) que no aportan
-  valor proporcional en un equipo reducido con reuniones informales frecuentes.
-- El foco de Kanban en **limitar el trabajo en curso (WIP)** y en el flujo continuo se ajusta
-  bien a un contexto académico donde los integrantes combinan este proyecto con otras
-  materias y no siempre pueden dedicar bloques de tiempo homogéneos por Sprint.
-- Los **entregables por plano e iteración**, definidos por la cátedra, se toman como hitos de
-  entrega (similares a un "release" o corte de evaluación), sin que esto implique adoptar Scrum:
-  las tareas simplemente deben estar en la columna `Done` al momento del corte de cada
-  iteración.
+## Organización del trabajo
 
-### Principios aplicados
+El equipo utiliza el Board de Jira para registrar y seguir
+las actividades.
 
-- **Visualizar el flujo de trabajo**: mediante el tablero de Jira con columnas de estado.
-- **Limitar el trabajo en curso**: se evita que un integrante tenga más de 1-2 tareas en
-  `InProgress` simultáneamente.
-- **Gestionar el flujo**: se prioriza mover tareas de forma continua entre columnas antes que
-  acumular trabajo en `Todo`.
-- **Mejora continua**: al cierre de cada iteración se revisa el cumplimiento de este documento
-  y se ajusta si es necesario (ver historial de cambios más abajo).
+Las columnas representan el avance del trabajo:
 
-## Gestión en Jira
+- Por hacer: actividades pendientes.
+- En curso: actividades que se están realizando.
+- Listo: actividades terminadas y verificadas.
 
-### Backlog
+Se procura limitar el trabajo simultáneo y terminar las actividades
+iniciadas antes de comenzar otras.
 
-El Backlog del proyecto se organiza en **Épicas**, una por cada plano de trabajo definido por la
-cátedra:
+## Planificación de la iteración
 
-- **Épica: Diseño del Producto**
-- **Épica: Herramientas y Técnicas**
-- **Épica: Prototipo**
+Al inicio de cada iteración se deben:
 
-Cada iteración agrega Historias/Tareas concretas debajo de estas épicas, según los entregables
-solicitados para esa iteración. A diferencia de Scrum, estas tareas no se "comprometen" en
-bloque al inicio de la iteración: se van agregando y priorizando en el Backlog de forma continua,
-y el corte de cada iteración simplemente marca la fecha en la que se evalúa qué quedó en `Done`.
+- Revisar los requisitos y entregables de la consigna.
+- Registrar las actividades necesarias en el Board.
+- Ordenarlas según sus dependencias y prioridad.
+- Distribuir el trabajo entre los integrantes.
 
-### Board
+## Revisiones semanales
 
-El tablero del equipo se configura con las siguientes columnas:
+Cada semana se debe revisar:
 
-| Columna | Significado |
-|---|---|
-| **Todo** | Tareas priorizadas, listas para tomarse, aún no iniciadas |
-| **InProgress** | Tareas en desarrollo activo (con límite de WIP por integrante) |
-| **ToTest** | Tareas cuyo desarrollo está terminado y pendientes de verificación/prueba |
-| **Done** | Tareas verificadas y completadas |
+- El avance respecto a lo planificado.
+- Los resultados de las pruebas.
+- Los problemas y bloqueos encontrados.
+- Los ajustes de alcance acordados con el Product Owner.
 
-Este flujo de 4 columnas permite distinguir claramente entre "terminado de programar" y
-"verificado que funciona", algo especialmente relevante en este proyecto dado que varios
-entregables requieren pruebas end-to-end (por ejemplo, verificar que el flujo MQTT completo
-funciona antes de mover una tarea a `Done`).
+Los cambios de planificación deben reflejarse en el Board.
 
-## Revisión y ajuste de la metodología
+## Verificación del trabajo
 
-Al final de cada iteración, el equipo revisa el cumplimiento de esta metodología: si el flujo de
-trabajo definido no se ajusta a la realidad del equipo, se documentan los cambios en este mismo
-archivo, indicando la iteración en la que se realizó el ajuste y la justificación correspondiente.
+Una actividad se considera terminada cuando su resultado cumple
+el alcance previsto y se ha realizado la verificación correspondiente.
 
-### Historial de cambios
+Para los cambios de código, se ejecutan las pruebas pertinentes.
+Para la integración, se comprueba la comunicación con el checker.
+Para la documentación, se revisa que describa la implementación actual.
 
-| Iteración | Cambio | Justificación |
-|---|---|---|
-| 2 | Definición inicial de la metodología: Kanban con tablero de 4 columnas (Todo, InProgress, ToTest, Done) | Primera declaración formal de metodología. Se elige Kanban por sobre Scrum dado el flujo continuo de trabajo del equipo y la carga académica variable de sus integrantes, que dificulta comprometerse a un Sprint Backlog cerrado |
+## TDD en el core
+
+El desarrollo de las reglas del core sigue el ciclo:
+
+1. Escribir una prueba que describa el comportamiento requerido.
+2. Ejecutarla y comprobar que detecta el comportamiento faltante.
+3. Implementar la regla necesaria para que pase.
+4. Mejorar el código conservando las pruebas aprobadas.
+
+El criterio de adecuación de las pruebas se documenta en
+`docs/tests/criterio-tests.md`.
+
+## Evidencias
+
+La planificación y las revisiones realizadas se registran
+en Jira y en las notas del equipo.
+
+Este documento describe la metodología adoptada; no sustituye
+el registro de las reuniones ni demuestra por sí mismo
+que se hayan realizado.
