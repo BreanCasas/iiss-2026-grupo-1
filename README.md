@@ -228,12 +228,16 @@ Con factor 60, un segundo real representa un minuto virtual.
 
 El factor es positivo y vale 1 si se omite.
 
-INICIAR resincroniza y conserva el desplazamiento recibido.
+INICIAR resincroniza el reloj con el instante recibido.
 
-La tarifa se evalúa con esa hora local.
-GET /control muestra el instante en UTC.
+El sitio tiene una única zona horaria: America/Montevideo (UTC-03:00,
+sin cambio de horario). Se puede cambiar con la variable ECOWARM_ZONE.
 
-El desplazamiento permanece fijo hasta otro INICIAR.
+La franja de tarifa se evalúa siempre en esa zona. El offset con que llegue
+fechaHora no cambia la hora local: 17:00-03:00 y 20:00Z son el mismo instante
+y se interpretan como las 17:00 de Uruguay. En cambio 17:00Z son las 14:00.
+
+GET /control muestra el mismo instante en UTC.
 
 La franja incluye el inicio y excluye el final: [desde, hasta).
 
@@ -246,6 +250,11 @@ iniciar a las 16:58 con factor 10.
 Se alcanza el inicio aproximadamente 12 segundos reales después.
 
 El factor no acelera por sí mismo la simulación térmica del checker.
+
+El ciclo de control se despierta justo en cada cambio de franja, aunque el
+tiempo esté acelerado, y también apenas se inicia o detiene el control.
+Cada habitación se consulta y se comanda por separado, de modo que un
+switch sin respuesta no impide apagar los demás.
 
 ## Construcción y pruebas
 

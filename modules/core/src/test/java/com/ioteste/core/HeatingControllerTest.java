@@ -190,4 +190,30 @@ class HeatingControllerTest {
                         rooms, 3.7, schedule.isPeak(peakEnd))
         );
     }
+
+    @Test
+    void selectsNothingWhenThereAreNoRooms() {
+        HeatingController controller = new HeatingController();
+
+        assertEquals(
+                Set.of(),
+                controller.selectRoomsToHeat(List.of(), 3.7, false)
+        );
+    }
+
+    @Test
+    void neverSelectsARoomWhoseOwnPowerExceedsTheSiteMaximum() {
+        HeatingController controller = new HeatingController();
+
+        List<RoomState> rooms = List.of(
+                new RoomState("room1", 15.0, 21.5, 5.0),
+                new RoomState("room2", 19.0, 21.5, 1.2)
+        );
+
+        // room1 tiene más déficit pero no cabe: se calefacciona room2.
+        assertEquals(
+                Set.of("room2"),
+                controller.selectRoomsToHeat(rooms, 3.7, false)
+        );
+    }
 }

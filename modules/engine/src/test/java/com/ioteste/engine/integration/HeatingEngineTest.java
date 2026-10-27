@@ -84,6 +84,54 @@ class HeatingEngineTest {
     }
 
     @Test
+    void oneFailedPendingShutdownDoesNotPreventShuttingDownTheOthers() {
+        SiteService site = mock(SiteService.class);
+        ControlService control = mock(ControlService.class);
+        TemperatureSubscriber subscriber =
+                mock(TemperatureSubscriber.class);
+        SwitchClient switches = mock(SwitchClient.class);
+
+        SiteInventory.Room other = new SiteInventory.Room(
+                "room2",
+                "Dormitorio",
+                20.0,
+                0.8,
+                "ht-room2",
+                "ht-room2/status/temperature:0",
+                "sw-room2",
+                "http://localhost:9090"
+        );
+
+        when(site.snapshot()).thenReturn(
+                new SiteService.Snapshot(
+                        inventory(),
+                        List.of(room(), other),
+                        1
+                )
+        );
+
+        when(switches.command(room(), SwitchClient.State.OFF))
+                .thenThrow(new IllegalStateException("Switch inaccesible"));
+
+        when(switches.command(other, SwitchClient.State.OFF))
+                .thenReturn(SwitchClient.State.OFF);
+
+        new HeatingEngine(
+                site,
+                control,
+                subscriber,
+                switches
+        ).tick();
+
+        // El segundo switch se apaga aunque el primero falló...
+        verify(switches).command(other, SwitchClient.State.OFF);
+
+        // ...pero el trabajo pendiente se conserva para reintentar.
+        verify(site, never()).confirmShutdowns(anyLong());
+        verifyNoInteractions(control, subscriber);
+    }
+
+    @Test
     void processesPendingShutdownsEvenWhenControlIsStopped() {
         SiteService site = mock(SiteService.class);
         ControlService control = mock(ControlService.class);

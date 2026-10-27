@@ -85,8 +85,9 @@ Engine confirma los comandos y detiene el ciclo si uno falla.
 El reloj conserva su factor numérico y calcula tiempo virtual desde
 el instante inicial y el tiempo real transcurrido.
 
-INICIAR resincroniza y conserva el desplazamiento para evaluar
-la hora local.
+INICIAR resincroniza el reloj. La hora local se calcula siempre con la
+zona única del sitio (America/Montevideo, configurable con ECOWARM_ZONE),
+sin depender del offset de la fecha recibida.
 
 La franja es [desde, hasta).
 HABILES representa lunes a viernes.
@@ -131,6 +132,29 @@ Tras reiniciar se espera una nueva lectura MQTT.
 SiteService y ControlService sincronizan sus operaciones.
 
 HeatingEngine evita ciclos propios simultáneos.
+
+El ciclo de control no usa una espera fija. TickLoop ejecuta tick() y
+vuelve a programarlo con la espera que calcula HeatingEngine.nextDelay():
+normalmente 1 s reales, pero menos si el reloj virtual llega antes al
+próximo cambio de franja (TickPlanner, con PeakSchedule.nextChange).
+Con tiempo acelerado, una espera fija de 1 s equivaldría a factor × 1 s
+virtuales y el corte de la franja punta llegaría tarde.
+
+El ciclo arranca cuando la aplicación está lista, sin espera inicial, y se
+despierta de inmediato cuando el control se inicia, resincroniza o detiene.
+Si durante un ciclo el reloj cruza un límite de franja, se repite enseguida.
+
+Las tareas programadas usan un scheduler de 4 hilos (SchedulingConfig).
+Con el valor por defecto de Spring, de 1 hilo, el registro, las
+suscripciones MQTT y el ciclo de control se bloqueaban entre sí.
+
+En cada ciclo la hora virtual se lee después de consultar los switches,
+que es la parte lenta, para decidir con la hora más reciente.
+
+Cada habitación se consulta y se comanda por separado: un switch sin
+respuesta se trata como estado desconocido (OFF) y no impide apagar los
+demás. Si un apagado falla, los encendidos solo se hacen si, contando esa
+habitación como encendida, no se supera la potencia máxima del sitio.
 
 Las llamadas REST a switches no mantienen bloqueados
 los servicios de sitio y control.

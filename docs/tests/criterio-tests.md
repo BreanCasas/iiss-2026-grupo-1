@@ -20,6 +20,13 @@ Los casos representan reglas, límites, combinaciones y transiciones:
 - Secuencia antes, durante y después de punta.
 - Temperatura ausente y switch desconocido.
 - Control detenido y comandos innecesarios.
+- Franja en viernes por la noche y domingo por la noche (cambio de día).
+- Lista de habitaciones vacía y habitación que sola supera el máximo.
+- Próximo cambio de franja: antes, dentro, en el límite exacto y fin de semana.
+- Ciclo de control con tiempo acelerado: despertar en el cambio de franja,
+  ciclo que dura más que el período y límite cruzado durante un ciclo.
+- Fallos del entorno dentro de un ciclo: switch sin respuesta al consultar,
+  apagado fallido con y sin potencia disponible.
 
 La cantidad de pruebas por sí sola no demuestra adecuación.
 Cada caso se vincula con un comportamiento del controlador.
@@ -28,10 +35,10 @@ Cada caso se vincula con un comportamiento del controlador.
 
 | Clase | Casos |
 |---|---:|
-| HeatingControllerTest | 10 |
-| PeakScheduleTest | 5 |
+| HeatingControllerTest | 12 |
+| PeakScheduleTest | 14 |
 | HeatingDecisionTest | 8 |
-| Total core | 23 |
+| Total core | 34 |
 
 HeatingDecisionTest compara listas completas de acciones en ocho escenarios:
 
@@ -52,15 +59,18 @@ Engine realiza las comunicaciones para ejecutar las acciones.
 | Clase | Casos | Comportamiento |
 |---|---:|---|
 | ControlControllerTest | 8 | Autenticación, comandos, estado y errores |
-| ControlServiceTimeTest | 2 | Desplazamiento horario y resincronización |
+| ControlServiceTimeTest | 6 | Zona única del sitio, offsets equivalentes, UTC distinto de local, cambio de día |
+| ControlServiceClockTest | 3 | Reloj inyectable y aviso de INICIAR / DETENER |
+| TickPlannerTest | 11 | Espera hasta el próximo ciclo con tiempo acelerado |
+| TickLoopTest | 7 | Bucle de control: sin espera inicial, despertar, una sola cadena |
 | SiteValidatorTest | 12 | Validación del inventario |
 | SiteServiceTest | 6 | Persistencia y apagados pendientes |
-| HeatingEngineTest | 2 | Fallo de apagado y pendientes con control detenido |
-| HeatingScenarioTest | 5 | Ejecución de escenarios completos |
+| HeatingEngineTest | 3 | Fallo de apagado, pendientes con control detenido y apagados independientes |
+| HeatingScenarioTest | 11 | Escenarios completos, switch caído, apagado fallido y espera del ciclo |
 | TemperatureSubscriberTest | 4 | Lecturas válidas, rechazo y fallo de guardado |
 | VirtualClockTest | 3 | Instante inicial y avance normal/acelerado |
 | VirtualHeatingTest | 1 | Entrada y salida de punta con reloj virtual |
-| Total engine | 43 | |
+| Total engine | 75 | |
 
 Las pruebas del reloj utilizan una fuente controlada para avanzar
 el tiempo sin esperar minutos u horas reales.
