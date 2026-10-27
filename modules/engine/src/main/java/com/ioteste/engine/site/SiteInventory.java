@@ -1,6 +1,10 @@
 package com.ioteste.engine.site;
 
 import com.ioteste.core.PeakSchedule;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ioteste.engine.numeric.MilliLongDeserializer;
+import com.ioteste.engine.numeric.MilliLongSerializer;
 
 import java.util.List;
 
@@ -19,7 +23,9 @@ public record SiteInventory(
     public record Site(
             String id,
             String nombre,
-            Double potenciaContratadaKW,
+            @JsonDeserialize(using = MilliLongDeserializer.class)
+            @JsonSerialize(using = MilliLongSerializer.class)
+            Long potenciaContratadaKW,
             Tariff tarifa
     ) {
     }
@@ -39,8 +45,12 @@ public record SiteInventory(
     public record Room(
             String id,
             String nombre,
-            Double temperaturaEsperada,
-            Double potenciaKW,
+            @JsonDeserialize(using = MilliLongDeserializer.class)
+            @JsonSerialize(using = MilliLongSerializer.class)
+            Long temperaturaEsperada,
+            @JsonDeserialize(using = MilliLongDeserializer.class)
+            @JsonSerialize(using = MilliLongSerializer.class)
+            Long potenciaKW,
             String idTermostato,
             String topicTermostato,
             String idSwitch,

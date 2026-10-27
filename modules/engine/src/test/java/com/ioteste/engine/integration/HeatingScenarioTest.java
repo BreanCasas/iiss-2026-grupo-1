@@ -38,8 +38,8 @@ class HeatingScenarioTest {
         temperatures = mock(TemperatureSubscriber.class);
         switches = mock(SwitchClient.class);
 
-        room1 = room("room1", "Living", 21.5);
-        room2 = room("room2", "Dormitorio", 20.0);
+        room1 = room("room1", "Living", 21500L);
+        room2 = room("room2", "Dormitorio", 20000L);
 
         when(site.confirmShutdowns(1L)).thenReturn(true);
         when(site.isCurrent(1L)).thenReturn(true);
@@ -57,9 +57,9 @@ class HeatingScenarioTest {
 
     @Test
     void enteringPeakTurnsOffBothColdRooms() {
-        configureSite(3.7);
+        configureSite(3700L);
         setTime("2026-10-05T17:00:00-03:00");
-        setTemperatures(19.0, 17.0);
+        setTemperatures(19000L, 17000L);
         setSwitchStates(SwitchClient.State.ON, SwitchClient.State.ON);
 
         engine.tick();
@@ -73,11 +73,11 @@ class HeatingScenarioTest {
 
     @Test
     void limitedPowerTurnsOffLowerPriorityBeforeHeatingHigherPriority() {
-        configureSite(1.2);
+        configureSite(1200L);
         setTime("2026-10-05T12:00:00-03:00");
 
         // Déficit room1 = 1,5; déficit room2 = 3.
-        setTemperatures(20.0, 17.0);
+        setTemperatures(20000L, 17000L);
         setSwitchStates(SwitchClient.State.ON, SwitchClient.State.OFF);
 
         engine.tick();
@@ -96,9 +96,9 @@ class HeatingScenarioTest {
 
     @Test
     void reachingTargetTurnsOffOneRoomAndStartsTheOther() {
-        configureSite(3.7);
+        configureSite(3700L);
         setTime("2026-10-05T12:00:00-03:00");
-        setTemperatures(21.5, 18.0);
+        setTemperatures(21500L, 18000L);
         setSwitchStates(SwitchClient.State.ON, SwitchClient.State.OFF);
 
         engine.tick();
@@ -117,9 +117,9 @@ class HeatingScenarioTest {
 
     @Test
     void correctSwitchStatesDoNotProduceRedundantCommands() {
-        configureSite(1.2);
+        configureSite(1200L);
         setTime("2026-10-05T12:00:00-03:00");
-        setTemperatures(20.0, 17.0);
+        setTemperatures(20000L, 17000L);
 
         // room2 tiene prioridad y ya está encendida.
         setSwitchStates(SwitchClient.State.OFF, SwitchClient.State.ON);
@@ -133,11 +133,11 @@ class HeatingScenarioTest {
 
     @Test
     void severalCyclesStopAtPeakAndResumeWithUpdatedPriority() {
-        configureSite(1.2);
+        configureSite(1200L);
 
         // Primer ciclo: room2 tiene mayor déficit.
         setTime("2026-10-05T16:59:00-03:00");
-        setTemperatures(20.0, 17.0);
+        setTemperatures(20000L, 17000L);
         setSwitchStates(SwitchClient.State.OFF, SwitchClient.State.OFF);
 
         engine.tick();
@@ -172,7 +172,7 @@ class HeatingScenarioTest {
         // Tercer ciclo: sale de punta y las temperaturas cambiaron.
         // Ahora room1 tiene mayor déficit: 3,5 frente a 1.
         setTime("2026-10-05T23:00:00-03:00");
-        setTemperatures(18.0, 19.0);
+        setTemperatures(18000L, 19000L);
         setSwitchStates(SwitchClient.State.OFF, SwitchClient.State.OFF);
 
         engine.tick();
@@ -188,9 +188,9 @@ class HeatingScenarioTest {
 
     @Test
     void unreachableSwitchDoesNotPreventTurningOffTheOtherRoomInPeak() {
-        configureSite(3.7);
+        configureSite(3700L);
         setTime("2026-10-05T17:00:00-03:00");
-        setTemperatures(19.0, 17.0);
+        setTemperatures(19000L, 17000L);
 
         when(switches.status(room1)).thenThrow(
                 new IllegalStateException("sin respuesta"));
@@ -211,11 +211,11 @@ class HeatingScenarioTest {
 
     @Test
     void failedShutdownBlocksTurningOnAnotherRoomWhenPowerWouldBeExceeded() {
-        configureSite(1.2);
+        configureSite(1200L);
         setTime("2026-10-05T12:00:00-03:00");
 
         // room1 debe apagarse y room2 encenderse, pero room1 no responde.
-        setTemperatures(20.0, 17.0);
+        setTemperatures(20000L, 17000L);
         setSwitchStates(SwitchClient.State.ON, SwitchClient.State.OFF);
 
         when(switches.command(room1, SwitchClient.State.OFF)).thenThrow(
@@ -234,11 +234,11 @@ class HeatingScenarioTest {
 
     @Test
     void failedShutdownDoesNotBlockTurningOnWhenThereIsEnoughPower() {
-        configureSite(3.7);
+        configureSite(3700L);
         setTime("2026-10-05T12:00:00-03:00");
 
         // room1 llegó al objetivo (debe apagarse); room2 está fría.
-        setTemperatures(21.5, 17.0);
+        setTemperatures(21500L, 17000L);
         setSwitchStates(SwitchClient.State.ON, SwitchClient.State.OFF);
 
         when(switches.command(room1, SwitchClient.State.OFF)).thenThrow(
@@ -252,10 +252,10 @@ class HeatingScenarioTest {
 
     @Test
     void nextDelayWakesUpAtThePeakStartWhenTheClockIsAccelerated() {
-        configureSite(3.7);
+        configureSite(3700L);
 
         // Faltan 30 s virtuales para las 17:00; a factor 60, 0,5 s reales.
-        setTime("2026-10-05T16:59:30-03:00", 60.0);
+        setTime("2026-10-05T16:59:30-03:00", 60000L);
 
         long millis = engine.nextDelay().toMillis();
 
@@ -272,13 +272,13 @@ class HeatingScenarioTest {
 
     @Test
     void nextDelayIsTheRegularPeriodWhenControlIsStopped() {
-        configureSite(3.7);
+        configureSite(3700L);
         when(control.status()).thenReturn(ControlStatus.stopped());
 
         assertEquals(HeatingEngine.REGULAR_PERIOD, engine.nextDelay());
     }
 
-    private void configureSite(double maximumPowerKw) {
+    private void configureSite(long maximumPowerKw) {
         SiteInventory inventory = new SiteInventory(
                 "2.0",
                 new SiteInventory.Site(
@@ -304,10 +304,10 @@ class HeatingScenarioTest {
     }
 
     private void setTime(String virtualTime) {
-        setTime(virtualTime, 1.0);
+        setTime(virtualTime, 1000L);
     }
 
-    private void setTime(String virtualTime, double factor) {
+    private void setTime(String virtualTime, long factor) {
         when(control.status()).thenReturn(
                 new ControlStatus(
                         ControlStatus.State.EN_EJECUCION,
@@ -318,7 +318,7 @@ class HeatingScenarioTest {
         );
     }
 
-    private void setTemperatures(double first, double second) {
+    private void setTemperatures(long first, long second) {
         when(temperatures.temperature(room1.topicTermostato()))
                 .thenReturn(first);
         when(temperatures.temperature(room2.topicTermostato()))
@@ -334,13 +334,13 @@ class HeatingScenarioTest {
     }
 
     private SiteInventory.Room room(
-            String id, String name, double target) {
+            String id, String name, long target) {
 
         return new SiteInventory.Room(
                 id,
                 name,
                 target,
-                1.2,
+                1200L,
                 "ht-" + id,
                 "ht-" + id + "/status/temperature:0",
                 "sw-" + id,

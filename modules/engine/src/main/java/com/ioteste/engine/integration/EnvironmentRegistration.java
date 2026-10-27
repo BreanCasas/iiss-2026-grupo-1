@@ -108,7 +108,8 @@ public class EnvironmentRegistration {
 
         } catch (Exception exception) {
             log.warn("No se pudo registrar el controlador ({}). Reintentando.",
-                    exception.getClass().getSimpleName());
+                    exception
+            );
         }
     }
 

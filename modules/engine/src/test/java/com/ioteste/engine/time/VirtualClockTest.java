@@ -18,7 +18,7 @@ class VirtualClockTest {
 
         VirtualClock clock = new VirtualClock(
                 initialTime,
-                60.0,
+                60000L,
                 realNanos::get
         );
 
@@ -37,7 +37,7 @@ class VirtualClockTest {
                 Instant.parse("2026-10-05T16:59:00Z");
 
         VirtualClock clock = new VirtualClock(
-                initialTime, 60.0, realNanos::get
+                initialTime, 60000L, realNanos::get
         );
 
         assertEquals(initialTime, clock.now());
@@ -50,7 +50,7 @@ class VirtualClockTest {
                 Instant.parse("2026-10-05T16:59:00Z");
 
         VirtualClock clock = new VirtualClock(
-                initialTime, 1.0, realNanos::get
+                initialTime, 1000L, realNanos::get
         );
 
         realNanos.set(7_000_000_000L);

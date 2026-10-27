@@ -40,8 +40,8 @@ class TemperatureSubscriberTest {
         room = new SiteInventory.Room(
                 "room1",
                 "Living",
-                21.5,
-                1.2,
+                21500L,
+                1200L,
                 "ht-room1",
                 TOPIC,
                 "sw-room1",
@@ -53,7 +53,7 @@ class TemperatureSubscriberTest {
                 new SiteInventory.Site(
                         "casa",
                         "Casa",
-                        3.7,
+                        3700L,
                         new SiteInventory.Tariff(
                                 new SiteInventory.PeakPeriod(
                                         "17:00",
@@ -95,11 +95,7 @@ class TemperatureSubscriberTest {
                         """)
         );
 
-        assertEquals(
-                19.3,
-                subscriber.temperature(TOPIC),
-                0.0001
-        );
+        assertEquals(19300L, subscriber.temperature(TOPIC));
 
         ArgumentCaptor<JsonNode> payload =
                 ArgumentCaptor.forClass(JsonNode.class);
@@ -112,9 +108,9 @@ class TemperatureSubscriberTest {
         );
 
         assertEquals(
-                19.3,
-                payload.getValue().get("tC").asDouble(),
-                0.0001
+                19300L,
+                payload.getValue().get("tC").decimalValue()
+                        .movePointRight(3).longValueExact()
         );
 
         assertTrue(payload.getValue().get("ts").isLong());
@@ -172,11 +168,7 @@ class TemperatureSubscriberTest {
                         """)
         ));
 
-        assertEquals(
-                19.3,
-                subscriber.temperature(TOPIC),
-                0.0001
-        );
+        assertEquals(19300L, subscriber.temperature(TOPIC));
 
         verify(readings).save(
                 eq(room),

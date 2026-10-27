@@ -351,3 +351,11 @@ El checker se detiene aparte con Ctrl+C.
 
 La metodología es Scrumban, con planificación,
 seguimiento en Jira y revisiones semanales.
+## Representación numérica interna
+
+Las temperaturas, potencias y factores de aceleración se representan en Java
+con `long`, usando milésimas como unidad interna: por ejemplo, 21,5 °C se
+almacena como 21500, 2,5 kW como 2500 y un factor 1,5 como 1500. En los límites
+JSON/MQTT se convierte desde/hacia números decimales sin usar coma flotante
+binaria; los valores internos se mantienen como enteros escalados. El histórico
+MongoDB guarda las lecturas en `tempMilliCelsius` y `tempMilliFahrenheit`.

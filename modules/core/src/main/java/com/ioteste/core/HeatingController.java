@@ -19,14 +19,14 @@ public class HeatingController {
 
     public record RoomConfig(
             String id,
-            double targetTemperature,
-            double requiredPowerKw
+            long targetTemperature,
+            long requiredPowerKw
     ) {
     }
 
     public record SiteConfig(
             List<RoomConfig> rooms,
-            double maximumPowerKw,
+            long maximumPowerKw,
             PeakSchedule peakSchedule
     ) {
         public SiteConfig {
@@ -36,7 +36,7 @@ public class HeatingController {
 
     public record RoomObservation(
             String id,
-            Double currentTemperature,
+            Long currentTemperature,
             SwitchState switchState
     ) {
     }
@@ -139,10 +139,10 @@ public class HeatingController {
     }
 
     public boolean shouldHeat(
-            double currentTemperature,
-            double targetTemperature,
-            double requiredPowerKw,
-            double availablePowerKw,
+            long currentTemperature,
+            long targetTemperature,
+            long requiredPowerKw,
+            long availablePowerKw,
             boolean peakHours) {
 
         return !peakHours
@@ -152,7 +152,7 @@ public class HeatingController {
 
     public Set<String> selectRoomsToHeat(
             List<RoomState> rooms,
-            double maximumPowerKw,
+            long maximumPowerKw,
             boolean peakHours) {
 
         if (peakHours) {
@@ -164,7 +164,7 @@ public class HeatingController {
                         room.currentTemperature()
                                 < room.targetTemperature())
                 .sorted(Comparator
-                        .comparingDouble((RoomState room) ->
+                        .comparingLong((RoomState room) ->
                                 room.targetTemperature()
                                         - room.currentTemperature())
                         .reversed()
@@ -172,7 +172,7 @@ public class HeatingController {
                 .toList();
 
         Set<String> selected = new LinkedHashSet<>();
-        double availablePowerKw = maximumPowerKw;
+        long availablePowerKw = maximumPowerKw;
 
         for (RoomState room : prioritizedRooms) {
             if (shouldHeat(

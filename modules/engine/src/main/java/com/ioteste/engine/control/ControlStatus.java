@@ -1,11 +1,14 @@
 package com.ioteste.engine.control;
 
 import java.time.Instant;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ioteste.engine.numeric.MilliLongSerializer;
 
 public record ControlStatus(
         State estado,
         Instant fechaHora,
-        Double factorTiempo,
+        @JsonSerialize(using = MilliLongSerializer.class)
+        Long factorTiempo,
         Instant iniciadoEn
 ) {
 

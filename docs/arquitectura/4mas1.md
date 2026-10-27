@@ -277,3 +277,6 @@ La recuperación de pendientes se prueba con colaboradores simulados.
 
 Queda ampliar las pruebas con infraestructura real en la iteración 5,
 completar las restantes vistas y comprobar el histórico antiguo en MongoDB.
+Las temperaturas, potencias y el factor de aceleración se representan
+internamente con `long` escalado a milésimas. Los adaptadores JSON/MQTT
+convierten los números decimales en la frontera de entrada y salida.

@@ -24,7 +24,7 @@ class VirtualHeatingTest {
 
         VirtualClock clock = new VirtualClock(
                 Instant.parse("2026-10-05T16:59:00Z"),
-                60.0,
+                60000L,
                 realNanos::get
         );
 
@@ -37,11 +37,11 @@ class VirtualHeatingTest {
         HeatingController controller = new HeatingController();
 
         List<RoomState> rooms = List.of(
-                new RoomState("room1", 19.0, 21.5, 1.2)
+                new RoomState("room1", 19000L, 21500L, 1200L)
         );
 
         assertEquals(Set.of("room1"), controller.selectRoomsToHeat(
-                rooms, 3.7,
+                rooms, 3700L,
                 schedule.isPeak(LocalDateTime.ofInstant(
                         clock.now(), ZoneOffset.UTC))
         ));
@@ -50,7 +50,7 @@ class VirtualHeatingTest {
         realNanos.set(1_000_000_000L);
 
         assertEquals(Set.of(), controller.selectRoomsToHeat(
-                rooms, 3.7,
+                rooms, 3700L,
                 schedule.isPeak(LocalDateTime.ofInstant(
                         clock.now(), ZoneOffset.UTC))
         ));
@@ -59,7 +59,7 @@ class VirtualHeatingTest {
         realNanos.set(361_000_000_000L);
 
         assertEquals(Set.of("room1"), controller.selectRoomsToHeat(
-                rooms, 3.7,
+                rooms, 3700L,
                 schedule.isPeak(LocalDateTime.ofInstant(
                         clock.now(), ZoneOffset.UTC))
         ));

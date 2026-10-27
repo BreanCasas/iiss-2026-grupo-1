@@ -133,7 +133,7 @@ class SiteServiceTest {
         SiteInventory.Site site = new SiteInventory.Site(
                 "casa",
                 "Casa",
-                3.7,
+                3700L,
                 new SiteInventory.Tariff(
                         new SiteInventory.PeakPeriod(
                                 "17:00",
@@ -146,8 +146,8 @@ class SiteServiceTest {
         SiteInventory.Room room = new SiteInventory.Room(
                 "room1",
                 "Living",
-                21.5,
-                1.2,
+                21500L,
+                1200L,
                 "ht-room1",
                 "ht-room1/status/temperature:0",
                 "sw-room1",

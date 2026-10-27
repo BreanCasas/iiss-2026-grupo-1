@@ -34,7 +34,7 @@ public final class TickPlanner {
             boolean running,
             Instant virtualNow,
             Instant evaluatedAt,
-            double factor,
+            long factor,
             ZoneId zone,
             PeakSchedule schedule,
             Duration regularPeriod,
@@ -42,7 +42,6 @@ public final class TickPlanner {
 
         if (!running
                 || virtualNow == null
-                || !Double.isFinite(factor)
                 || factor <= 0) {
 
             return regularPeriod;
@@ -69,8 +68,13 @@ public final class TickPlanner {
 
         long virtualNanos = Duration.between(virtualNow, boundary).toNanos();
 
-        long realNanos = (long) Math.ceil(virtualNanos / factor)
-                + MARGIN_NANOS;
+        java.math.BigInteger numerator = java.math.BigInteger.valueOf(virtualNanos)
+                .multiply(java.math.BigInteger.valueOf(1000L));
+        java.math.BigInteger denominator = java.math.BigInteger.valueOf(factor);
+        java.math.BigInteger[] division = numerator.divideAndRemainder(denominator);
+        long scaledRealNanos = division[0].longValueExact()
+                + (division[1].signum() == 0 ? 0 : 1);
+        long realNanos = Math.addExact(scaledRealNanos, MARGIN_NANOS);
 
         Duration untilBoundary = Duration.ofNanos(
                 Math.max(realNanos, minimumDelay.toNanos())

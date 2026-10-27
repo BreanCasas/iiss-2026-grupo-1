@@ -40,8 +40,8 @@ public class TemperatureReadingRepository {
                 .append("roomName", room.nombre())
                 .append("thermostatId", room.idTermostato())
                 .append("topic", topic)
-                .append("tempCelsius", payload.get("tC").asDouble())
-                .append("tempFahrenheit", optionalNumber(payload, "tF"))
+                .append("tempMilliCelsius", scaledNumber(payload, "tC"))
+                .append("tempMilliFahrenheit", scaledNumber(payload, "tF"))
                 .append("sourceTs", sourceTs)
                 .append("sourceTsUnit", "epoch_milliseconds")
                 .append("receivedAt", Date.from(receivedAt))
@@ -67,15 +67,17 @@ public class TemperatureReadingRepository {
         return value.longValue();
     }
 
-    private Double optionalNumber(JsonNode payload, String field) {
+    private Long scaledNumber(JsonNode payload, String field) {
         JsonNode value = payload.get(field);
 
         if (value == null || !value.isNumber()) {
             return null;
         }
 
-        double number = value.asDouble();
-
-        return Double.isFinite(number) ? number : null;
+        try {
+            return value.decimalValue().movePointRight(3).longValueExact();
+        } catch (ArithmeticException exception) {
+            return null;
+        }
     }
 }

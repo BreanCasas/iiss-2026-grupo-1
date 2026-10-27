@@ -1,9 +1,10 @@
 package com.ioteste.core;
 
+/** Numeric values use thousandths: milli-degrees Celsius and milli-kW. */
 public record RoomState(
         String id,
-        double currentTemperature,
-        double targetTemperature,
-        double requiredPowerKw
+        long currentTemperature,
+        long targetTemperature,
+        long requiredPowerKw
 ) {
 }

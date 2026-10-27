@@ -48,8 +48,7 @@ public class SiteValidator {
             );
 
             require(
-                    room.temperaturaEsperada() != null
-                            && Double.isFinite(room.temperaturaEsperada()),
+                    room.temperaturaEsperada() != null,
                     "temperaturaEsperada debe ser un número finito"
             );
 
@@ -119,9 +118,9 @@ public class SiteValidator {
         );
     }
 
-    private void requirePositive(Double value, String field) {
+    private void requirePositive(Long value, String field) {
         require(
-                value != null && Double.isFinite(value) && value > 0,
+                value != null && value > 0,
                 field + " debe ser un número mayor que cero"
         );
     }

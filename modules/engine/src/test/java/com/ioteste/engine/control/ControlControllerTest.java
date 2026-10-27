@@ -76,7 +76,7 @@ class ControlControllerTest {
                             """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado").value("EN_EJECUCION"))
-                .andExpect(jsonPath("$.factorTiempo").value(60.0))
+                .andExpect(jsonPath("$.factorTiempo").value(60))
                 .andExpect(jsonPath("$.fechaHora").isString())
                 .andExpect(jsonPath("$.iniciadoEn").isString());
     }
@@ -126,7 +126,7 @@ class ControlControllerTest {
                             """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado").value("EN_EJECUCION"))
-                .andExpect(jsonPath("$.factorTiempo").value(1.0));
+                .andExpect(jsonPath("$.factorTiempo").value(1));
     }
 
     @Test

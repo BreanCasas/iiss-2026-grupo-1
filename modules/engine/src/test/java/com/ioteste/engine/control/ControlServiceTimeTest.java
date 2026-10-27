@@ -51,7 +51,7 @@ class ControlServiceTimeTest {
                 service.zone()
         );
 
-        // 23:00 at UTC+02 is 21:00 UTC, which is 18:00 in Montevideo.
+        assertEquals(ZoneId.of("America/Montevideo"), service.zone());
         assertEquals(18, localTime.getHour());
         assertTrue(schedule().isPeak(localTime));
     }

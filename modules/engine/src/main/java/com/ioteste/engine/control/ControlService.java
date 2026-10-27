@@ -17,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class ControlService {
 
     private VirtualClock clock;
-    private Double timeFactor;
+    private Long timeFactor;
     private Instant startedAt;
     /**
      * Zona horaria única del sitio. La franja de energía cara
@@ -107,12 +107,11 @@ public class ControlService {
             );
         }
 
-        double factor = command.factorTiempo() == null
-                ? 1.0
+        long factor = command.factorTiempo() == null
+                ? 1000L
                 : command.factorTiempo();
 
         if (command.fechaHora() == null
-                || !Double.isFinite(factor)
                 || factor <= 0) {
 
             throw new ResponseStatusException(

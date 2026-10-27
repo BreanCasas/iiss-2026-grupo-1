@@ -17,10 +17,10 @@ class HeatingControllerTest {
         HeatingController controller = new HeatingController();
 
         boolean result = controller.shouldHeat(
-                19.0,
-                21.5,
-                1.2,
-                3.7,
+                19000L,
+                21500L,
+                1200L,
+                3700L,
                 false
         );
 
@@ -33,10 +33,10 @@ class HeatingControllerTest {
         HeatingController controller = new HeatingController();
 
         boolean result = controller.shouldHeat(
-                19.0,
-                21.5,
-                1.2,
-                3.7,
+                19000L,
+                21500L,
+                1200L,
+                3700L,
                 true
         );
 
@@ -49,10 +49,10 @@ class HeatingControllerTest {
         HeatingController controller = new HeatingController();
 
         boolean result = controller.shouldHeat(
-                19.0,
-                21.5,
-                1.2,
-                1.0,
+                19000L,
+                21500L,
+                1200L,
+                1000L,
                 false
         );
 
@@ -65,7 +65,7 @@ class HeatingControllerTest {
         HeatingController controller = new HeatingController();
 
         boolean result = controller.shouldHeat(
-                21.5, 21.5, 1.2, 3.7, false
+                21500L, 21500L, 1200L, 3700L, false
         );
 
         assertFalse(result,
@@ -77,7 +77,7 @@ class HeatingControllerTest {
         HeatingController controller = new HeatingController();
 
         boolean result = controller.shouldHeat(
-                19.0, 21.5, 1.2, 1.2, false
+                19000L, 21500L, 1200L, 1200L, false
         );
 
         assertTrue(result,
@@ -89,12 +89,12 @@ class HeatingControllerTest {
         HeatingController controller = new HeatingController();
 
         List<RoomState> rooms = List.of(
-                new RoomState("room1", 20.0, 21.5, 1.2),
-                new RoomState("room2", 18.0, 21.5, 1.2)
+                new RoomState("room1", 20000L, 21500L, 1200L),
+                new RoomState("room2", 18000L, 21500L, 1200L)
         );
 
         Set<String> selected = controller.selectRoomsToHeat(
-                rooms, 2.0, false
+                rooms, 2000L, false
         );
 
         assertEquals(Set.of("room2"), selected,
@@ -106,13 +106,13 @@ class HeatingControllerTest {
         HeatingController controller = new HeatingController();
 
         List<RoomState> rooms = List.of(
-                new RoomState("room1", 20.0, 21.5, 1.2),
-                new RoomState("room2", 18.0, 21.5, 1.2)
+                new RoomState("room1", 20000L, 21500L, 1200L),
+                new RoomState("room2", 18000L, 21500L, 1200L)
         );
 
         assertEquals(
                 Set.of("room1", "room2"),
-                controller.selectRoomsToHeat(rooms, 3.0, false)
+                controller.selectRoomsToHeat(rooms, 3000L, false)
         );
     }
 
@@ -121,13 +121,13 @@ class HeatingControllerTest {
         HeatingController controller = new HeatingController();
 
         List<RoomState> rooms = List.of(
-                new RoomState("room1", 19.0, 21.5, 1.2),
-                new RoomState("room2", 18.0, 21.5, 1.2)
+                new RoomState("room1", 19000L, 21500L, 1200L),
+                new RoomState("room2", 18000L, 21500L, 1200L)
         );
 
         assertEquals(
                 Set.of(),
-                controller.selectRoomsToHeat(rooms, 3.0, true)
+                controller.selectRoomsToHeat(rooms, 3000L, true)
         );
     }
 
@@ -135,19 +135,19 @@ class HeatingControllerTest {
     void breaksEqualDeficitTieByIdRegardlessOfInputOrder() {
         HeatingController controller = new HeatingController();
 
-        RoomState room1 = new RoomState("room1", 19.0, 21.5, 1.2);
-        RoomState room2 = new RoomState("room2", 19.0, 21.5, 1.2);
+        RoomState room1 = new RoomState("room1", 19000L, 21500L, 1200L);
+        RoomState room2 = new RoomState("room2", 19000L, 21500L, 1200L);
 
         assertEquals(
                 Set.of("room1"),
                 controller.selectRoomsToHeat(
-                        List.of(room2, room1), 2.0, false)
+                        List.of(room2, room1), 2000L, false)
         );
 
         assertEquals(
                 Set.of("room1"),
                 controller.selectRoomsToHeat(
-                        List.of(room1, room2), 2.0, false)
+                        List.of(room1, room2), 2000L, false)
         );
     }
 
@@ -162,7 +162,7 @@ class HeatingControllerTest {
         );
 
         List<RoomState> rooms = List.of(
-                new RoomState("room1", 19.0, 21.5, 1.2)
+                new RoomState("room1", 19000L, 21500L, 1200L)
         );
 
         LocalDateTime beforePeak =
@@ -175,19 +175,19 @@ class HeatingControllerTest {
         assertEquals(
                 Set.of("room1"),
                 controller.selectRoomsToHeat(
-                        rooms, 3.7, schedule.isPeak(beforePeak))
+                        rooms, 3700L, schedule.isPeak(beforePeak))
         );
 
         assertEquals(
                 Set.of(),
                 controller.selectRoomsToHeat(
-                        rooms, 3.7, schedule.isPeak(peakStart))
+                        rooms, 3700L, schedule.isPeak(peakStart))
         );
 
         assertEquals(
                 Set.of("room1"),
                 controller.selectRoomsToHeat(
-                        rooms, 3.7, schedule.isPeak(peakEnd))
+                        rooms, 3700L, schedule.isPeak(peakEnd))
         );
     }
 
@@ -197,7 +197,7 @@ class HeatingControllerTest {
 
         assertEquals(
                 Set.of(),
-                controller.selectRoomsToHeat(List.of(), 3.7, false)
+                controller.selectRoomsToHeat(List.of(), 3700L, false)
         );
     }
 
@@ -206,14 +206,14 @@ class HeatingControllerTest {
         HeatingController controller = new HeatingController();
 
         List<RoomState> rooms = List.of(
-                new RoomState("room1", 15.0, 21.5, 5.0),
-                new RoomState("room2", 19.0, 21.5, 1.2)
+                new RoomState("room1", 15000L, 21500L, 5000L),
+                new RoomState("room2", 19000L, 21500L, 1200L)
         );
 
         // room1 tiene más déficit pero no cabe: se calefacciona room2.
         assertEquals(
                 Set.of("room2"),
-                controller.selectRoomsToHeat(rooms, 3.7, false)
+                controller.selectRoomsToHeat(rooms, 3700L, false)
         );
     }
 }

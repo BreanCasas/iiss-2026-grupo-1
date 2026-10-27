@@ -288,7 +288,6 @@ components:
           example: Casa Rodríguez
         potenciaContratadaKW:
           type: number
-          format: double
           exclusiveMinimum: true
           minimum: 0
           description: |
@@ -347,12 +346,10 @@ components:
           example: Living
         temperaturaEsperada:
           type: number
-          format: double
           description: Grados Celsius, 1 decimal. Es la temperatura del **ambiente**.
           example: 21.5
         potenciaKW:
           type: number
-          format: double
           exclusiveMinimum: true
           minimum: 0
           description: |
@@ -401,7 +398,6 @@ components:
             evalúa. `null` si está `DETENIDO`.
         factorTiempo:
           type: number
-          format: double
           nullable: true
           description: Aceleración vigente. `null` si está `DETENIDO`.
         iniciadoEn:
@@ -433,7 +429,6 @@ components:
           description: Instante al que el control **sincroniza su noción del tiempo**.
         factorTiempo:
           type: number
-          format: double
           exclusiveMinimum: true
           minimum: 0
           default: 1

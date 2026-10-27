@@ -22,7 +22,7 @@ class ControlServiceClockTest {
         return new ControlService(URUGUAY, nanos::get, () -> wallClock);
     }
 
-    private ControlCommand start(String dateTime, Double factor) {
+    private ControlCommand start(String dateTime, Long factor) {
         return new ControlCommand(
                 "INICIAR",
                 OffsetDateTime.parse(dateTime),
@@ -34,7 +34,7 @@ class ControlServiceClockTest {
     void virtualTimeAdvancesOnlyWhenTheInjectedClockAdvances() {
         ControlService service = service();
 
-        service.command(start("2026-10-05T16:59:00-03:00", 60.0));
+        service.command(start("2026-10-05T16:59:00-03:00", 60000L));
 
         assertEquals(
                 OffsetDateTime.parse("2026-10-05T16:59:00-03:00")
@@ -56,7 +56,7 @@ class ControlServiceClockTest {
     void startMomentComesFromTheInjectedWallClock() {
         ControlService service = service();
 
-        service.command(start("2026-10-05T16:59:00-03:00", 1.0));
+        service.command(start("2026-10-05T16:59:00-03:00", 1000L));
 
         assertEquals(wallClock, service.status().iniciadoEn());
     }
@@ -68,7 +68,7 @@ class ControlServiceClockTest {
 
         service.onChange(notifications::incrementAndGet);
 
-        service.command(start("2026-10-05T16:59:00-03:00", 1.0));
+        service.command(start("2026-10-05T16:59:00-03:00", 1000L));
         service.command(new ControlCommand("DETENER", null, null));
 
         assertEquals(2, notifications.get());

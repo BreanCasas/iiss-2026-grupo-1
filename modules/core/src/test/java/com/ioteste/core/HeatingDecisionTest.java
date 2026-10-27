@@ -19,9 +19,9 @@ class HeatingDecisionTest {
         assertEquals(
                 List.of(off("room1"), off("room2")),
                 decide(
-                        3.7, 17, 0, true,
-                        observation("room1", 19.0, SwitchState.ON),
-                        observation("room2", 17.0, SwitchState.ON)
+                        3700L, 17, 0, true,
+                        observation("room1", 19000L, SwitchState.ON),
+                        observation("room2", 17000L, SwitchState.ON)
                 )
         );
     }
@@ -31,9 +31,9 @@ class HeatingDecisionTest {
         assertEquals(
                 List.of(off("room1"), on("room2")),
                 decide(
-                        1.2, 12, 0, true,
-                        observation("room1", 20.0, SwitchState.ON),
-                        observation("room2", 17.0, SwitchState.OFF)
+                        1200L, 12, 0, true,
+                        observation("room1", 20000L, SwitchState.ON),
+                        observation("room2", 17000L, SwitchState.OFF)
                 )
         );
     }
@@ -43,9 +43,9 @@ class HeatingDecisionTest {
         assertEquals(
                 List.of(off("room1"), on("room2")),
                 decide(
-                        3.7, 12, 0, true,
-                        observation("room1", 21.5, SwitchState.ON),
-                        observation("room2", 18.0, SwitchState.OFF)
+                        3700L, 12, 0, true,
+                        observation("room1", 21500L, SwitchState.ON),
+                        observation("room2", 18000L, SwitchState.OFF)
                 )
         );
     }
@@ -55,21 +55,21 @@ class HeatingDecisionTest {
         assertEquals(
                 List.of(),
                 decide(
-                        1.2, 12, 0, true,
-                        observation("room1", 20.0, SwitchState.OFF),
-                        observation("room2", 17.0, SwitchState.ON)
+                        1200L, 12, 0, true,
+                        observation("room1", 20000L, SwitchState.OFF),
+                        observation("room2", 17000L, SwitchState.ON)
                 )
         );
     }
 
     @Test
     void beforePeakDuringPeakAndAfterPeakProduceConsistentDecisions() {
-        SiteConfig config = config(1.2);
+        SiteConfig config = config(1200L);
 
         ControlState before = state(
                 true,
-                observation("room1", 20.0, SwitchState.OFF),
-                observation("room2", 17.0, SwitchState.OFF)
+                observation("room1", 20000L, SwitchState.OFF),
+                observation("room2", 17000L, SwitchState.OFF)
         );
 
         assertEquals(
@@ -84,8 +84,8 @@ class HeatingDecisionTest {
         // Estado después de aplicar el encendido anterior.
         ControlState during = state(
                 true,
-                observation("room1", 20.0, SwitchState.OFF),
-                observation("room2", 17.0, SwitchState.ON)
+                observation("room1", 20000L, SwitchState.OFF),
+                observation("room2", 17000L, SwitchState.ON)
         );
 
         assertEquals(
@@ -100,8 +100,8 @@ class HeatingDecisionTest {
         // Después del apagado y nuevas lecturas, cambia la prioridad.
         ControlState after = state(
                 true,
-                observation("room1", 18.0, SwitchState.OFF),
-                observation("room2", 19.0, SwitchState.OFF)
+                observation("room1", 18000L, SwitchState.OFF),
+                observation("room2", 19000L, SwitchState.OFF)
         );
 
         assertEquals(
@@ -119,13 +119,13 @@ class HeatingDecisionTest {
         assertEquals(
                 List.of(off("room1"), on("room1")),
                 decide(
-                        3.7, 12, 0, true,
+                        3700L, 12, 0, true,
                         observation(
                                 "room1",
-                                19.0,
+                                19000L,
                                 SwitchState.DESCONOCIDO
                         ),
-                        observation("room2", 20.0, SwitchState.OFF)
+                        observation("room2", 20000L, SwitchState.OFF)
                 )
         );
     }
@@ -135,9 +135,9 @@ class HeatingDecisionTest {
         assertEquals(
                 List.of(off("room1")),
                 decide(
-                        3.7, 12, 0, true,
+                        3700L, 12, 0, true,
                         observation("room1", null, SwitchState.ON),
-                        observation("room2", 20.0, SwitchState.OFF)
+                        observation("room2", 20000L, SwitchState.OFF)
                 )
         );
     }
@@ -146,14 +146,14 @@ class HeatingDecisionTest {
     void stoppedControlTurnsOffBothRoomsRegardlessOfTheirTemperatures() {
         ControlState stopped = state(
                 false,
-                observation("room1", 19.0, SwitchState.ON),
-                observation("room2", 17.0, SwitchState.ON)
+                observation("room1", 19000L, SwitchState.ON),
+                observation("room2", 17000L, SwitchState.ON)
         );
 
         assertEquals(
                 List.of(off("room1"), off("room2")),
                 controller.decide(
-                        config(3.7),
+                        config(3700L),
                         null,
                         stopped
                 ).actions()
@@ -161,7 +161,7 @@ class HeatingDecisionTest {
     }
 
     private List<SwitchAction> decide(
-            double power,
+            long power,
             int hour,
             int minute,
             boolean running,
@@ -174,11 +174,11 @@ class HeatingDecisionTest {
         ).actions();
     }
 
-    private SiteConfig config(double power) {
+    private SiteConfig config(long power) {
         return new SiteConfig(
                 List.of(
-                        new RoomConfig("room1", 21.5, 1.2),
-                        new RoomConfig("room2", 20.0, 1.2)
+                        new RoomConfig("room1", 21500L, 1200L),
+                        new RoomConfig("room2", 20000L, 1200L)
                 ),
                 power,
                 new PeakSchedule(
@@ -201,7 +201,7 @@ class HeatingDecisionTest {
 
     private RoomObservation observation(
             String id,
-            Double temperature,
+            Long temperature,
             SwitchState status) {
 
         return new RoomObservation(

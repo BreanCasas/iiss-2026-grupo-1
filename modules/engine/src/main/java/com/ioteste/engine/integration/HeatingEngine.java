@@ -47,7 +47,7 @@ public class HeatingEngine {
     static final Duration MINIMUM_DELAY = Duration.ofMillis(20);
 
     // Tolerancia para comparar sumas de potencias decimales.
-    private static final double POWER_TOLERANCE_KW = 1e-9;
+    private static final long POWER_TOLERANCE_MILLI_KW = 0L;
 
     private final SiteService siteService;
     private final ControlService controlService;
@@ -123,8 +123,8 @@ public class HeatingEngine {
             boolean running =
                     control.estado() == ControlStatus.State.EN_EJECUCION;
 
-            double factor = control.factorTiempo() == null
-                    ? 1.0
+            long factor = control.factorTiempo() == null
+                    ? 1000L
                     : control.factorTiempo();
 
             return TickPlanner.nextDelay(
@@ -197,7 +197,7 @@ public class HeatingEngine {
             log.warn(
                     "No se pudo consultar el switch {} ({}).",
                     room.idSwitch(),
-                    exception.getClass().getSimpleName()
+                    exception
             );
 
             return SwitchState.DESCONOCIDO;
@@ -360,11 +360,10 @@ public class HeatingEngine {
                 }
 
                 log.warn(
-                        "No se pudo comandar el switch {} -> {} ({}): {}",
+                        "No se pudo comandar el switch {} -> {}.",
                         room.idSwitch(),
                         desired,
-                        exception.getClass().getSimpleName(),
-                        exception.getMessage()
+                        exception
                 );
             }
         }
@@ -407,14 +406,14 @@ public class HeatingEngine {
 
         mayBeOn.addAll(failedOff);
 
-        double totalKw = 0;
+        long totalMilliKw = 0;
 
         for (String roomId : mayBeOn) {
-            totalKw += roomsById.get(roomId).potenciaKW();
+            totalMilliKw = Math.addExact(totalMilliKw, roomsById.get(roomId).potenciaKW());
         }
 
-        return totalKw
+        return totalMilliKw
                 <= inventory.sitio().potenciaContratadaKW()
-                + POWER_TOLERANCE_KW;
+                + POWER_TOLERANCE_MILLI_KW;
     }
 }

@@ -14,7 +14,7 @@ class SiteValidatorTest {
         return new SiteInventory.Site(
                 "casa",
                 "Casa",
-                3.7,
+                3700L,
                 new SiteInventory.Tariff(
                         new SiteInventory.PeakPeriod(
                                 "17:00",
@@ -33,8 +33,8 @@ class SiteValidatorTest {
         return new SiteInventory.Room(
                 id,
                 "Living",
-                21.5,
-                1.2,
+                21500L,
+                1200L,
                 thermostatId,
                 thermostatId + "/status/temperature:0",
                 switchId,
@@ -128,7 +128,7 @@ class SiteValidatorTest {
         SiteInventory.Site invalidSite = new SiteInventory.Site(
                 "casa",
                 "Casa",
-                0.0,
+                0L,
                 site().tarifa()
         );
 
@@ -149,8 +149,8 @@ class SiteValidatorTest {
         SiteInventory.Room invalidRoom = new SiteInventory.Room(
                 "room1",
                 "Living",
-                21.5,
-                -1.2,
+                21500L,
+                -1200L,
                 "ht-room1",
                 "ht-room1/status/temperature:0",
                 "sw-room1",
@@ -176,7 +176,7 @@ class SiteValidatorTest {
         SiteInventory.Site configuredSite = new SiteInventory.Site(
                 "casa",
                 "Casa",
-                3.7,
+                3700L,
                 new SiteInventory.Tariff(
                         new SiteInventory.PeakPeriod(
                                 from,

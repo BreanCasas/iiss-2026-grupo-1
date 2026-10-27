@@ -35,7 +35,7 @@ public class TemperatureSubscriber {
     private final ObjectMapper mapper;
     private final TemperatureReadingRepository readings;
 
-    private final Map<String, Double> temperatures =
+    private final Map<String, Long> temperatures =
             new ConcurrentHashMap<>();
 
     private final Set<String> subscribedTopics =
@@ -169,7 +169,7 @@ public class TemperatureSubscriber {
 
             if (temperature == null
                     || !temperature.isNumber()
-                    || !Double.isFinite(temperature.asDouble())) {
+                    || !temperature.isNumber()) {
 
                 log.warn("Temperatura MQTT inválida en {}", topic);
                 return;
@@ -192,11 +192,21 @@ public class TemperatureSubscriber {
             return;
         }
 
-        double value = payload.get("tC").asDouble();
+        long value;
+        try {
+            value = payload.get("tC").decimalValue()
+                    .movePointRight(3).longValueExact();
+        } catch (ArithmeticException exception) {
+            log.warn("Temperatura MQTT fuera de precisión/rango en {}", topic);
+            return;
+        }
 
         temperatures.put(topic, value);
 
-        log.info("Temperatura recibida: {} = {} °C", topic, value);
+        log.info("Temperatura recibida: {} = {}.{} °C",
+  		topic,
+		value / 1000,
+		Math.abs(value % 1000) / 100);
 
         for (SiteInventory.Room room : rooms) {
             try {
@@ -226,11 +236,6 @@ public class TemperatureSubscriber {
             );
         }
 
-        if (timestamp.isDouble() || timestamp.isFloat()) {
-            throw new IllegalArgumentException(
-                    "ts debe leerse exactamente, sin coma flotante binaria"
-            );
-        }
 
         try {
             long epochMillis = timestamp.decimalValue()
@@ -247,7 +252,7 @@ public class TemperatureSubscriber {
         }
     }
 
-    public Double temperature(String topic) {
+    public Long temperature(String topic) {
         return temperatures.get(topic);
     }
 
