@@ -6,7 +6,7 @@ import com.ioteste.core.PeakSchedule;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,16 +26,16 @@ class ControlServiceTimeTest {
 
         LocalDateTime localTime = LocalDateTime.ofInstant(
                 status.fechaHora(),
-                service.timeOffset()
+                service.zone()
         );
 
-        assertEquals(ZoneOffset.ofHours(-3), service.timeOffset());
+        assertEquals(ZoneId.of("America/Montevideo"), service.zone());
         assertEquals(17, localTime.getHour());
         assertTrue(schedule().isPeak(localTime));
     }
 
     @Test
-    void resynchronizationReplacesPreviousOffset() throws Exception {
+    void incomingOffsetIsNormalizedToTheSiteZone() throws Exception {
         ControlService service = new ControlService();
 
         service.command(readCommand(
@@ -48,12 +48,12 @@ class ControlServiceTimeTest {
 
         LocalDateTime localTime = LocalDateTime.ofInstant(
                 status.fechaHora(),
-                service.timeOffset()
+                service.zone()
         );
 
-        assertEquals(ZoneOffset.ofHours(2), service.timeOffset());
-        assertEquals(23, localTime.getHour());
-        assertFalse(schedule().isPeak(localTime));
+        // 23:00 at UTC+02 is 21:00 UTC, which is 18:00 in Montevideo.
+        assertEquals(18, localTime.getHour());
+        assertTrue(schedule().isPeak(localTime));
     }
 
     private ControlCommand readCommand(String dateTime) throws Exception {
