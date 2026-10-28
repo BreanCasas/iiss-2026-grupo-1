@@ -1,0 +1,15 @@
+Informe de cobertura JaCoCo — módulo core
+
+Pruebas ejecutadas: 34
+Pruebas exitosas: 34
+Fallos: 0
+Errores: 0
+
+Cobertura de instrucciones: 98 %
+Cobertura de ramas: 93 %
+Líneas cubiertas: 104 de 106
+Métodos cubiertos: 20 de 20
+Clases cubiertas: 11 de 11
+
+Requisito de cobertura mínima del core: 85 %
+Resultado: Cumple.

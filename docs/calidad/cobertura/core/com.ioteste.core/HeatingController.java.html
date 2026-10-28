@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HeatingController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">IoTEste Core</a> &gt; <a href="index.source.html" class="el_package">com.ioteste.core</a> &gt; <span class="el_source">HeatingController.java</span></div><h1>HeatingController.java</h1><pre class="source lang-java linenums">package com.ioteste.core;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+<span class="fc" id="L12">public class HeatingController {</span>
+
+<span class="fc" id="L14">    public enum SwitchState {</span>
+<span class="fc" id="L15">        ON,</span>
+<span class="fc" id="L16">        OFF,</span>
+<span class="fc" id="L17">        DESCONOCIDO</span>
+    }
+
+<span class="fc" id="L20">    public record RoomConfig(</span>
+            String id,
+            long targetTemperature,
+            long requiredPowerKw
+    ) {
+    }
+
+    public record SiteConfig(
+            List&lt;RoomConfig&gt; rooms,
+            long maximumPowerKw,
+            PeakSchedule peakSchedule
+    ) {
+<span class="fc" id="L32">        public SiteConfig {</span>
+<span class="fc" id="L33">            rooms = List.copyOf(rooms);</span>
+<span class="fc" id="L34">        }</span>
+    }
+
+<span class="fc" id="L37">    public record RoomObservation(</span>
+            String id,
+            Long currentTemperature,
+            SwitchState switchState
+    ) {
+    }
+
+    public record ControlState(
+            boolean running,
+            List&lt;RoomObservation&gt; rooms
+    ) {
+<span class="fc" id="L48">        public ControlState {</span>
+<span class="fc" id="L49">            rooms = List.copyOf(rooms);</span>
+<span class="fc" id="L50">        }</span>
+    }
+
+<span class="fc" id="L53">    public record SwitchAction(</span>
+            String roomId,
+            SwitchState state
+    ) {
+    }
+
+    public record Decision(List&lt;SwitchAction&gt; actions) {
+<span class="fc" id="L60">        public Decision {</span>
+<span class="fc" id="L61">            actions = List.copyOf(actions);</span>
+<span class="fc" id="L62">        }</span>
+    }
+
+    public Decision decide(
+            SiteConfig config,
+            LocalDateTime time,
+            ControlState state) {
+
+<span class="fc" id="L70">        Map&lt;String, RoomObservation&gt; observed = new HashMap&lt;&gt;();</span>
+
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        for (RoomObservation room : state.rooms()) {</span>
+<span class="fc" id="L73">            observed.put(room.id(), room);</span>
+<span class="fc" id="L74">        }</span>
+
+<span class="fc" id="L76">        List&lt;RoomState&gt; measured = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        for (RoomConfig room : config.rooms()) {</span>
+<span class="fc" id="L79">            RoomObservation observation = observed.get(room.id());</span>
+
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">            if (observation != null</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">                    &amp;&amp; observation.currentTemperature() != null) {</span>
+
+<span class="fc" id="L84">                measured.add(new RoomState(</span>
+<span class="fc" id="L85">                        room.id(),</span>
+<span class="fc" id="L86">                        observation.currentTemperature(),</span>
+<span class="fc" id="L87">                        room.targetTemperature(),</span>
+<span class="fc" id="L88">                        room.requiredPowerKw()</span>
+                ));
+            }
+<span class="fc" id="L91">        }</span>
+
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        Set&lt;String&gt; selected = state.running()</span>
+<span class="fc" id="L94">                ? selectRoomsToHeat(</span>
+                measured,
+<span class="fc" id="L96">                config.maximumPowerKw(),</span>
+<span class="fc" id="L97">                config.peakSchedule().isPeak(time)</span>
+        )
+<span class="fc" id="L99">                : Set.of();</span>
+
+<span class="fc" id="L101">        List&lt;SwitchAction&gt; actions = new ArrayList&lt;&gt;();</span>
+
+        // Primero todos los apagados necesarios.
+<span class="fc bfc" id="L104" title="All 2 branches covered.">        for (RoomConfig room : config.rooms()) {</span>
+<span class="fc" id="L105">            SwitchState current =</span>
+<span class="fc" id="L106">                    switchState(observed.get(room.id()));</span>
+
+<span class="fc bfc" id="L108" title="All 2 branches covered.">            if (current == SwitchState.DESCONOCIDO</span>
+<span class="fc bfc" id="L109" title="All 4 branches covered.">                    || (!selected.contains(room.id())</span>
+                    &amp;&amp; current != SwitchState.OFF)) {
+
+<span class="fc" id="L112">                actions.add(new SwitchAction(</span>
+<span class="fc" id="L113">                        room.id(),</span>
+                        SwitchState.OFF
+                ));
+            }
+<span class="fc" id="L117">        }</span>
+
+        // Después los encendidos necesarios.
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        for (RoomConfig room : config.rooms()) {</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">            if (selected.contains(room.id())</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">                    &amp;&amp; switchState(observed.get(room.id()))</span>
+                    != SwitchState.ON) {
+
+<span class="fc" id="L125">                actions.add(new SwitchAction(</span>
+<span class="fc" id="L126">                        room.id(),</span>
+                        SwitchState.ON
+                ));
+            }
+<span class="fc" id="L130">        }</span>
+
+<span class="fc" id="L132">        return new Decision(actions);</span>
+    }
+
+    private SwitchState switchState(RoomObservation observation) {
+<span class="pc bpc" id="L136" title="2 of 4 branches missed.">        return observation == null || observation.switchState() == null</span>
+<span class="nc" id="L137">                ? SwitchState.DESCONOCIDO</span>
+<span class="fc" id="L138">                : observation.switchState();</span>
+    }
+
+    public boolean shouldHeat(
+            long currentTemperature,
+            long targetTemperature,
+            long requiredPowerKw,
+            long availablePowerKw,
+            boolean peakHours) {
+
+<span class="fc bfc" id="L148" title="All 6 branches covered.">        return !peakHours</span>
+                &amp;&amp; currentTemperature &lt; targetTemperature
+                &amp;&amp; requiredPowerKw &lt;= availablePowerKw;
+    }
+
+    public Set&lt;String&gt; selectRoomsToHeat(
+            List&lt;RoomState&gt; rooms,
+            long maximumPowerKw,
+            boolean peakHours) {
+
+<span class="fc bfc" id="L158" title="All 2 branches covered.">        if (peakHours) {</span>
+<span class="fc" id="L159">            return Set.of();</span>
+        }
+
+<span class="fc" id="L162">        List&lt;RoomState&gt; prioritizedRooms = rooms.stream()</span>
+<span class="fc" id="L163">                .filter(room -&gt;</span>
+<span class="fc" id="L164">                        room.currentTemperature()</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">                                &lt; room.targetTemperature())</span>
+<span class="fc" id="L166">                .sorted(Comparator</span>
+<span class="fc" id="L167">                        .comparingLong((RoomState room) -&gt;</span>
+<span class="fc" id="L168">                                room.targetTemperature()</span>
+<span class="fc" id="L169">                                        - room.currentTemperature())</span>
+<span class="fc" id="L170">                        .reversed()</span>
+<span class="fc" id="L171">                        .thenComparing(RoomState::id))</span>
+<span class="fc" id="L172">                .toList();</span>
+
+<span class="fc" id="L174">        Set&lt;String&gt; selected = new LinkedHashSet&lt;&gt;();</span>
+<span class="fc" id="L175">        long availablePowerKw = maximumPowerKw;</span>
+
+<span class="fc bfc" id="L177" title="All 2 branches covered.">        for (RoomState room : prioritizedRooms) {</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">            if (shouldHeat(</span>
+<span class="fc" id="L179">                    room.currentTemperature(),</span>
+<span class="fc" id="L180">                    room.targetTemperature(),</span>
+<span class="fc" id="L181">                    room.requiredPowerKw(),</span>
+                    availablePowerKw,
+                    peakHours)) {
+
+<span class="fc" id="L185">                selected.add(room.id());</span>
+<span class="fc" id="L186">                availablePowerKw -= room.requiredPowerKw();</span>
+            }
+<span class="fc" id="L188">        }</span>
+
+<span class="fc" id="L190">        return Set.copyOf(selected);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

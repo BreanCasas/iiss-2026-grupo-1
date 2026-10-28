@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PeakSchedule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">IoTEste Core</a> &gt; <a href="index.source.html" class="el_package">com.ioteste.core</a> &gt; <span class="el_source">PeakSchedule.java</span></div><h1>PeakSchedule.java</h1><pre class="source lang-java linenums">package com.ioteste.core;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+<span class="fc" id="L7">public record PeakSchedule(</span>
+        LocalTime from,
+        LocalTime until,
+        Days days
+) {
+
+<span class="fc" id="L13">    public enum Days {</span>
+<span class="fc" id="L14">        HABILES,</span>
+<span class="fc" id="L15">        TODOS</span>
+    }
+
+    public boolean isPeak(LocalDateTime dateTime) {
+<span class="fc" id="L19">        LocalTime time = dateTime.toLocalTime();</span>
+
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        return appliesOn(dateTime.toLocalDate())</span>
+<span class="fc bfc" id="L22" title="All 2 branches covered.">                &amp;&amp; !time.isBefore(from)</span>
+<span class="fc bfc" id="L23" title="All 2 branches covered.">                &amp;&amp; time.isBefore(until);</span>
+    }
+
+    /**
+     * Próximo instante local, estrictamente posterior a {@code after},
+     * en que isPeak cambia de valor: inicio o fin de una franja.
+     *
+     * Sirve para despertar al controlador justo en el cambio de franja
+     * y no depender de la frecuencia con que se evalúa.
+     */
+    public LocalDateTime nextChange(LocalDateTime after) {
+<span class="fc" id="L34">        LocalDate firstDay = after.toLocalDate();</span>
+
+        // Hay una franja en cualquier ventana de 7 días consecutivos.
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">        for (int offset = 0; offset &lt;= 7; offset++) {</span>
+<span class="fc" id="L38">            LocalDate day = firstDay.plusDays(offset);</span>
+
+<span class="fc bfc" id="L40" title="All 2 branches covered.">            if (!appliesOn(day)) {</span>
+<span class="fc" id="L41">                continue;</span>
+            }
+
+<span class="fc" id="L44">            LocalDateTime start = day.atTime(from);</span>
+
+<span class="fc bfc" id="L46" title="All 2 branches covered.">            if (start.isAfter(after)) {</span>
+<span class="fc" id="L47">                return start;</span>
+            }
+
+<span class="fc" id="L50">            LocalDateTime end = day.atTime(until);</span>
+
+<span class="fc bfc" id="L52" title="All 2 branches covered.">            if (end.isAfter(after)) {</span>
+<span class="fc" id="L53">                return end;</span>
+            }
+        }
+
+<span class="nc" id="L57">        throw new IllegalStateException(</span>
+                &quot;La franja no se aplica ningún día: &quot; + this);
+    }
+
+    private boolean appliesOn(LocalDate date) {
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        return days == Days.TODOS</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">                || date.getDayOfWeek().getValue() &lt;= 5;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
