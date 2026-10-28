@@ -37,10 +37,18 @@ de esta entrega.
 ## Requisitos y configuración
 
 - Docker y Docker Compose.
+- Docker Desktop activo para ejecutar la suite completa en Windows.
 - Java 25 para el entorno probado.
 - ecowarm-check.jar del docente.
 - Git Bash para scripts en Windows.
 - curl para scripts/api-example.sh.
+
+Las pruebas de integración MQTT utilizan Testcontainers para crear
+brokers Mosquitto temporales. No requieren que el checker ni MongoDB
+estén ejecutándose.
+
+La primera ejecución necesita descargar las dependencias Maven y las
+imágenes de Docker utilizadas por las pruebas.
 
 Conservar los valores existentes de .env.
 
@@ -266,7 +274,7 @@ switch sin respuesta no impide apagar los demás.
 
 ## Construcción y pruebas
 
-Desde PowerShell:
+Desde PowerShell con Docker Desktop activo:
 
 ```powershell
 & "C:\Program Files\Git\bin\bash.exe" ./scripts/build.sh
@@ -274,7 +282,7 @@ Desde PowerShell:
 & "C:\Program Files\Git\bin\bash.exe" ./scripts/api-example.sh
 ```
 
-Desde Linux o Git Bash:
+Desde Git Bash con Docker Desktop activo:
 
 ```bash
 bash scripts/build.sh
@@ -282,17 +290,34 @@ bash scripts/test.sh
 bash scripts/api-example.sh
 ```
 
-Con Java 25 y Maven locales:
+Con Java 25 y Maven locales, y un motor Docker accesible para
+Testcontainers:
 
 ```bash
 mvn -B clean verify
 ```
 
-Para ejecutar las pruebas desde PowerShell mediante Docker:
+Para ejecutar la suite desde PowerShell mediante Docker:
 
 ```powershell
-docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" --workdir /workspace maven:3.9-eclipse-temurin-25 mvn -B clean test
+docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" --mount "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock" -e TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal --workdir /workspace maven:3.9-eclipse-temurin-25 mvn -B clean verify
 ```
+
+scripts/test.sh ejecuta clean verify y proporciona al contenedor Maven
+acceso al socket de Docker. TESTCONTAINERS_HOST_OVERRIDE indica la
+dirección utilizada para acceder a los puertos publicados de los brokers
+temporales; el valor predeterminado del script es host.docker.internal,
+correspondiente al entorno Docker Desktop probado.
+
+El archivo modules/engine/src/test/resources/docker-java.properties
+contiene:
+
+```properties
+api.version=1.44
+```
+
+Esta configuración permite utilizar el cliente Docker de las pruebas
+con el Docker Engine 29 del entorno probado.
 
 El Dockerfile construye con -DskipTests.
 Los tests se ejecutan por separado.
@@ -300,10 +325,12 @@ Los tests se ejecutan por separado.
 | Módulo | Pruebas | Fallos | Errores | Omitidas |
 |---|---:|---:|---:|---:|
 | core | 34 | 0 | 0 | 0 |
-| engine | 84 | 0 | 0 | 0 |
-| Total | 118 | 0 | 0 | 0 |
+| engine | 86 | 0 | 0 | 0 |
+| Total | 120 | 0 | 0 | 0 |
 
 Resultado de las pruebas con Java 25: BUILD SUCCESS.
+
+La ejecución completa también se verificó mediante scripts/test.sh.
 
 La cobertura del core medida con JaCoCo es de 98 % de instrucciones
 y 93 % de ramas. El reporte se encuentra en:
@@ -317,7 +344,7 @@ Validación realizada el 28 de octubre de 2026, hora de Uruguay:
 - Checker: 8/8 comprobaciones aprobadas.
 - Comandos a switches: 18.
 - Consultas de estado: 156.
-- Suite Maven: 118 tests, sin fallos, errores ni pruebas omitidas.
+- Suite Maven: 120 tests, sin fallos, errores ni pruebas omitidas.
 
 La cantidad de comandos y consultas depende de la duración de la ejecución.
 El checker verifica interoperabilidad; no sustituye las pruebas específicas
@@ -345,10 +372,11 @@ pull request hacia main o ejecución manual.
 
 Guarda reportes Surefire.
 
-Los tests no requieren MongoDB ni checker activos.
+Los tests no requieren MongoDB ni checker activos. La suite completa
+requiere un motor Docker accesible para crear los brokers temporales.
 
 El resultado del workflow debe comprobarse en GitHub Actions después
-del push.
+del push de los últimos cambios.
 
 ## Detener el entorno
 
@@ -423,13 +451,31 @@ Se verificaron los siguientes comportamientos:
 - INICIAR permite encender y DETENER provoca el apagado.
 - Una reducción de la temperatura esperada durante la ejecución provoca
   el apagado y conserva el control en marcha.
+- La detención y el arranque de un proceso Mosquitto real permiten
+  recuperar la conexión, la suscripción y la recepción con el mismo
+  cliente MQTT.
+- Las publicaciones realizadas durante la ausencia de suscripción
+  no llegan al suscriptor ni renuevan la lectura; una publicación nueva,
+  después de restablecer la suscripción, permite recuperar la temperatura.
 
-Las pruebas temporales utilizan un reloj simulado, sin esperas reales.
-La ausencia de mensajes se simula sin invocar receive(); no se inyectan
-pérdidas individuales de paquetes en la red.
+Las pruebas de vigencia utilizan un reloj simulado, sin esperar
+30 segundos reales.
 
-Resultado de la ejecución: 118 pruebas, con 0 fallos y 0 errores
-(34 del core y 84 del engine).
+Las dos pruebas de integración MQTT utilizan Testcontainers y la imagen
+eclipse-mosquitto:2.0.22. Crean brokers temporales independientes del
+checker y del controlador desplegado.
+
+En la prueba de recuperación se detiene y arranca únicamente el proceso
+Mosquitto, conservando el contenedor y su dirección. Se comprueba también
+que el cliente MQTT del suscriptor no haya sido reemplazado.
+
+La pérdida de entrega se provoca retirando temporalmente la suscripción
+y publicando mensajes no retenidos. Después se restablece la suscripción
+y se verifica que solo se almacenaron la lectura inicial y la nueva.
+No se inyectan pérdidas individuales de paquetes TCP.
+
+Resultado de la ejecución: 120 pruebas, con 0 fallos y 0 errores
+(34 del core y 86 del engine).
 
 ### Prueba manual de recuperación del entorno
 
@@ -480,5 +526,6 @@ corresponden a UTC, como aparecen en los logs:
 El apagado y los encendidos confirmados demuestran que REST siguió
 disponible. No se reiniciaron el controlador ni el checker.
 
-Esta prueba simula una interrupción de red hacia MQTT; no detiene
-el proceso del broker ni inyecta pérdidas individuales de mensajes.
+Esta prueba manual simula una interrupción de red hacia MQTT.
+La detención real del proceso del broker se verifica por separado
+en la prueba automatizada con Mosquitto.

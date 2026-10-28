@@ -14,6 +14,8 @@ export MSYS_NO_PATHCONV=1
 
 docker run --rm \
     --mount "type=bind,source=${MOUNT_DIR},target=/workspace" \
+    --mount "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock" \
+    -e TESTCONTAINERS_HOST_OVERRIDE="${TESTCONTAINERS_HOST_OVERRIDE:-host.docker.internal}" \
     --workdir /workspace \
     maven:3.9-eclipse-temurin-25 \
-    mvn -B test
+    mvn -B clean verify

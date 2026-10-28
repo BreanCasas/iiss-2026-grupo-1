@@ -119,6 +119,7 @@ no implica una comprobación automática de todas las reglas del documento.
 | Tratamiento de fallos | HeatingEngine registra fallos de switches y continúa intentando los demás apagados. TemperatureSubscriber registra problemas de recepción y persistencia. |
 | Vigencia de observaciones | TemperatureSubscriber devuelve null cuando una lectura cumple 30 segundos sin renovación válida. |
 | Pruebas temporales repetibles | Las pruebas de vencimiento utilizan un Clock simulado, sin esperas reales. |
+| Dependencias de pruebas | Testcontainers se declara con alcance test en modules/engine/pom.xml y no modifica las dependencias de producción. |
 
 Esta revisión aporta evidencia sobre los componentes indicados. No
 constituye una auditoría exhaustiva de todas las convenciones de nombres,
@@ -126,15 +127,20 @@ duplicaciones, comentarios, accesos o posibles secretos del repositorio.
 
 ### Compilación y pruebas
 
-Se ejecutó desde la raíz del proyecto, en PowerShell:
+Se ejecutó desde la raíz del proyecto, en PowerShell, con Docker Desktop
+activo:
 
-    docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" --workdir /workspace maven:3.9-eclipse-temurin-25 mvn -B clean test
+    docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" --mount "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock" -e TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal --workdir /workspace maven:3.9-eclipse-temurin-25 mvn -B clean verify
+
+También se verificó la ejecución mediante:
+
+    & "C:\Program Files\Git\bin\bash.exe" ./scripts/test.sh
 
 Resultado comprobado:
 
 - Core: 34 pruebas.
-- Engine: 84 pruebas.
-- Total: 118 pruebas.
+- Engine: 86 pruebas.
+- Total: 120 pruebas.
 - Fallos: 0.
 - Errores: 0.
 - Pruebas omitidas: 0.
@@ -147,6 +153,15 @@ y modificación de la temperatura esperada durante la ejecución.
 También se verifica que una ausencia de mensajes de 20 segundos conserva
 válida la lectura y que una lectura nueva renueva su plazo de vigencia.
 Este caso simula ausencia de recepción, no pérdida de paquetes en la red.
+
+Las pruebas de integración MQTT incorporan un broker real mediante
+Testcontainers y eclipse-mosquitto:2.0.22. La suite completa requiere
+un motor Docker accesible, pero no requiere que MongoDB ni el checker
+estén ejecutándose.
+
+El archivo modules/engine/src/test/resources/docker-java.properties
+contiene api.version=1.44 para la compatibilidad del cliente Docker
+de las pruebas con el Docker Engine 29 del entorno probado.
 
 ### Cobertura del core
 
@@ -197,8 +212,40 @@ se observaron:
 El procedimiento de bloqueo y restauración figura en README.md.
 Los horarios de la evidencia se registran en docs/arquitectura/4mas1.md.
 
-Esta prueba simula una falla de red hacia MQTT. No detiene el proceso
-del broker ni inyecta pérdidas individuales de mensajes.
+Esta prueba manual simula una falla de red hacia MQTT.
+
+### Detención y recuperación del servidor MQTT
+
+La prueba realBrokerRestartAllowsSubscriptionAndReadingRecovery
+detiene y arranca un proceso Mosquitto real dentro de un contenedor
+temporal.
+
+Se verifican la desconexión, el vencimiento de la lectura mediante
+un reloj simulado, la recuperación de la suscripción y la recepción
+de una nueva temperatura.
+
+El contenedor y su dirección se conservan durante la prueba.
+El cliente MQTT del suscriptor es el mismo antes y después de
+la recuperación.
+
+La prueba pasó tanto en la ejecución de TemperatureSubscriberTest
+como en la suite completa.
+
+### Publicaciones no entregadas
+
+La prueba publicationsMissedWithoutSubscriptionDoNotRenewTheReading
+retira temporalmente la suscripción de un cliente conectado a un
+broker real y publica dos mensajes no retenidos.
+
+Se comprueba que esas publicaciones no modifican la temperatura
+disponible ni renuevan su plazo original.
+
+Después del vencimiento se restablece la suscripción y una publicación
+nueva recupera la lectura. El repositorio recibe únicamente la lectura
+inicial y la nueva.
+
+Este caso verifica pérdida de entrega de publicaciones por ausencia
+de suscripción; no inyecta pérdidas individuales de paquetes TCP.
 
 ### Interoperabilidad
 
@@ -214,9 +261,12 @@ El archivo .github/workflows/maven.yml configura Java 25 y ejecuta
 mvn clean verify para los eventos definidos, incluidos los pushes
 a iteracion5. También configura la conservación de reportes de pruebas.
 
+La suite completa requiere Docker accesible en el entorno de ejecución
+para crear los brokers temporales de Testcontainers.
+
 El resultado de esa ejecución deberá comprobarse en GitHub Actions
-después del push. Su configuración no demuestra por sí sola una
-ejecución exitosa.
+después del push de los últimos cambios. Una ejecución anterior en verde
+no demuestra el resultado de las pruebas incorporadas posteriormente.
 
 ### Alcance de la evidencia
 

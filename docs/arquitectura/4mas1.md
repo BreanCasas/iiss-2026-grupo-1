@@ -230,6 +230,10 @@ La separación permite probar las decisiones del core sin infraestructura
 externa. Engine transforma la configuración y las observaciones en
 entradas del core y ejecuta las acciones devueltas.
 
+Las pruebas MQTT de engine incorporan Testcontainers como dependencia
+de alcance test. Utilizan brokers Mosquitto temporales y no agregan
+dependencias de producción ni servicios al docker-compose de la aplicación.
+
 ## Vista de procesos
 
 El controlador se ejecuta en una JVM. Las solicitudes HTTP, las tareas
@@ -320,6 +324,10 @@ El contenedor control accede al entorno del host mediante
 host.docker.internal. La configuración del volumen permite conservar
 los datos de MongoDB al recrear los contenedores.
 
+Los brokers creados por Testcontainers pertenecen únicamente al entorno
+de pruebas. Utilizan puertos publicados dinámicamente y no reemplazan
+al broker del checker en el despliegue de la aplicación.
+
 ## Vista de escenarios (+1)
 
 Los escenarios relacionan las operaciones externas con los componentes
@@ -399,8 +407,14 @@ bloqueando el puerto 1883 desde la red del contenedor del controlador,
 con REST disponible. Al retirar el bloqueo se recuperaron la conexión,
 las suscripciones, las lecturas y el control, sin reiniciar los procesos.
 
-Esta segunda prueba simula una falla de red hacia MQTT; no detiene
-el proceso del broker.
+La detención real del servidor MQTT se verifica adicionalmente mediante
+una prueba automatizada que detiene y arranca el proceso Mosquitto.
+El contenedor conserva su dirección y el suscriptor utiliza el mismo
+cliente MQTT durante la recuperación.
+
+Otra prueba publica mensajes no retenidos durante la ausencia temporal
+de suscripción. Esas publicaciones no renuevan la lectura; después de
+restablecer la suscripción, una publicación nueva recupera la temperatura.
 
 ### Cambio de configuración durante la ejecución
 
@@ -518,8 +532,8 @@ anteriores dejan de estar disponibles al vencer su plazo de vigencia.
 Pruebas ejecutadas:
 
 - Core: 34 pruebas.
-- Engine: 84 pruebas.
-- Total: 118 pruebas.
+- Engine: 86 pruebas.
+- Total: 120 pruebas.
 
 Las pruebas incorporadas verifican el vencimiento de las lecturas a los
 30 segundos reales, la recuperación con una lectura válida y que los
@@ -530,15 +544,22 @@ al recibir una nueva lectura válida.
 Se verifica además una ausencia de mensajes de 20 segundos, durante
 la cual la lectura sigue vigente, y su renovación con una lectura nueva.
 
-Las pruebas temporales utilizan un reloj simulado, sin esperas reales.
-No inyectan pérdidas individuales de paquetes en la red.
+Las pruebas de vigencia utilizan un reloj simulado, sin esperar
+30 segundos reales.
 
 Las pruebas de integración comprueban el recorrido INICIAR, encender,
 DETENER y apagar, y la reducción de la temperatura esperada durante
 la ejecución utilizando SiteService y ControlService reales.
 
 Resultado comprobado con Java 25: BUILD SUCCESS,
-sin fallos ni errores.
+sin fallos, errores ni pruebas omitidas.
+
+La suite completa se verificó mediante clean verify y scripts/test.sh.
+Requiere un motor Docker accesible para las pruebas con Testcontainers.
+
+El archivo modules/engine/src/test/resources/docker-java.properties
+configura api.version=1.44 para el cliente Docker de las pruebas,
+compatible con el Docker Engine 29 del entorno probado.
 
 Cobertura del core medida con JaCoCo:
 
@@ -586,13 +607,52 @@ La recuperación de MQTT permitió reanudar el control con lecturas nuevas.
 El procedimiento reproducible de bloqueo y restauración se documenta
 en README.md.
 
-Esta prueba simula una interrupción de red hacia MQTT. No detiene
-el proceso del broker ni inyecta pérdidas individuales de mensajes.
+Esta prueba manual simula una interrupción de red hacia MQTT.
+La detención real del proceso del broker se verifica por separado
+en la prueba automatizada con Mosquitto.
+
+### Detención y recuperación de un broker real
+
+La prueba realBrokerRestartAllowsSubscriptionAndReadingRecovery,
+ubicada en TemperatureSubscriberTest, utiliza Testcontainers y
+eclipse-mosquitto:2.0.22.
+
+El procedimiento verifica:
+
+1. Conexión y suscripción a un broker real.
+2. Recepción de una temperatura inicial.
+3. Detención del proceso Mosquitto y detección de la desconexión.
+4. Vencimiento de la lectura mediante el reloj simulado.
+5. Arranque de Mosquitto dentro del mismo contenedor.
+6. Recuperación de conexión y suscripción con el mismo cliente MQTT.
+7. Recepción de una temperatura nueva.
+
+El contenedor permanece activo durante la detención de Mosquitto.
+Se conserva el puerto publicado y no se reinicia el suscriptor.
+
+La prueba pasó junto con las otras ocho pruebas de
+TemperatureSubscriberTest y posteriormente en la suite completa.
+
+### Publicaciones no entregadas
+
+La prueba publicationsMissedWithoutSubscriptionDoNotRenewTheReading
+utiliza un broker real y retira temporalmente la suscripción del cliente.
+
+Durante ese intervalo se publican dos mensajes no retenidos.
+Se comprueba que la última temperatura disponible no cambió y que
+vence al cumplirse su plazo original.
+
+Después se restablece la suscripción y se publica una lectura nueva.
+La temperatura vuelve a estar disponible y se comprueba que el
+repositorio recibió únicamente la lectura inicial y la nueva.
+
+Esta prueba verifica pérdida de entrega de publicaciones por ausencia
+de suscripción. No inyecta pérdidas individuales de paquetes TCP.
 
 ### Checker e inspección de persistencia
 
-El 28 de octubre de 2026, hora de Uruguay, el checker obtuvo 8/8
-con la versión actual, con 18 comandos y 156 consultas de estado.
+El 28 de octubre de 2026, hora de Uruguay, el checker obtuvo 8/8,
+con 18 comandos y 156 consultas de estado.
 
 Este resultado confirma la interoperabilidad REST y MQTT evaluada por
 el checker. No reemplaza los tests del core ni las pruebas específicas
@@ -603,9 +663,8 @@ tenían sourceTs y payload.ts de tipo long y unidad epoch_milliseconds.
 
 La recuperación de pendientes se prueba con colaboradores simulados.
 
-La detención aislada del proceso del broker, la inyección de pérdidas
-individuales de mensajes y la comprobación del histórico antiguo de
-MongoDB no se verificaron en estas pruebas.
+La inyección de pérdidas individuales de paquetes TCP y la comprobación
+del histórico antiguo de MongoDB no se realizaron en estas pruebas.
 
 Las temperaturas, potencias y el factor de aceleración se representan
 internamente con `long` escalado a milésimas. Los adaptadores JSON/MQTT
