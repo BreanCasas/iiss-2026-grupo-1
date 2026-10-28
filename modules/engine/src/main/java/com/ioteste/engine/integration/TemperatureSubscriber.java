@@ -10,6 +10,7 @@ import com.ioteste.engine.site.SiteService;
 
 import jakarta.annotation.PreDestroy;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -30,12 +32,18 @@ public class TemperatureSubscriber {
     private static final Logger log =
             LoggerFactory.getLogger(TemperatureSubscriber.class);
 
+    private static final long TEMPERATURE_TIMEOUT_MS = 30_000L;
+
     private final EnvironmentRegistration registration;
     private final SiteService siteService;
     private final ObjectMapper mapper;
     private final TemperatureReadingRepository readings;
+    private final Clock clock;
 
-    private final Map<String, Long> temperatures =
+    private record Reading(long temperature, long receivedAtMillis) {
+    }
+
+    private final Map<String, Reading> temperatures =
             new ConcurrentHashMap<>();
 
     private final Set<String> subscribedTopics =
@@ -44,16 +52,28 @@ public class TemperatureSubscriber {
     private volatile Set<String> activeTopics = Set.of();
     private MqttClient client;
 
+    @Autowired
     public TemperatureSubscriber(
             EnvironmentRegistration registration,
             SiteService siteService,
             ObjectMapper mapper,
             TemperatureReadingRepository readings) {
 
+        this(registration, siteService, mapper, readings, Clock.systemUTC());
+    }
+
+    TemperatureSubscriber(
+            EnvironmentRegistration registration,
+            SiteService siteService,
+            ObjectMapper mapper,
+            TemperatureReadingRepository readings,
+            Clock clock) {
+
         this.registration = registration;
         this.siteService = siteService;
         this.mapper = mapper;
         this.readings = readings;
+        this.clock = clock;
     }
 
     @Scheduled(initialDelay = 4000, fixedDelay = 2000)
@@ -201,12 +221,15 @@ public class TemperatureSubscriber {
             return;
         }
 
-        temperatures.put(topic, value);
+        temperatures.put(
+                topic,
+                new Reading(value, clock.millis())
+        );
 
         log.info("Temperatura recibida: {} = {}.{} °C",
-  		topic,
-		value / 1000,
-		Math.abs(value % 1000) / 100);
+                topic,
+                value / 1000,
+                Math.abs(value % 1000) / 100);
 
         for (SiteInventory.Room room : rooms) {
             try {
@@ -236,7 +259,6 @@ public class TemperatureSubscriber {
             );
         }
 
-
         try {
             long epochMillis = timestamp.decimalValue()
                     .movePointRight(3)
@@ -253,7 +275,20 @@ public class TemperatureSubscriber {
     }
 
     public Long temperature(String topic) {
-        return temperatures.get(topic);
+        Reading reading = temperatures.get(topic);
+
+        if (reading == null) {
+            return null;
+        }
+
+        long elapsedMillis =
+                clock.millis() - reading.receivedAtMillis();
+
+        if (elapsedMillis >= TEMPERATURE_TIMEOUT_MS) {
+            return null;
+        }
+
+        return reading.temperature();
     }
 
     @PreDestroy

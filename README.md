@@ -1,13 +1,14 @@
 # IoTEste EcoWarm
 
-Taller de Ingeniería de Software - Iteración 4 - Java 25.
+Taller de Ingeniería de Software - Iteración 5 - Java 25.
 
 Control de calefacción por habitaciones mediante MQTT y switches REST.
 
 ## Evolución y estructura
 
-La iteración 4 conserva la recepción MQTT, el control REST y la persistencia
-de las entregas anteriores y organiza el controlador en core y engine.
+El controlador conserva la separación en core y engine. La iteración 5
+incorpora mejoras de calidad, soporte y pruebas de tiempo acelerado,
+vencimiento de lecturas y verificación de recuperación de comunicaciones.
 
 | Ubicación | Contenido |
 |---|---|
@@ -19,7 +20,7 @@ de las entregas anteriores y organiza el controlador en core y engine.
 | scripts/ | Construcción, arranque, parada y tests |
 | docs/api/openapi.yaml | Contrato estandarizado de la API |
 | docs/tests/criterio-tests.md | Criterio de adecuación y resultados |
-| docs/arquitectura/4mas1.md | Vista lógica y secuencias |
+| docs/arquitectura/4mas1.md | Vistas de arquitectura 4+1 y secuencias |
 | .github/workflows/maven.yml | Integración continua |
 
 Engine depende de core.
@@ -84,11 +85,15 @@ Puertos:
 
 El controlador se registra y obtiene la dirección del broker.
 
-Si se reinicia el checker después del registro:
+Si se reinicia el checker después del registro y se necesita repetir
+el registro y la carga inicial del entorno:
 
 ```powershell
 docker compose --env-file .env -f docker/docker-compose.yml restart control
 ```
+
+Este reinicio no es necesario para recuperar únicamente la conexión
+MQTT: la reconexión y las suscripciones se restablecen automáticamente.
 
 ## API REST
 
@@ -166,7 +171,9 @@ Devuelve una Decision con acciones OFF antes de ON.
 
 Engine reúne lecturas y estados, consulta al core y ejecuta los comandos.
 
-Confirma apagados antes de nuevos encendidos.
+Confirma apagados antes de nuevos encendidos. Si un apagado falla,
+considera el posible consumo de esa habitación antes de permitir
+encendidos que puedan superar la potencia máxima.
 
 ## Inventario y persistencia
 
@@ -191,7 +198,8 @@ Inventario y pendientes se recuperan al arrancar.
 La última temperatura se conserva en memoria.
 Se espera una nueva lectura MQTT tras reiniciar.
 
-Si falla el guardado, la temperatura sigue disponible en memoria.
+Si falla el guardado, la temperatura sigue disponible en memoria
+hasta que venza su vigencia.
 Esa escritura no tiene reintentos automáticos.
 
 El histórico no se expone mediante los antiguos endpoints /rooms.
@@ -280,29 +288,44 @@ Con Java 25 y Maven locales:
 mvn -B clean verify
 ```
 
+Para ejecutar las pruebas desde PowerShell mediante Docker:
+
+```powershell
+docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" --workdir /workspace maven:3.9-eclipse-temurin-25 mvn -B clean test
+```
+
 El Dockerfile construye con -DskipTests.
 Los tests se ejecutan por separado.
 
 | Módulo | Pruebas | Fallos | Errores | Omitidas |
 |---|---:|---:|---:|---:|
-| core | 23 | 0 | 0 | 0 |
-| engine | 43 | 0 | 0 | 0 |
-| Total | 66 | 0 | 0 | 0 |
+| core | 34 | 0 | 0 | 0 |
+| engine | 84 | 0 | 0 | 0 |
+| Total | 118 | 0 | 0 | 0 |
 
 Resultado de las pruebas con Java 25: BUILD SUCCESS.
 
+La cobertura del core medida con JaCoCo es de 98 % de instrucciones
+y 93 % de ramas. El reporte se encuentra en:
+
+- docs/calidad/cobertura/core/index.html
+
 ## Checker y validación
 
-Validación realizada el 11 de octubre de 2026, hora de Uruguay:
+Validación realizada el 28 de octubre de 2026, hora de Uruguay:
 
 - Checker: 8/8 comprobaciones aprobadas.
 - Comandos a switches: 18.
-- Consultas de estado: 204.
-- Suite Maven: 66 tests, sin fallos, errores ni pruebas omitidas.
-- MongoDB: las dos lecturas más recientes verificadas tenían sourceTs
-  y payload.ts de tipo long, con unidad epoch_milliseconds.
+- Consultas de estado: 156.
+- Suite Maven: 118 tests, sin fallos, errores ni pruebas omitidas.
 
 La cantidad de comandos y consultas depende de la duración de la ejecución.
+El checker verifica interoperabilidad; no sustituye las pruebas específicas
+de fallas de comunicación.
+
+En una inspección anterior de MongoDB, las dos lecturas más recientes
+verificadas tenían sourceTs y payload.ts de tipo long, con unidad
+epoch_milliseconds.
 
 La comprobación de tipos corresponde a las lecturas nuevas inspeccionadas.
 No implica que se haya migrado el histórico anterior.
@@ -317,12 +340,15 @@ Para ver el veredicto, presionar Ctrl+C en la terminal del checker.
 mvn -B --no-transfer-progress clean verify
 ```
 
-Se activa por push a main o iteracion-4,
+Se activa por push a main, iteracion-4 o iteracion5,
 pull request hacia main o ejecución manual.
 
 Guarda reportes Surefire.
 
 Los tests no requieren MongoDB ni checker activos.
+
+El resultado del workflow debe comprobarse en GitHub Actions después
+del push.
 
 ## Detener el entorno
 
@@ -348,9 +374,13 @@ El checker se detiene aparte con Ctrl+C.
 - docs/api/openapi.yaml
 - docs/tests/criterio-tests.md
 - docs/arquitectura/4mas1.md
+- docs/calidad/estandares-codificacion.md
+- docs/calidad/cobertura/core/index.html
+- docs/arquitectura/virtualclock.md
 
 La metodología es Scrumban, con planificación,
 seguimiento en Jira y revisiones semanales.
+
 ## Representación numérica interna
 
 Las temperaturas, potencias y factores de aceleración se representan en Java
@@ -359,3 +389,96 @@ almacena como 21500, 2,5 kW como 2500 y un factor 1,5 como 1500. En los límites
 JSON/MQTT se convierte desde/hacia números decimales sin usar coma flotante
 binaria; los valores internos se mantienen como enteros escalados. El histórico
 MongoDB guarda las lecturas en `tempMilliCelsius` y `tempMilliFahrenheit`.
+
+## Vencimiento de lecturas y recuperación de comunicaciones
+
+Cada lectura válida de temperatura se conserva junto con su instante de
+recepción en milisegundos. Su vigencia es de 30 segundos reales,
+independientemente del factor de aceleración del controlador.
+
+El plazo se define en la constante TEMPERATURE_TIMEOUT_MS.
+No se configura mediante .env.
+
+Cuando transcurren 30 segundos sin una nueva lectura válida, la temperatura
+se considera desconocida. En el próximo ciclo de control se ordena apagar
+la calefacción de esa habitación si su estado lo requiere. Si el switch
+no responde, los ciclos posteriores vuelven a intentar las acciones necesarias.
+
+Una nueva lectura válida permite reanudar el control según la temperatura,
+la configuración, la franja horaria y la potencia disponible.
+Los mensajes inválidos no renuevan la vigencia de la lectura anterior.
+
+### Pruebas automatizadas
+
+Se verificaron los siguientes comportamientos:
+
+- La lectura permanece disponible antes de los 30 segundos.
+- La lectura vence al cumplirse exactamente 30 segundos.
+- Una nueva lectura válida restablece la temperatura disponible.
+- Un mensaje inválido no extiende la vigencia de la lectura anterior.
+- Una interrupción de recepción de 20 segundos mantiene válida la lectura;
+  una nueva lectura renueva el plazo de vigencia.
+- El engine ordena encender, apagar por vencimiento y volver a encender
+  al recibir una nueva lectura válida.
+- INICIAR permite encender y DETENER provoca el apagado.
+- Una reducción de la temperatura esperada durante la ejecución provoca
+  el apagado y conserva el control en marcha.
+
+Las pruebas temporales utilizan un reloj simulado, sin esperas reales.
+La ausencia de mensajes se simula sin invocar receive(); no se inyectan
+pérdidas individuales de paquetes en la red.
+
+Resultado de la ejecución: 118 pruebas, con 0 fallos y 0 errores
+(34 del core y 84 del engine).
+
+### Prueba manual de recuperación del entorno
+
+Con el controlador funcionando, se detuvo el checker y se volvió a iniciar.
+El checker reúne el broker MQTT, los termostatos y los switches REST, por
+lo que esta prueba interrumpe las comunicaciones MQTT y REST.
+
+Los logs del controlador mostraron la reconexión a MQTT, la renovación
+de ambas suscripciones, la recepción de nuevas temperaturas y la
+reanudación de los comandos de calefacción, sin reiniciar el controlador.
+
+Esta prueba verifica la recuperación del entorno completo.
+
+### Prueba manual de interrupción aislada de la comunicación MQTT
+
+Con el checker y el controlador funcionando, se bloqueó únicamente
+el tráfico saliente TCP hacia el puerto 1883 desde la red del contenedor
+ioteste-control. REST permaneció disponible en el puerto 9090.
+
+Bloqueo desde PowerShell:
+
+```powershell
+docker run --rm --network container:ioteste-control --cap-add NET_ADMIN nicolaka/netshoot iptables -I OUTPUT -p tcp --dport 1883 -j REJECT --reject-with tcp-reset
+```
+
+Se mantuvo la interrupción durante más de 30 segundos.
+
+Restauración:
+
+```powershell
+docker run --rm --network container:ioteste-control --cap-add NET_ADMIN nicolaka/netshoot iptables -D OUTPUT -p tcp --dport 1883 -j REJECT --reject-with tcp-reset
+```
+
+Cada ejecución del bloqueo agrega una regla. El comando de restauración
+debe ejecutarse una vez por cada regla agregada.
+
+Evidencia observada el 28 de octubre de 2026; los horarios siguientes
+corresponden a UTC, como aparecen en los logs:
+
+- 03:12:57.895: última temperatura de room1 y pérdida de conexión MQTT.
+- 03:13:28.540: confirmación OFF de sw-room1, aproximadamente 30,6 segundos
+  después de su última lectura. Room2 ya estaba apagada.
+- Durante el corte se registraron reintentos de conexión MQTT.
+- 03:15:49.353: reconexión MQTT y renovación de ambas suscripciones.
+- 03:15:52: recepción de temperaturas nuevas para ambas habitaciones.
+- 03:15:53: confirmación ON de ambos switches.
+
+El apagado y los encendidos confirmados demuestran que REST siguió
+disponible. No se reiniciaron el controlador ni el checker.
+
+Esta prueba simula una interrupción de red hacia MQTT; no detiene
+el proceso del broker ni inyecta pérdidas individuales de mensajes.

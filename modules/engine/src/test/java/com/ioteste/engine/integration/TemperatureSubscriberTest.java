@@ -7,6 +7,7 @@ import com.ioteste.engine.site.SiteInventory;
 import com.ioteste.engine.site.SiteService;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +29,7 @@ class TemperatureSubscriberTest {
     private TemperatureReadingRepository readings;
     private TemperatureSubscriber subscriber;
     private SiteInventory.Room room;
+    private Clock clock;
 
     @BeforeEach
     void setUp() {
@@ -67,11 +69,15 @@ class TemperatureSubscriberTest {
 
         when(siteService.get()).thenReturn(inventory);
 
+        clock = mock(Clock.class);
+        when(clock.millis()).thenReturn(1_000L);
+
         subscriber = new TemperatureSubscriber(
                 registration,
                 siteService,
                 new ObjectMapper(),
-                readings
+                readings,
+                clock
         );
 
         ReflectionTestUtils.setField(
@@ -176,6 +182,63 @@ class TemperatureSubscriberTest {
                 any(JsonNode.class),
                 any(Instant.class)
         );
+    }
+
+    @Test
+    void readingExpiresAfterThirtySecondsAndRecoversWithNewMessage() {
+        subscriber.receive(TOPIC, message("{\"tC\":19.3}"));
+
+        assertEquals(19300L, subscriber.temperature(TOPIC));
+
+        when(clock.millis()).thenReturn(30_999L);
+
+        assertEquals(19300L, subscriber.temperature(TOPIC));
+
+        when(clock.millis()).thenReturn(31_000L);
+
+        assertNull(subscriber.temperature(TOPIC));
+
+        subscriber.receive(TOPIC, message("{\"tC\":18.5}"));
+
+        assertEquals(18500L, subscriber.temperature(TOPIC));
+    }
+
+    @Test
+    void invalidMessageDoesNotExtendReadingLifetime() {
+        subscriber.receive(TOPIC, message("{\"tC\":19.3}"));
+
+        when(clock.millis()).thenReturn(30_000L);
+
+        subscriber.receive(TOPIC, message("{\"tC\":\"incorrecta\"}"));
+
+        assertEquals(19300L, subscriber.temperature(TOPIC));
+
+        when(clock.millis()).thenReturn(31_000L);
+
+        assertNull(subscriber.temperature(TOPIC));
+    }
+
+    @Test
+    void briefInterruptionKeepsReadingValidAndNewMessageRenewsIt() {
+        subscriber.receive(TOPIC, message("{\"tC\":19.3}"));
+
+        when(clock.millis()).thenReturn(21_000L);
+
+        assertEquals(19300L, subscriber.temperature(TOPIC));
+
+        subscriber.receive(TOPIC, message("{\"tC\":19.5}"));
+
+        when(clock.millis()).thenReturn(31_000L);
+
+        assertEquals(19500L, subscriber.temperature(TOPIC));
+
+        when(clock.millis()).thenReturn(50_999L);
+
+        assertEquals(19500L, subscriber.temperature(TOPIC));
+
+        when(clock.millis()).thenReturn(51_000L);
+
+        assertNull(subscriber.temperature(TOPIC));
     }
 
     private MqttMessage message(String json) {

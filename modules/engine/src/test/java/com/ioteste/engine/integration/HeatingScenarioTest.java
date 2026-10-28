@@ -1,19 +1,28 @@
 package com.ioteste.engine.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ioteste.core.PeakSchedule;
+import com.ioteste.engine.control.ControlCommand;
 import com.ioteste.engine.control.ControlService;
 import com.ioteste.engine.control.ControlStatus;
 import com.ioteste.engine.site.SiteInventory;
+import com.ioteste.engine.site.SiteRepository;
 import com.ioteste.engine.site.SiteService;
 
+import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -276,6 +285,159 @@ class HeatingScenarioTest {
         when(control.status()).thenReturn(ControlStatus.stopped());
 
         assertEquals(HeatingEngine.REGULAR_PERIOD, engine.nextDelay());
+    }
+
+    @Test
+    void expiredTemperatureTurnsHeatingOffAndFreshReadingRestartsIt() {
+        configureSite(3700L);
+        setTime("2026-10-05T12:00:00-03:00");
+
+        Clock clock = mock(Clock.class);
+        when(clock.millis()).thenReturn(1_000L);
+
+        TemperatureSubscriber subscriber = new TemperatureSubscriber(
+                mock(EnvironmentRegistration.class),
+                site,
+                new ObjectMapper(),
+                mock(TemperatureReadingRepository.class),
+                clock
+        );
+
+        ReflectionTestUtils.setField(
+                subscriber,
+                "activeTopics",
+                Set.of(room1.topicTermostato())
+        );
+
+        engine = new HeatingEngine(site, control, subscriber, switches);
+
+        MqttMessage message = new MqttMessage(
+                "{\"tC\":18.0}".getBytes(StandardCharsets.UTF_8)
+        );
+
+        subscriber.receive(room1.topicTermostato(), message);
+        setSwitchStates(SwitchClient.State.OFF, SwitchClient.State.OFF);
+
+        engine.tick();
+
+        verify(switches).command(room1, SwitchClient.State.ON);
+        clearInvocations(switches);
+
+        when(clock.millis()).thenReturn(31_000L);
+        setSwitchStates(SwitchClient.State.ON, SwitchClient.State.OFF);
+
+        engine.tick();
+
+        verify(switches).command(room1, SwitchClient.State.OFF);
+        verify(switches, never()).command(any(), eq(SwitchClient.State.ON));
+        clearInvocations(switches);
+
+        subscriber.receive(room1.topicTermostato(), message);
+        setSwitchStates(SwitchClient.State.OFF, SwitchClient.State.OFF);
+
+        engine.tick();
+
+        verify(switches).command(room1, SwitchClient.State.ON);
+    }
+
+    @Test
+    void startingThenStoppingControlTurnsHeatingOnThenOff() {
+        configureSite(3700L);
+        useRealServices();
+
+        setTemperatures(19000L, 21000L);
+        setSwitchStates(SwitchClient.State.OFF, SwitchClient.State.OFF);
+
+        control.command(new ControlCommand(
+                "INICIAR",
+                OffsetDateTime.parse("2026-10-05T12:00:00-03:00"),
+                1000L
+        ));
+
+        engine.tick();
+
+        verify(switches).command(room1, SwitchClient.State.ON);
+        verify(switches, never()).command(room2, SwitchClient.State.ON);
+        clearInvocations(switches);
+
+        setSwitchStates(SwitchClient.State.ON, SwitchClient.State.OFF);
+
+        control.command(new ControlCommand("DETENER", null, null));
+
+        engine.tick();
+
+        verify(switches).command(room1, SwitchClient.State.OFF);
+        verify(switches, never()).command(any(), eq(SwitchClient.State.ON));
+    }
+
+    @Test
+    void changingTargetTemperatureWhileRunningTurnsHeatingOff() {
+        configureSite(3700L);
+        useRealServices();
+
+        setTemperatures(19000L, 21000L);
+        setSwitchStates(SwitchClient.State.OFF, SwitchClient.State.OFF);
+
+        control.command(new ControlCommand(
+                "INICIAR",
+                OffsetDateTime.parse("2026-10-05T12:00:00-03:00"),
+                1000L
+        ));
+
+        engine.tick();
+
+        verify(switches).command(room1, SwitchClient.State.ON);
+        clearInvocations(switches);
+
+        SiteInventory.Room updatedRoom = new SiteInventory.Room(
+                room1.id(),
+                room1.nombre(),
+                18000L,
+                room1.potenciaKW(),
+                room1.idTermostato(),
+                room1.topicTermostato(),
+                room1.idSwitch(),
+                room1.urlSwitch()
+        );
+
+        SiteInventory previous = site.get();
+
+        site.replace(new SiteInventory(
+                previous.schemaVersion(),
+                previous.sitio(),
+                List.of(updatedRoom, room2)
+        ));
+
+        setSwitchStates(SwitchClient.State.ON, SwitchClient.State.OFF);
+        when(switches.status(updatedRoom)).thenReturn(SwitchClient.State.OFF);
+
+        engine.tick();
+
+        verify(switches).command(room1, SwitchClient.State.OFF);
+        verify(switches).status(updatedRoom);
+        verify(switches, never()).command(any(), eq(SwitchClient.State.ON));
+
+        assertEquals(
+                ControlStatus.State.EN_EJECUCION,
+                control.status().estado()
+        );
+        assertEquals(
+                18000L,
+                site.get().habitaciones().get(0).temperaturaEsperada()
+        );
+        assertTrue(site.snapshot().pendingShutdowns().isEmpty());
+    }
+
+    private void useRealServices() {
+        SiteInventory inventory = site.get();
+        SiteRepository repository = mock(SiteRepository.class);
+
+        when(repository.load()).thenReturn(Optional.of(inventory));
+        when(repository.loadPendingShutdowns()).thenReturn(List.of());
+
+        site = new SiteService(repository);
+        control = new ControlService();
+        engine = new HeatingEngine(site, control, temperatures, switches);
     }
 
     private void configureSite(long maximumPowerKw) {

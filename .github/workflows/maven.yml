@@ -2,7 +2,7 @@ name: IoTEste - Compilación y pruebas
 
 on:
   push:
-    branches: ["main", "iteracion-4"]
+    branches: ["main", "iteracion-4", "iteracion5"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:

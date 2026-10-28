@@ -104,7 +104,125 @@ legibilidad, el mantenimiento y la confiabilidad del sistema.
 
 ## 10. Verificación del cumplimiento
 
-Este documento define los criterios de referencia. El cumplimiento debe
-comprobarse revisando el código y ejecutando las pruebas del proyecto.
-La existencia de este documento no implica que todos los criterios hayan
-sido verificados automáticamente.
+La verificación combina revisión del código, ejecución de pruebas y
+medición de cobertura. Cada evidencia respalda los aspectos indicados;
+no implica una comprobación automática de todas las reglas del documento.
+
+### Revisión del código
+
+| Criterio | Evidencia revisada |
+|---|---|
+| Separación entre lógica e integraciones | Las clases de producción de core importan únicamente tipos de Java. Las comunicaciones MQTT, REST y MongoDB se implementan en engine. |
+| Validación del inventario | SiteValidator comprueba campos obligatorios, potencias positivas, identificadores únicos, horarios y URLs de switches. |
+| Nombres descriptivos | Las clases revisadas incluyen HeatingController, SiteValidator y TemperatureSubscriber. La constante TEMPERATURE_TIMEOUT_MS expresa el plazo y su unidad. |
+| Precisión numérica | Los adaptadores convierten valores decimales a long escalado mediante operaciones exactas. |
+| Tratamiento de fallos | HeatingEngine registra fallos de switches y continúa intentando los demás apagados. TemperatureSubscriber registra problemas de recepción y persistencia. |
+| Vigencia de observaciones | TemperatureSubscriber devuelve null cuando una lectura cumple 30 segundos sin renovación válida. |
+| Pruebas temporales repetibles | Las pruebas de vencimiento utilizan un Clock simulado, sin esperas reales. |
+
+Esta revisión aporta evidencia sobre los componentes indicados. No
+constituye una auditoría exhaustiva de todas las convenciones de nombres,
+duplicaciones, comentarios, accesos o posibles secretos del repositorio.
+
+### Compilación y pruebas
+
+Se ejecutó desde la raíz del proyecto, en PowerShell:
+
+    docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" --workdir /workspace maven:3.9-eclipse-temurin-25 mvn -B clean test
+
+Resultado comprobado:
+
+- Core: 34 pruebas.
+- Engine: 84 pruebas.
+- Total: 118 pruebas.
+- Fallos: 0.
+- Errores: 0.
+- Pruebas omitidas: 0.
+- Resultado final: BUILD SUCCESS.
+
+Las pruebas incluyen vencimiento y recuperación de lecturas, rechazo de
+mensajes inválidos sin renovar la vigencia, inicio y parada del control,
+y modificación de la temperatura esperada durante la ejecución.
+
+También se verifica que una ausencia de mensajes de 20 segundos conserva
+válida la lectura y que una lectura nueva renueva su plazo de vigencia.
+Este caso simula ausencia de recepción, no pérdida de paquetes en la red.
+
+### Cobertura del core
+
+Se ejecutó:
+
+    docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" --workdir /workspace maven:3.9-eclipse-temurin-25 mvn -B -pl modules/core -am clean verify
+
+El reporte JaCoCo generado y copiado a docs/calidad/cobertura/core
+mostró:
+
+- Cobertura de instrucciones: 98 %.
+- Cobertura de ramas: 93 %.
+
+Ambos porcentajes superan el mínimo requerido del 85 %.
+
+Reporte HTML: [Cobertura del core](cobertura/core/index.html).
+
+### Recuperación de comunicaciones
+
+Se verificó manualmente la recuperación del entorno deteniendo y
+reiniciando el checker sin reiniciar el controlador.
+
+Los logs mostraron reconexión MQTT, renovación de suscripciones,
+recepción de nuevas temperaturas y reanudación del control.
+
+El checker reúne MQTT, termostatos y switches REST. Esta primera
+prueba corresponde a la recuperación del entorno completo.
+
+Además, se verificó una interrupción aislada de la comunicación MQTT,
+bloqueando el tráfico TCP saliente hacia el puerto 1883 desde la red
+del contenedor ioteste-control. REST permaneció disponible en 9090.
+
+Durante el corte se observó:
+
+- Pérdida de conexión MQTT y reintentos.
+- Ausencia de nuevas temperaturas.
+- Confirmación del apagado de room1 aproximadamente 30,6 segundos
+  después de su última lectura. Room2 ya estaba apagada.
+
+Al retirar el bloqueo, sin reiniciar el controlador ni el checker,
+se observaron:
+
+- Reconexión MQTT.
+- Renovación de ambas suscripciones.
+- Nuevas temperaturas de ambas habitaciones.
+- Confirmación de encendido de ambos switches.
+
+El procedimiento de bloqueo y restauración figura en README.md.
+Los horarios de la evidencia se registran en docs/arquitectura/4mas1.md.
+
+Esta prueba simula una falla de red hacia MQTT. No detiene el proceso
+del broker ni inyecta pérdidas individuales de mensajes.
+
+### Interoperabilidad
+
+El checker obtuvo 8/8 comprobaciones aprobadas el 28 de octubre de 2026,
+hora de Uruguay, con 18 comandos y 156 consultas de estado.
+
+Este resultado verifica la interoperabilidad evaluada por el checker;
+no sustituye las pruebas unitarias ni las pruebas específicas de fallas.
+
+### Integración continua
+
+El archivo .github/workflows/maven.yml configura Java 25 y ejecuta
+mvn clean verify para los eventos definidos, incluidos los pushes
+a iteracion5. También configura la conservación de reportes de pruebas.
+
+El resultado de esa ejecución deberá comprobarse en GitHub Actions
+después del push. Su configuración no demuestra por sí sola una
+ejecución exitosa.
+
+### Alcance de la evidencia
+
+Las pruebas automatizadas verifican comportamiento y la cobertura mide
+ejecución del código. Ninguna de las dos comprueba por sí sola todas las
+convenciones de estilo.
+
+No se ha incorporado un verificador automático de estilo. Queda pendiente
+la revisión final de los cambios antes de la entrega.
