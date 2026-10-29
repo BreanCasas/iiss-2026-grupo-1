@@ -13,7 +13,8 @@ public class SiteService {
     public record Snapshot(
             SiteInventory inventory,
             List<SiteInventory.Room> pendingShutdowns,
-            long revision) {}
+            long revision) {
+    }
 
     private final SiteRepository repository;
     private final SiteValidator validator = new SiteValidator();
@@ -97,6 +98,26 @@ public class SiteService {
         if (!pending.isEmpty()) {
             repository.save(active, List.of());
             pending = List.of();
+        }
+
+        return true;
+    }
+
+    public synchronized boolean confirmShutdowns(
+            long expectedRevision,
+            List<SiteInventory.Room> completed) {
+
+        if (revision != expectedRevision) {
+            return false;
+        }
+
+        List<SiteInventory.Room> remaining = pending.stream()
+                .filter(room -> !completed.contains(room))
+                .toList();
+
+        if (!remaining.equals(pending)) {
+            repository.save(active, remaining);
+            pending = remaining;
         }
 
         return true;

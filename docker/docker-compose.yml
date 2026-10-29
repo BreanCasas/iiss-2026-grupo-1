@@ -28,10 +28,11 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017
       SPRING_DATA_MONGODB_DATABASE: ${MONGODB_DATABASE:-ioteste}
       IOTESTE_API_KEY: ${IOTESTE_API_KEY:?Definir IOTESTE_API_KEY en .env}
-      ECOWARM_ENVIRONMENT_URL: http://host.docker.internal:9090
-      ECOWARM_PUBLIC_URL: http://localhost:8080
+      ECOWARM_ENVIRONMENT_URL: http://192.168.1.116:9091
+      ECOWARM_PUBLIC_URL: http://192.168.1.149:8080
       ECOWARM_LABEL: grupo-1
       ECOWARM_ENVIRONMENT_KEY: ${ECOWARM_ENVIRONMENT_KEY:-}
+      ECOWARM_ALLOW_REMOVED_SWITCHES: "true"
     ports:
       - "8080:8080"
     extra_hosts:

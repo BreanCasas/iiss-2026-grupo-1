@@ -1,5 +1,8 @@
 package com.ioteste.engine.integration;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.ioteste.core.HeatingController;
 import com.ioteste.core.PeakSchedule;
 import com.ioteste.core.HeatingController.RoomConfig;
@@ -30,7 +33,9 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Component
 public class HeatingEngine {
@@ -55,6 +60,9 @@ public class HeatingEngine {
     private final SwitchClient switches;
 
     private final HeatingController core = new HeatingController();
+
+    @Value("${ECOWARM_ALLOW_REMOVED_SWITCHES:false}")
+    private boolean allowRemovedSwitches;
 
     // Instante virtual usado en la última evaluación (null si el control
     // estaba detenido). Permite repetir el ciclo si un límite de franja
@@ -145,6 +153,7 @@ public class HeatingEngine {
 
     private boolean shutDownPendingRooms(SiteService.Snapshot snapshot) {
         boolean allConfirmed = true;
+        List<SiteInventory.Room> completed = new ArrayList<>();
 
         for (SiteInventory.Room room : snapshot.pendingShutdowns()) {
             try {
@@ -159,21 +168,80 @@ public class HeatingEngine {
                     );
                 }
 
+                completed.add(room);
+
                 log.info("Switch anterior {} -> OFF", room.idSwitch());
 
             } catch (Exception exception) {
-                allConfirmed = false;
+                if (isRemovedPendingSwitch(snapshot, room, exception)) {
+                    completed.add(room);
 
-                log.warn(
-                        "No se pudo apagar el switch anterior {} ({}): {}",
-                        room.idSwitch(),
-                        exception.getClass().getSimpleName(),
-                        exception.getMessage()
-                );
+                    log.warn(
+                            "Se retira el pendiente de {}: el servidor informa "
+                                    + "que no existe y no figura en el inventario actual.",
+                            room.idSwitch()
+                    );
+                } else {
+                    allConfirmed = false;
+
+                    log.warn(
+                            "No se pudo apagar el switch anterior {} ({}): {}",
+                            room.idSwitch(),
+                            exception.getClass().getSimpleName(),
+                            exception.getMessage()
+                    );
+                }
             }
         }
 
+        if (!allConfirmed && !completed.isEmpty()) {
+            siteService.confirmShutdowns(
+                    snapshot.revision(),
+                    completed
+            );
+        }
+
         return allConfirmed;
+    }
+
+    private boolean isRemovedPendingSwitch(
+            SiteService.Snapshot snapshot,
+            SiteInventory.Room previous,
+            Exception exception) {
+
+        if (!allowRemovedSwitches
+                || !(exception instanceof HttpClientErrorException.NotFound notFound)) {
+            return false;
+        }
+
+        boolean stillConfigured = snapshot.inventory().habitaciones().stream()
+                .anyMatch(room ->
+                        Objects.equals(room.idSwitch(), previous.idSwitch())
+                                && Objects.equals(
+                                room.urlSwitch().replaceAll("/+$", ""),
+                                previous.urlSwitch().replaceAll("/+$", "")
+                        )
+                );
+
+        if (stillConfigured) {
+            return false;
+        }
+
+        try {
+            JsonNode body = new ObjectMapper().readTree(
+                    notFound.getResponseBodyAsString()
+            );
+
+            return body != null
+                    && body.path("status").asInt(-1) == 404
+                    && body.path("mensaje").isTextual()
+                    && body.path("mensaje").asText().equals(
+                    "no existe el switch " + previous.idSwitch()
+            );
+
+        } catch (Exception invalidResponse) {
+            return false;
+        }
     }
 
     private static PeakSchedule peakSchedule(SiteInventory inventory) {
@@ -409,7 +477,10 @@ public class HeatingEngine {
         long totalMilliKw = 0;
 
         for (String roomId : mayBeOn) {
-            totalMilliKw = Math.addExact(totalMilliKw, roomsById.get(roomId).potenciaKW());
+            totalMilliKw = Math.addExact(
+                    totalMilliKw,
+                    roomsById.get(roomId).potenciaKW()
+            );
         }
 
         return totalMilliKw
