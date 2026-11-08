@@ -1,0 +1,626 @@
+{
+  "zonaHoraria" : "America/Montevideo",
+  "plan" : {
+    "id" : "E19",
+    "nombre" : "Un switch ya encendido",
+    "descripcion" : "5 habitaciones de 1 kW con 4,5 kW contratados. La última arranca con el switch encendido y menos fría que las otras cuatro, que están apagadas: las cuatro entran justas, pero con la quinta prendida son 5 kW. Un controlador que enciende sin saber cómo están los switches —supone que lo que no comandó está apagado— salta la llave. Para no pasarse tiene que consultar la quinta, apagarla antes de encender, o contarla como encendida mientras no sabe.",
+    "habitaciones" : 5,
+    "potenciaContratadaKW" : 4.5,
+    "potenciaInstaladaKW" : 5.0,
+    "temperaturaInicial" : {
+      "delta" : -0.8
+    },
+    "habitacionesIniciales" : {
+      "room5" : {
+        "temperaturaInicial" : {
+          "delta" : -0.3
+        },
+        "switch" : "ON"
+      }
+    },
+    "inicio" : {
+      "fechaHora" : "2026-11-03T10:00-03:00",
+      "zonaHoraria" : "America/Montevideo",
+      "factorTiempo" : 60.0
+    },
+    "duracion" : "1h",
+    "duracionSegundos" : 3600,
+    "estimacionRealSegundos" : 65,
+    "pasos" : [
+    ],
+    "fallas" : null,
+    "esperado" : [
+      {
+        "tipo" : "potenciaMaxima",
+        "nivel" : "riesgo",
+        "obligatoria" : true,
+        "parametros" : {
+          "tolerancia" : 0.1,
+          "gracia" : "2m"
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "soloSwitchesDelSitio",
+        "nivel" : "contrato",
+        "obligatoria" : true,
+        "parametros" : {
+          "gracia" : "2m"
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "aprovechamiento",
+        "nivel" : "mejora",
+        "obligatoria" : false,
+        "parametros" : {
+          "desde" : "0s",
+          "min" : 0.8
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "conmutaciones",
+        "nivel" : "mejora",
+        "obligatoria" : false,
+        "parametros" : {
+          "maxPorHora" : 6.0
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "noComandaDetenido",
+        "nivel" : "contrato",
+        "obligatoria" : true,
+        "parametros" : {
+          
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "actua",
+        "nivel" : "riesgo",
+        "obligatoria" : true,
+        "parametros" : {
+          "tolerancia" : 0.5,
+          "max" : "10m"
+        },
+        "nota" : null
+      }
+    ],
+    "hash" : "a0b251bea03055afbd26b527d1dc2c3119eb0963c45cc5ee04ca0dfffcb415a9"
+  },
+  "eventos" : [
+    {
+      "real" : "2026-11-07T21:38:34.987-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "DETENER",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"DETENIDO\",\"fechaHora\":null,\"factorTiempo\":null,\"iniciadoEn\":null}"
+    },
+    {
+      "real" : "2026-11-07T21:38:34.997-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "sitio 'e19-switch-encendido' en el simulador (5 habitaciones, v2)",
+      "ok" : true,
+      "detalle" : null
+    },
+    {
+      "real" : "2026-11-07T21:38:35.036-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "PUT /sitio",
+      "ok" : true,
+      "detalle" : "200 {\"schemaVersion\":\"2.0\",\"sitio\":{\"id\":\"e19-switch-encendido\",\"nombre\":\"Un switch ya encendido\",\"potenciaContratadaKW\":4.5,\"tarifa\":{\"punta\":{\"desde\":\"18:00\",\"hasta\":\"22:00\",\"dias\":\"TODOS\"}}},\"habitacio"
+    },
+    {
+      "real" : "2026-11-07T21:38:35.043-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "GET /sitio",
+      "ok" : true,
+      "detalle" : "200 {\"schemaVersion\":\"2.0\",\"sitio\":{\"id\":\"e19-switch-encendido\",\"nombre\":\"Un switch ya encendido\",\"potenciaContratadaKW\":4.5,\"tarifa\":{\"punta\":{\"desde\":\"18:00\",\"hasta\":\"22:00\",\"dias\":\"TODOS\"}}},\"habitacio"
+    },
+    {
+      "real" : "2026-11-07T21:38:35.055-03:00",
+      "virtual" : "2026-11-03T10:00:00.060-03:00",
+      "t" : "0s",
+      "fase" : "inicio",
+      "que" : "INICIAR 2026-11-03T13:00:00.000Z ×60.0",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"EN_EJECUCION\",\"fechaHora\":\"2026-11-03T13:00:00.004759200Z\",\"factorTiempo\":6E+1,\"iniciadoEn\":\"2026-11-08T00:38:35.050735938Z\"}"
+    },
+    {
+      "real" : "2026-11-07T21:38:35.083-03:00",
+      "virtual" : "2026-11-03T10:00:01.740-03:00",
+      "t" : "1s",
+      "fase" : "inicio",
+      "que" : "GET /control",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"EN_EJECUCION\",\"fechaHora\":\"2026-11-03T13:00:01.771316220Z\",\"factorTiempo\":6E+1,\"iniciadoEn\":\"2026-11-08T00:38:35.050735938Z\"}"
+    },
+    {
+      "real" : "2026-11-07T21:39:35.074-03:00",
+      "virtual" : "2026-11-03T11:00:01.200-03:00",
+      "t" : "1h1s",
+      "fase" : "fin",
+      "que" : "fin del escenario (1h virtuales)",
+      "ok" : true,
+      "detalle" : null
+    },
+    {
+      "real" : "2026-11-07T21:39:35.231-03:00",
+      "virtual" : "2026-11-03T11:00:10.620-03:00",
+      "t" : "1h10s",
+      "fase" : "salida",
+      "que" : "pasa: 6 ✓, 0 ✗, 2 observaciones",
+      "ok" : true,
+      "detalle" : null
+    },
+    {
+      "real" : "2026-11-07T21:39:35.248-03:00",
+      "virtual" : "2026-11-03T11:00:11.640-03:00",
+      "t" : "1h11s",
+      "fase" : "fin",
+      "que" : "DETENER",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"DETENIDO\",\"fechaHora\":null,\"factorTiempo\":null,\"iniciadoEn\":null}"
+    }
+  ],
+  "final" : {
+    "instante" : "2026-11-03T11:00:01.140-03:00",
+    "sitio" : "e19-switch-encendido",
+    "consumoTotalKwh" : 3.867,
+    "habitaciones" : [
+      {
+        "id" : "room1",
+        "temperaturaEsperada" : 21.0,
+        "temperatura" : 20.399,
+        "switch" : "ON",
+        "consumoKwh" : 0.967
+      },
+      {
+        "id" : "room2",
+        "temperaturaEsperada" : 21.0,
+        "temperatura" : 20.399,
+        "switch" : "ON",
+        "consumoKwh" : 0.967
+      },
+      {
+        "id" : "room3",
+        "temperaturaEsperada" : 21.0,
+        "temperatura" : 20.399,
+        "switch" : "ON",
+        "consumoKwh" : 0.967
+      },
+      {
+        "id" : "room4",
+        "temperaturaEsperada" : 21.0,
+        "temperatura" : 20.399,
+        "switch" : "ON",
+        "consumoKwh" : 0.967
+      },
+      {
+        "id" : "room5",
+        "temperaturaEsperada" : 21.0,
+        "temperatura" : 20.647,
+        "switch" : "OFF",
+        "consumoKwh" : 0.0
+      }
+    ]
+  },
+  "metricas" : {
+    "global" : {
+      "desde" : "0s",
+      "hasta" : "1h",
+      "potenciaPicoKW" : 4.0,
+      "potenciaMediaKW" : 3.93,
+      "excesoMaxKW" : 0.0,
+      "segundosSobreContratada" : 0.0,
+      "kwh" : 3.867,
+      "kwhEnPunta" : 0.0,
+      "kwhFueraDePunta" : 3.867,
+      "aprovechamiento" : 0.983,
+      "fraccionEnRango" : 0.2,
+      "brechaMedia" : 0.65,
+      "deficitMedio" : 0.65,
+      "comandos" : 9,
+      "conmutaciones" : 5,
+      "comandosASwitchesAjenos" : 0
+    },
+    "tramos" : [
+      {
+        "desde" : "0s",
+        "hasta" : "1h",
+        "potenciaPicoKW" : 4.0,
+        "potenciaMediaKW" : 3.93,
+        "excesoMaxKW" : 0.0,
+        "segundosSobreContratada" : 0.0,
+        "kwh" : 3.867,
+        "kwhEnPunta" : 0.0,
+        "kwhFueraDePunta" : 3.867,
+        "aprovechamiento" : 0.983,
+        "fraccionEnRango" : 0.2,
+        "brechaMedia" : 0.65,
+        "deficitMedio" : 0.65,
+        "comandos" : 9,
+        "conmutaciones" : 5,
+        "comandosASwitchesAjenos" : 0
+      }
+    ],
+    "habitaciones" : [
+      {
+        "id" : "room1",
+        "temperaturaMin" : 20.2,
+        "temperaturaMax" : 20.4,
+        "temperaturaFinal" : 20.4,
+        "esperadaFinal" : 21.0,
+        "brechaMedia" : 0.73,
+        "fraccionEnRango" : 0.0,
+        "alcanzoEn" : null,
+        "kwh" : 0.983,
+        "comandos" : 2,
+        "conmutaciones" : 1,
+        "conmutacionesPorHora" : 1.0
+      },
+      {
+        "id" : "room2",
+        "temperaturaMin" : 20.2,
+        "temperaturaMax" : 20.4,
+        "temperaturaFinal" : 20.4,
+        "esperadaFinal" : 21.0,
+        "brechaMedia" : 0.73,
+        "fraccionEnRango" : 0.0,
+        "alcanzoEn" : null,
+        "kwh" : 0.983,
+        "comandos" : 2,
+        "conmutaciones" : 1,
+        "conmutacionesPorHora" : 1.0
+      },
+      {
+        "id" : "room3",
+        "temperaturaMin" : 20.2,
+        "temperaturaMax" : 20.4,
+        "temperaturaFinal" : 20.4,
+        "esperadaFinal" : 21.0,
+        "brechaMedia" : 0.73,
+        "fraccionEnRango" : 0.0,
+        "alcanzoEn" : null,
+        "kwh" : 0.983,
+        "comandos" : 2,
+        "conmutaciones" : 1,
+        "conmutacionesPorHora" : 1.0
+      },
+      {
+        "id" : "room4",
+        "temperaturaMin" : 20.2,
+        "temperaturaMax" : 20.4,
+        "temperaturaFinal" : 20.4,
+        "esperadaFinal" : 21.0,
+        "brechaMedia" : 0.73,
+        "fraccionEnRango" : 0.0,
+        "alcanzoEn" : null,
+        "kwh" : 0.983,
+        "comandos" : 2,
+        "conmutaciones" : 1,
+        "conmutacionesPorHora" : 1.0
+      },
+      {
+        "id" : "room5",
+        "temperaturaMin" : 20.65,
+        "temperaturaMax" : 20.7,
+        "temperaturaFinal" : 20.65,
+        "esperadaFinal" : 21.0,
+        "brechaMedia" : 0.32,
+        "fraccionEnRango" : 1.0,
+        "alcanzoEn" : null,
+        "kwh" : 0.0,
+        "comandos" : 1,
+        "conmutaciones" : 1,
+        "conmutacionesPorHora" : 1.0
+      }
+    ],
+    "toleranciaConfort" : 0.5
+  },
+  "expectativasDetalle" : [
+    {
+      "cumple" : true,
+      "detalle" : "la potencia encendida nunca pasó la contratada + 0,10 kW",
+      "medido" : {
+        "veces" : 0,
+        "segundos" : 0.0,
+        "excesoMaxKW" : 0.0,
+        "primera" : null
+      },
+      "tipo" : "potenciaMaxima",
+      "nivel" : "riesgo",
+      "obligatoria" : true,
+      "parametros" : {
+        "tolerancia" : 0.1,
+        "gracia" : "2m"
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "todos los comandos fueron a switches del sitio vigente",
+      "medido" : {
+        "comandos" : 0,
+        "switches" : [
+        ],
+        "primero" : null
+      },
+      "tipo" : "soloSwitchesDelSitio",
+      "nivel" : "contrato",
+      "obligatoria" : true,
+      "parametros" : {
+        "gracia" : "2m"
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "cuando no entraba todo, usó en promedio el 98,3% de lo que podía encender (mínimo 80%)",
+      "medido" : {
+        "aprovechamiento" : 0.983,
+        "muestras" : 59
+      },
+      "tipo" : "aprovechamiento",
+      "nivel" : "mejora",
+      "obligatoria" : false,
+      "parametros" : {
+        "desde" : "0s",
+        "min" : 0.8
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "la que más conmutó, room1, 1,0 veces por hora (máximo 6,0)",
+      "medido" : {
+        "peor" : {
+          "id" : "room1",
+          "porHora" : 1.0
+        }
+      },
+      "tipo" : "conmutaciones",
+      "nivel" : "mejora",
+      "obligatoria" : false,
+      "parametros" : {
+        "maxPorHora" : 6.0
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "ningún comando de encender a switches entre el DETENER del setup y el INICIAR",
+      "medido" : {
+        "comandos" : 0,
+        "switches" : [
+        ]
+      },
+      "tipo" : "noComandaDetenido",
+      "nivel" : "contrato",
+      "obligatoria" : true,
+      "parametros" : {
+        
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 59s (desde 1m)",
+      "medido" : {
+        "rachas" : 0,
+        "masLarga" : {
+          "desde" : "1m",
+          "duracion" : "59s",
+          "habitaciones" : [
+            "room1",
+            "room2",
+            "room3",
+            "room4"
+          ]
+        }
+      },
+      "tipo" : "actua",
+      "nivel" : "riesgo",
+      "obligatoria" : true,
+      "parametros" : {
+        "tolerancia" : 0.5,
+        "max" : "10m"
+      },
+      "nota" : null
+    }
+  ],
+  "observaciones" : [
+    {
+      "gravedad" : "menor",
+      "tipo" : "formatoInstante",
+      "detalle" : "instantes con más precisión que milisegundos en iniciar, control-consultado (p. ej. 2026-11-03T13:00:00.004759200Z): interop-v2 los fija en ISO-8601 con milisegundos",
+      "medido" : {
+        "ejemplos" : [
+          "2026-11-03T13:00:00.004759200Z",
+          "2026-11-08T00:38:35.050735938Z",
+          "2026-11-03T13:00:01.771316220Z"
+        ]
+      }
+    },
+    {
+      "gravedad" : "menor",
+      "tipo" : "formatoNumero",
+      "detalle" : "números en notación exponencial en iniciar, control-consultado (p. ej. 6E+1)",
+      "medido" : {
+        "ejemplos" : [
+          "6E+1"
+        ]
+      }
+    }
+  ],
+  "escenarioFuente" : {
+    "id" : "E19",
+    "nombre" : "Un switch ya encendido",
+    "descripcion" : "5 habitaciones de 1 kW con 4,5 kW contratados. La última arranca con el switch encendido y menos fría que las otras cuatro, que están apagadas: las cuatro entran justas, pero con la quinta prendida son 5 kW. Un controlador que enciende sin saber cómo están los switches —supone que lo que no comandó está apagado— salta la llave. Para no pasarse tiene que consultar la quinta, apagarla antes de encender, o contarla como encendida mientras no sabe.",
+    "setup" : {
+      "sitio" : {
+        "inventario" : {
+          "schemaVersion" : "2.0",
+          "sitio" : {
+            "id" : "e19-switch-encendido",
+            "nombre" : "Un switch ya encendido",
+            "potenciaContratadaKW" : 4.5,
+            "tarifa" : {
+              "punta" : {
+                "desde" : "18:00",
+                "hasta" : "22:00",
+                "dias" : "TODOS"
+              }
+            }
+          },
+          "habitaciones" : [
+            {
+              "id" : "room1",
+              "nombre" : "Habitación 1",
+              "temperaturaEsperada" : 21.0,
+              "potenciaKW" : 1.0,
+              "idTermostato" : "ht-sim-room1",
+              "topicTermostato" : "ht-sim-room1/status/temperature:0",
+              "idSwitch" : "sw-sim-room1",
+              "urlSwitch" : "http://simulador"
+            },
+            {
+              "id" : "room2",
+              "nombre" : "Habitación 2",
+              "temperaturaEsperada" : 21.0,
+              "potenciaKW" : 1.0,
+              "idTermostato" : "ht-sim-room2",
+              "topicTermostato" : "ht-sim-room2/status/temperature:0",
+              "idSwitch" : "sw-sim-room2",
+              "urlSwitch" : "http://simulador"
+            },
+            {
+              "id" : "room3",
+              "nombre" : "Habitación 3",
+              "temperaturaEsperada" : 21.0,
+              "potenciaKW" : 1.0,
+              "idTermostato" : "ht-sim-room3",
+              "topicTermostato" : "ht-sim-room3/status/temperature:0",
+              "idSwitch" : "sw-sim-room3",
+              "urlSwitch" : "http://simulador"
+            },
+            {
+              "id" : "room4",
+              "nombre" : "Habitación 4",
+              "temperaturaEsperada" : 21.0,
+              "potenciaKW" : 1.0,
+              "idTermostato" : "ht-sim-room4",
+              "topicTermostato" : "ht-sim-room4/status/temperature:0",
+              "idSwitch" : "sw-sim-room4",
+              "urlSwitch" : "http://simulador"
+            },
+            {
+              "id" : "room5",
+              "nombre" : "Habitación 5",
+              "temperaturaEsperada" : 21.0,
+              "potenciaKW" : 1.0,
+              "idTermostato" : "ht-sim-room5",
+              "topicTermostato" : "ht-sim-room5/status/temperature:0",
+              "idSwitch" : "sw-sim-room5",
+              "urlSwitch" : "http://simulador"
+            }
+          ]
+        }
+      },
+      "temperaturaInicial" : {
+        "delta" : -0.8
+      },
+      "habitaciones" : {
+        "room5" : {
+          "temperaturaInicial" : {
+            "delta" : -0.3
+          },
+          "switch" : "ON"
+        }
+      }
+    },
+    "inicio" : {
+      "fechaHora" : "2026-11-03T10:00",
+      "factorTiempo" : 60
+    },
+    "duracion" : "1h",
+    "esperado" : [
+      "potenciaMaxima",
+      "soloSwitchesDelSitio",
+      {
+        "aprovechamiento" : {
+          "min" : 0.8
+        }
+      },
+      {
+        "conmutaciones" : {
+          "maxPorHora" : 6
+        }
+      }
+    ]
+  },
+  "id" : "20261107-213834-2-E19",
+  "simulador" : "ecowarm-run",
+  "tanda" : "20261107-213834-1",
+  "escenario" : {
+    "id" : "E19",
+    "nombre" : "Un switch ya encendido",
+    "hash" : "a0b251bea03055afbd26b527d1dc2c3119eb0963c45cc5ee04ca0dfffcb415a9"
+  },
+  "controlador" : "grupo-1",
+  "estado" : "terminada",
+  "motivo" : null,
+  "creadaEn" : "2026-11-07T21:38:34.835-03:00",
+  "empezo" : "2026-11-07T21:38:34.835-03:00",
+  "termino" : "2026-11-07T21:39:35.248-03:00",
+  "estimacionRealSegundos" : 65,
+  "progreso" : {
+    "virtualTranscurrido" : "1h",
+    "virtualTotal" : "1h",
+    "fraccion" : 1.0,
+    "pasos" : "0/0",
+    "realRestanteSegundos" : 0
+  },
+  "resultado" : "pasa",
+  "expectativas" : {
+    "contrato" : {
+      "cumplen" : 2,
+      "fallan" : 0,
+      "noAplican" : 0
+    },
+    "riesgo" : {
+      "cumplen" : 2,
+      "fallan" : 0,
+      "noAplican" : 0
+    },
+    "mejora" : {
+      "cumplen" : 2,
+      "fallan" : 0,
+      "noAplican" : 0
+    },
+    "obligatorias" : {
+      "cumplen" : 4,
+      "fallan" : 0,
+      "noAplican" : 0
+    },
+    "informativas" : {
+      "cumplen" : 2,
+      "fallan" : 0,
+      "noAplican" : 0
+    },
+    "observaciones" : {
+      "graves" : 0,
+      "menores" : 2
+    }
+  }
+}

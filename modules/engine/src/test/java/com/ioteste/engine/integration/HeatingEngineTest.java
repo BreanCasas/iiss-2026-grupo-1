@@ -1,23 +1,22 @@
 package com.ioteste.engine.integration;
 
 import com.ioteste.core.PeakSchedule;
+import com.ioteste.engine.control.ControlCommand;
 import com.ioteste.engine.control.ControlService;
 import com.ioteste.engine.control.ControlStatus;
 import com.ioteste.engine.site.SiteInventory;
 import com.ioteste.engine.site.SiteRepository;
 import com.ioteste.engine.site.SiteService;
 
-import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,177 +24,54 @@ import static org.mockito.Mockito.*;
 
 class HeatingEngineTest {
 
-    private SiteInventory.Room room() {
-        return new SiteInventory.Room(
-                "room1",
-                "Living",
-                21500L,
-                1200L,
-                "ht-room1",
-                "ht-room1/status/temperature:0",
-                "sw-room1",
-                "http://localhost:9090"
-        );
-    }
+    @Test
+    void stoppedControlDoesNotSendCommandsOrClearPendingShutdowns() {
+        SiteInventory.Room room = room("room1");
+        Scenario scenario = scenario(List.of(room), List.of(room));
 
-    private SiteInventory inventory() {
-        return new SiteInventory(
-                "2.0",
-                new SiteInventory.Site(
-                        "casa",
-                        "Casa",
-                        3700L,
-                        new SiteInventory.Tariff(
-                                new SiteInventory.PeakPeriod(
-                                        "17:00",
-                                        "23:00",
-                                        PeakSchedule.Days.HABILES
-                                )
-                        )
-                ),
-                List.of()
-        );
+        scenario.control().command(
+                new ControlCommand("DETENER", null, null));
+
+        scenario.engine().tick();
+
+        verifyNoInteractions(scenario.switches(), scenario.subscriber());
+        verify(scenario.repository(), never()).save(any(), anyList());
+
+        assertEquals(
+                List.of(room),
+                scenario.site().snapshot().pendingShutdowns());
     }
 
     @Test
-    void failedShutdownKeepsPendingWorkAndPreventsEvaluation() {
-        SiteService site = mock(SiteService.class);
-        ControlService control = mock(ControlService.class);
-        TemperatureSubscriber subscriber =
-                mock(TemperatureSubscriber.class);
-        SwitchClient switches = mock(SwitchClient.class);
+    void failedShutdownOfCurrentSwitchKeepsPendingWorkAndPreventsEvaluation() {
+        SiteInventory.Room room = room("room1");
+        Scenario scenario = scenario(List.of(room), List.of(room));
 
-        when(site.snapshot()).thenReturn(
-                new SiteService.Snapshot(
-                        inventory(),
-                        List.of(room()),
-                        1
-                )
-        );
+        when(scenario.switches().command(room, SwitchClient.State.OFF))
+                .thenThrow(new ResourceAccessException("Sin conexión"));
 
-        when(switches.command(room(), SwitchClient.State.OFF))
-                .thenThrow(
-                        new IllegalStateException("Switch inaccesible")
-                );
+        scenario.engine().tick();
 
-        new HeatingEngine(
-                site,
-                control,
-                subscriber,
-                switches
-        ).tick();
+        assertEquals(
+                List.of(room),
+                scenario.site().snapshot().pendingShutdowns());
 
-        verify(site, never()).confirmShutdowns(anyLong());
-        verifyNoInteractions(control, subscriber);
+        verify(scenario.repository(), never()).save(any(), anyList());
+        verifyNoInteractions(scenario.subscriber());
+        verify(scenario.switches(), never()).status(any());
 
-        verify(switches, never()).command(
-                any(),
-                eq(SwitchClient.State.ON)
-        );
+        verify(scenario.switches(), never()).command(
+                any(), eq(SwitchClient.State.ON));
     }
 
     @Test
-    void oneFailedPendingShutdownDoesNotPreventShuttingDownTheOthers() {
-        SiteService site = mock(SiteService.class);
-        ControlService control = mock(ControlService.class);
-        TemperatureSubscriber subscriber =
-                mock(TemperatureSubscriber.class);
-        SwitchClient switches = mock(SwitchClient.class);
-
-        SiteInventory.Room other = new SiteInventory.Room(
-                "room2",
-                "Dormitorio",
-                20000L,
-                800L,
-                "ht-room2",
-                "ht-room2/status/temperature:0",
-                "sw-room2",
-                "http://localhost:9090"
-        );
-
-        when(site.snapshot()).thenReturn(
-                new SiteService.Snapshot(
-                        inventory(),
-                        List.of(room(), other),
-                        1
-                )
-        );
-
-        when(switches.command(room(), SwitchClient.State.OFF))
-                .thenThrow(new IllegalStateException("Switch inaccesible"));
-
-        when(switches.command(other, SwitchClient.State.OFF))
-                .thenReturn(SwitchClient.State.OFF);
-
-        new HeatingEngine(
-                site,
-                control,
-                subscriber,
-                switches
-        ).tick();
-
-        // El segundo switch se apaga aunque el primero falló...
-        verify(switches).command(other, SwitchClient.State.OFF);
-
-        // ...pero el trabajo pendiente se conserva para reintentar.
-        verify(site, never()).confirmShutdowns(anyLong());
-        verifyNoInteractions(control, subscriber);
-    }
-
-    @Test
-    void processesPendingShutdownsEvenWhenControlIsStopped() {
-        SiteService site = mock(SiteService.class);
-        ControlService control = mock(ControlService.class);
-        TemperatureSubscriber subscriber =
-                mock(TemperatureSubscriber.class);
-        SwitchClient switches = mock(SwitchClient.class);
-
-        when(site.snapshot()).thenReturn(
-                new SiteService.Snapshot(
-                        inventory(),
-                        List.of(room()),
-                        1
-                )
-        );
-
-        when(switches.command(room(), SwitchClient.State.OFF))
-                .thenReturn(SwitchClient.State.OFF);
-
-        when(site.confirmShutdowns(1)).thenReturn(true);
-        when(control.status()).thenReturn(ControlStatus.stopped());
-
-        new HeatingEngine(
-                site,
-                control,
-                subscriber,
-                switches
-        ).tick();
-
-        var order = inOrder(switches, site);
-
-        order.verify(switches).command(
-                room(),
-                SwitchClient.State.OFF
-        );
-
-        order.verify(site).confirmShutdowns(1);
-
-        verify(switches, never()).command(
-                any(),
-                eq(SwitchClient.State.ON)
-        );
-    }
-
-    @Test
-    void confirmedShutdownIsNotRepeatedWhenAnotherSwitchKeepsFailing() {
-        SiteInventory.Room first = room();
-        SiteInventory.Room second = otherRoom();
+    void confirmedShutdownIsNotRepeatedWhenAnotherCurrentSwitchKeepsFailing() {
+        SiteInventory.Room first = room("room1");
+        SiteInventory.Room second = room("room2");
 
         Scenario scenario = scenario(
                 List.of(first, second),
-                List.of(),
-                false
-        );
+                List.of(first, second));
 
         when(scenario.switches().command(second, SwitchClient.State.OFF))
                 .thenThrow(new ResourceAccessException("Sin conexión"));
@@ -204,13 +80,10 @@ class HeatingEngineTest {
 
         assertEquals(
                 List.of(second),
-                scenario.site().snapshot().pendingShutdowns()
-        );
+                scenario.site().snapshot().pendingShutdowns());
 
         verify(scenario.repository()).save(
-                scenario.site().get(),
-                List.of(second)
-        );
+                scenario.site().get(), List.of(second));
 
         scenario.engine().tick();
 
@@ -220,291 +93,421 @@ class HeatingEngineTest {
         verify(scenario.switches(), times(2))
                 .command(second, SwitchClient.State.OFF);
 
-        verifyNoInteractions(scenario.control());
+        verifyNoInteractions(scenario.subscriber());
     }
 
     @Test
-    void explicitlyMissingRemovedSwitchIsDiscardedWhenEnabled() {
-        Scenario scenario = scenario(
-                List.of(room()),
-                List.of(),
-                true
-        );
+    void pendingSwitchOutsideCurrentSiteIsDiscardedWithoutContactingIt() {
+        SiteInventory.Room removed = room("room4");
+        SiteInventory.Room current = room("room1");
 
-        when(scenario.switches().command(room(), SwitchClient.State.OFF))
-                .thenThrow(notFound("no existe el switch sw-room1"));
+        Scenario scenario = scenario(
+                List.of(removed), List.of(current));
 
         scenario.engine().tick();
 
         assertTrue(scenario.site().snapshot().pendingShutdowns().isEmpty());
 
+        verify(scenario.switches(), never()).command(eq(removed), any());
+        verify(scenario.switches(), never()).status(removed);
+        verify(scenario.switches()).status(current);
+
         verify(scenario.repository()).save(
-                scenario.site().get(),
-                List.of()
-        );
-
-        verify(scenario.control()).status();
-
-        verify(scenario.switches(), never()).command(
-                any(),
-                eq(SwitchClient.State.ON)
-        );
+                scenario.site().get(), List.of());
     }
 
     @Test
-    void missingRemovedSwitchIsRetriedWhenOptionIsDisabled() {
-        Scenario scenario = scenario(
-                List.of(room()),
-                List.of(),
-                false
-        );
+    void matchingSwitchIdAtAnotherAddressDoesNotAuthorizeOldEndpoint() {
+        SiteInventory.Room previous = room("room1");
+        SiteInventory.Room current = withUrl(
+                previous, "http://localhost:9091");
 
-        when(scenario.switches().command(room(), SwitchClient.State.OFF))
-                .thenThrow(notFound("no existe el switch sw-room1"));
+        Scenario scenario = scenario(
+                List.of(previous), List.of(current));
+
+        scenario.engine().tick();
+
+        assertTrue(scenario.site().snapshot().pendingShutdowns().isEmpty());
+
+        verify(scenario.switches(), never()).command(eq(previous), any());
+        verify(scenario.switches()).status(current);
+    }
+
+    @Test
+    void trailingSlashDoesNotMakeCurrentSwitchLookRemoved() {
+        SiteInventory.Room previous = room("room1");
+        SiteInventory.Room current = withUrl(
+                previous, previous.urlSwitch() + "/");
+
+        Scenario scenario = scenario(
+                List.of(previous), List.of(current));
+
+        scenario.engine().tick();
+
+        verify(scenario.switches()).command(
+                previous, SwitchClient.State.OFF);
+
+        assertTrue(scenario.site().snapshot().pendingShutdowns().isEmpty());
+    }
+
+    @Test
+    void missingSwitchStillInCurrentSiteIsNotAssumedOff() {
+        SiteInventory.Room room = room("room1");
+        Scenario scenario = scenario(List.of(room), List.of(room));
+
+        when(scenario.switches().command(room, SwitchClient.State.OFF))
+                .thenThrow(
+                        new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         scenario.engine().tick();
 
         assertEquals(
-                List.of(room()),
-                scenario.site().snapshot().pendingShutdowns()
-        );
+                List.of(room),
+                scenario.site().snapshot().pendingShutdowns());
 
         verify(scenario.repository(), never()).save(any(), anyList());
-        verifyNoInteractions(scenario.control());
+        verifyNoInteractions(scenario.subscriber());
     }
 
     @Test
-    void missingSwitchStillInCurrentInventoryIsNotDiscarded() {
-        Scenario scenario = scenario(
-                List.of(room()),
-                List.of(room()),
-                true
-        );
+    void stoppingDuringPendingShutdownsPreventsTheNextCommand() {
+        SiteInventory.Room first = room("room1");
+        SiteInventory.Room second = room("room2");
 
-        when(scenario.switches().command(room(), SwitchClient.State.OFF))
-                .thenThrow(notFound("no existe el switch sw-room1"));
+        Scenario scenario = scenario(
+                List.of(first, second),
+                List.of(first, second));
+
+        when(scenario.switches().command(first, SwitchClient.State.OFF))
+                .thenAnswer(invocation -> {
+                    scenario.control().command(
+                            new ControlCommand("DETENER", null, null));
+                    return SwitchClient.State.OFF;
+                });
 
         scenario.engine().tick();
 
-        assertEquals(
-                List.of(room()),
-                scenario.site().snapshot().pendingShutdowns()
-        );
+        verify(scenario.switches()).command(
+                first, SwitchClient.State.OFF);
 
-        verify(scenario.repository(), never()).save(any(), anyList());
-        verifyNoInteractions(scenario.control());
+        verify(scenario.switches(), never()).command(eq(second), any());
+
+        assertEquals(
+                List.of(second),
+                scenario.site().snapshot().pendingShutdowns());
     }
 
     @Test
-    void genericNotFoundResponseDoesNotDiscardPendingShutdown() {
-        Scenario scenario = scenario(
-                List.of(room()),
-                List.of(),
-                true
-        );
+    void inventoryChangeDuringPendingShutdownsPreventsStaleCommands() {
+        SiteInventory.Room first = room("room1");
+        SiteInventory.Room second = room("room2");
 
-        when(scenario.switches().command(room(), SwitchClient.State.OFF))
-                .thenThrow(notFound("ruta no encontrada"));
+        Scenario scenario = scenario(
+                List.of(first, second),
+                List.of(first, second));
+
+        when(scenario.switches().command(first, SwitchClient.State.OFF))
+                .thenAnswer(invocation -> {
+                    SiteInventory current = scenario.site().get();
+
+                    scenario.site().replace(new SiteInventory(
+                            current.schemaVersion(),
+                            current.sitio(),
+                            List.of(first)));
+
+                    return SwitchClient.State.OFF;
+                });
 
         scenario.engine().tick();
 
-        assertEquals(
-                List.of(room()),
-                scenario.site().snapshot().pendingShutdowns()
-        );
-
-        verify(scenario.repository(), never()).save(any(), anyList());
-        verifyNoInteractions(scenario.control());
-    }
-
-    @Test
-    void communicationAuthenticationAndServerErrorsKeepPendingShutdown() {
-        List<RuntimeException> failures = List.of(
-                new ResourceAccessException("Tiempo de espera agotado"),
-                HttpClientErrorException.create(
-                        HttpStatus.UNAUTHORIZED,
-                        "Unauthorized",
-                        new HttpHeaders(),
-                        new byte[0],
-                        StandardCharsets.UTF_8
-                ),
-                HttpServerErrorException.create(
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                        "Internal Server Error",
-                        new HttpHeaders(),
-                        new byte[0],
-                        StandardCharsets.UTF_8
-                )
-        );
-
-        for (RuntimeException failure : failures) {
-            Scenario scenario = scenario(
-                    List.of(room()),
-                    List.of(),
-                    true
-            );
-
-            when(scenario.switches().command(room(), SwitchClient.State.OFF))
-                    .thenThrow(failure);
-
-            scenario.engine().tick();
-
-            assertEquals(
-                    List.of(room()),
-                    scenario.site().snapshot().pendingShutdowns()
-            );
-
-            verify(scenario.repository(), never()).save(any(), anyList());
-            verifyNoInteractions(scenario.control());
-        }
-    }
-
-    @Test
-    void partialConfirmationFromOldRevisionCannotRemoveCurrentPendingWork() {
-        Scenario scenario = scenario(
-                List.of(room()),
-                List.of(),
-                false
-        );
-
-        long previousRevision = scenario.site().snapshot().revision();
-        SiteInventory previous = scenario.site().get();
-
-        scenario.site().replace(new SiteInventory(
-                "2.1",
-                previous.sitio(),
-                previous.habitaciones()
-        ));
-
-        clearInvocations(scenario.repository());
-
-        assertFalse(scenario.site().confirmShutdowns(
-                previousRevision,
-                List.of(room())
-        ));
+        verify(scenario.switches(), never()).command(eq(second), any());
 
         assertEquals(
-                List.of(room()),
-                scenario.site().snapshot().pendingShutdowns()
-        );
-
-        verify(scenario.repository(), never()).save(any(), anyList());
+                List.of(first),
+                scenario.site().get().habitaciones());
     }
 
     @Test
     void failedPersistenceKeepsConfirmedShutdownPendingForRetry() {
-        SiteInventory.Room first = room();
-        SiteInventory.Room second = otherRoom();
+        SiteInventory.Room first = room("room1");
+        SiteInventory.Room second = room("room2");
 
         Scenario scenario = scenario(
                 List.of(first, second),
-                List.of(),
-                false
-        );
+                List.of(first, second));
 
         when(scenario.switches().command(second, SwitchClient.State.OFF))
                 .thenThrow(new ResourceAccessException("Sin conexión"));
 
         doThrow(new IllegalStateException("Mongo inaccesible"))
-                .when(scenario.repository())
-                .save(any(), anyList());
+                .when(scenario.repository()).save(any(), anyList());
 
         scenario.engine().tick();
 
         assertEquals(
                 List.of(first, second),
-                scenario.site().snapshot().pendingShutdowns()
-        );
+                scenario.site().snapshot().pendingShutdowns());
 
         verify(scenario.repository()).save(
-                scenario.site().get(),
-                List.of(second)
-        );
+                scenario.site().get(), List.of(second));
 
-        verifyNoInteractions(scenario.control());
+        verifyNoInteractions(scenario.subscriber());
+    }
+
+    @Test
+    void oldRevisionCannotClearPendingShutdownsAfterInventoryChange() {
+        SiteInventory.Room first = room("room1");
+        SiteInventory.Room second = room("room2");
+
+        Scenario scenario = scenario(
+                List.of(first, second),
+                List.of(first, second));
+
+        long previousRevision = scenario.site().snapshot().revision();
+        SiteInventory current = scenario.site().get();
+
+        scenario.site().replace(new SiteInventory(
+                current.schemaVersion(),
+                current.sitio(),
+                List.of(first)));
+
+        clearInvocations(scenario.repository());
+
+        assertFalse(scenario.site().confirmShutdowns(
+                previousRevision, List.of(first)));
+
+        verify(scenario.repository(), never()).save(any(), anyList());
+    }
+
+    @Test
+    void approachingPeakTurnsOffBeforeTheBoundaryAtFactorSixty() {
+        SwitchClient switches = tickAt(
+                "2026-11-03T16:59:30-03:00",
+                60000L,
+                SwitchClient.State.ON);
+
+        verify(switches).command(room("room1"), SwitchClient.State.OFF);
+
+        verify(switches, never()).command(
+                any(), eq(SwitchClient.State.ON));
+    }
+
+    @Test
+    void approachingPeakDoesNotStartAnotherHeater() {
+        SwitchClient switches = tickAt(
+                "2026-11-03T16:59:30-03:00",
+                60000L,
+                SwitchClient.State.OFF);
+
+        verify(switches, never()).command(
+                any(), eq(SwitchClient.State.ON));
+    }
+
+    @Test
+    void coldRoomStillHeatsOutsideTheShutdownMargin() {
+        SwitchClient switches = tickAt(
+                "2026-11-03T16:57:00-03:00",
+                60000L,
+                SwitchClient.State.OFF);
+
+        verify(switches).command(room("room1"), SwitchClient.State.ON);
+    }
+
+    @Test
+    void weekdayPeakDoesNotPreventHeatingOnSaturday() {
+        SwitchClient switches = tickAt(
+                "2026-11-07T16:59:30-03:00",
+                60000L,
+                SwitchClient.State.OFF);
+
+        verify(switches).command(room("room1"), SwitchClient.State.ON);
+    }
+
+    @Test
+    void leavingPeakAllowsHeatingWithoutAnExtraMargin() {
+        SwitchClient switches = tickAt(
+                "2026-11-03T23:00:00-03:00",
+                60000L,
+                SwitchClient.State.OFF);
+
+        verify(switches).command(room("room1"), SwitchClient.State.ON);
+    }
+
+    @Test
+    void normalSpeedUsesTwoSecondsInsteadOfTwoMinutes() {
+        SwitchClient switches = tickAt(
+                "2026-11-03T16:59:30-03:00",
+                1000L,
+                SwitchClient.State.OFF);
+
+        verify(switches).command(room("room1"), SwitchClient.State.ON);
+    }
+
+    @Test
+    void normalSpeedTurnsOffWithinTwoSecondsOfPeakStart() {
+        SwitchClient switches = tickAt(
+                "2026-11-03T16:59:59-03:00",
+                1000L,
+                SwitchClient.State.ON);
+
+        verify(switches).command(room("room1"), SwitchClient.State.OFF);
+    }
+
+    @Test
+    void enteringShutdownMarginDuringTheCycleCancelsAnOutdatedOnDecision() {
+        SiteInventory.Room room = room("room1");
+        Scenario scenario = scenario(List.of(), List.of(room));
+        ControlService control = mock(ControlService.class);
+
+        Instant started = Instant.parse("2026-11-07T23:00:00Z");
+
+        ControlStatus before = new ControlStatus(
+                ControlStatus.State.EN_EJECUCION,
+                OffsetDateTime.parse(
+                        "2026-11-03T16:57:00-03:00").toInstant(),
+                60000L,
+                started);
+
+        ControlStatus nearPeak = new ControlStatus(
+                ControlStatus.State.EN_EJECUCION,
+                OffsetDateTime.parse(
+                        "2026-11-03T16:59:30-03:00").toInstant(),
+                60000L,
+                started);
+
+        when(control.zone()).thenReturn(
+                ZoneId.of("America/Montevideo"));
+
+        when(control.status()).thenReturn(
+                before, before, nearPeak, nearPeak);
+
+        when(scenario.subscriber().temperature(room.topicTermostato()))
+                .thenReturn(19000L);
+
+        new HeatingEngine(
+                scenario.site(),
+                control,
+                scenario.subscriber(),
+                scenario.switches()
+        ).tick();
+
+        verify(scenario.switches(), never()).command(
+                any(), eq(SwitchClient.State.ON));
+    }
+
+    private SwitchClient tickAt(
+            String virtualTime,
+            long factor,
+            SwitchClient.State state) {
+
+        SiteInventory.Room room = room("room1");
+        Scenario scenario = scenario(List.of(), List.of(room));
+        ControlService control = mock(ControlService.class);
+
+        when(control.zone()).thenReturn(
+                ZoneId.of("America/Montevideo"));
+
+        when(control.status()).thenReturn(new ControlStatus(
+                ControlStatus.State.EN_EJECUCION,
+                OffsetDateTime.parse(virtualTime).toInstant(),
+                factor,
+                Instant.parse("2026-11-07T23:00:00Z")));
+
+        when(scenario.switches().status(room)).thenReturn(state);
+
+        when(scenario.subscriber().temperature(room.topicTermostato()))
+                .thenReturn(19000L);
+
+        new HeatingEngine(
+                scenario.site(),
+                control,
+                scenario.subscriber(),
+                scenario.switches()
+        ).tick();
+
+        return scenario.switches();
     }
 
     private Scenario scenario(
             List<SiteInventory.Room> pending,
-            List<SiteInventory.Room> configured,
-            boolean allowRemovedSwitches) {
+            List<SiteInventory.Room> configured) {
 
-        SiteInventory active = new SiteInventory(
+        SiteInventory inventory = new SiteInventory(
                 "2.0",
-                inventory().sitio(),
-                configured
-        );
+                new SiteInventory.Site(
+                        "casa",
+                        "Casa",
+                        3700L,
+                        new SiteInventory.Tariff(
+                                new SiteInventory.PeakPeriod(
+                                        "17:00",
+                                        "23:00",
+                                        PeakSchedule.Days.HABILES))),
+                configured);
 
         SiteRepository repository = mock(SiteRepository.class);
 
-        when(repository.load()).thenReturn(Optional.of(active));
+        when(repository.load()).thenReturn(Optional.of(inventory));
         when(repository.loadPendingShutdowns()).thenReturn(pending);
 
         SiteService site = new SiteService(repository);
-        ControlService control = mock(ControlService.class);
+        ControlService control = new ControlService();
+
+        control.command(new ControlCommand(
+                "INICIAR",
+                OffsetDateTime.parse("2026-11-03T12:00:00-03:00"),
+                1000L));
+
         TemperatureSubscriber subscriber =
                 mock(TemperatureSubscriber.class);
+
         SwitchClient switches = mock(SwitchClient.class);
 
-        when(control.status()).thenReturn(ControlStatus.stopped());
-        when(control.zone()).thenReturn(ZoneId.of("America/Montevideo"));
+        when(switches.status(any())).thenReturn(SwitchClient.State.OFF);
 
-        when(switches.command(any(), eq(SwitchClient.State.OFF)))
-                .thenReturn(SwitchClient.State.OFF);
+        when(switches.command(any(), any()))
+                .thenAnswer(invocation ->
+                        invocation.getArgument(1, SwitchClient.State.class));
 
         HeatingEngine engine = new HeatingEngine(
-                site,
-                control,
-                subscriber,
-                switches
-        );
-
-        ReflectionTestUtils.setField(
-                engine,
-                "allowRemovedSwitches",
-                allowRemovedSwitches
-        );
+                site, control, subscriber, switches);
 
         return new Scenario(
-                repository,
-                site,
-                control,
-                switches,
-                engine
-        );
+                repository, site, control, subscriber, switches, engine);
     }
 
-    private SiteInventory.Room otherRoom() {
+    private SiteInventory.Room room(String id) {
         return new SiteInventory.Room(
-                "room2",
-                "Dormitorio",
-                20000L,
-                800L,
-                "ht-room2",
-                "ht-room2/status/temperature:0",
-                "sw-room2",
-                "http://localhost:9090"
-        );
+                id,
+                id,
+                21500L,
+                1200L,
+                "ht-" + id,
+                "ht-" + id + "/status/temperature:0",
+                "sw-" + id,
+                "http://localhost:9090");
     }
 
-    private HttpClientErrorException notFound(String message) {
-        String body = """
-                {"status":404,"mensaje":"%s"}
-                """.formatted(message);
+    private SiteInventory.Room withUrl(
+            SiteInventory.Room room,
+            String url) {
 
-        return HttpClientErrorException.create(
-                HttpStatus.NOT_FOUND,
-                "Not Found",
-                new HttpHeaders(),
-                body.getBytes(StandardCharsets.UTF_8),
-                StandardCharsets.UTF_8
-        );
+        return new SiteInventory.Room(
+                room.id(),
+                room.nombre(),
+                room.temperaturaEsperada(),
+                room.potenciaKW(),
+                room.idTermostato(),
+                room.topicTermostato(),
+                room.idSwitch(),
+                url);
     }
 
     private record Scenario(
             SiteRepository repository,
             SiteService site,
             ControlService control,
+            TemperatureSubscriber subscriber,
             SwitchClient switches,
             HeatingEngine engine) {
     }

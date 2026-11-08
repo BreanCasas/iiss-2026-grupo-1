@@ -11,6 +11,10 @@ public final class MilliLongSerializer extends JsonSerializer<Long> {
     @Override
     public void serialize(Long value, JsonGenerator generator,
                           SerializerProvider serializers) throws IOException {
-        generator.writeNumber(BigDecimal.valueOf(value, 3).stripTrailingZeros());
+        generator.writeNumber(
+                BigDecimal.valueOf(value, 3)
+                        .stripTrailingZeros()
+                        .toPlainString()
+        );
     }
 }

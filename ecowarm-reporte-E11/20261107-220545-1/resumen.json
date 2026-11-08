@@ -1,0 +1,75 @@
+{
+  "id" : "20261107-220545-1",
+  "simulador" : "ecowarm-run",
+  "controlador" : "grupo-1",
+  "creadaEn" : "2026-11-07T22:05:45.834-03:00",
+  "terminada" : true,
+  "conteo" : {
+    "corridas" : 1,
+    "pendientes" : 0,
+    "pasan" : 1,
+    "noPasan" : 0,
+    "sinExpectativas" : 0,
+    "abortadas" : 0,
+    "fallidas" : 0,
+    "canceladas" : 0
+  },
+  "corridas" : [
+    {
+      "id" : "20261107-220545-2-E11",
+      "simulador" : "ecowarm-run",
+      "tanda" : "20261107-220545-1",
+      "escenario" : {
+        "id" : "E11",
+        "nombre" : "Entrar en punta",
+        "hash" : "5794aaf06a2a34d70a032c2889c33a767c4da829d7d6db5d69a98c33763e7637"
+      },
+      "controlador" : "grupo-1",
+      "estado" : "terminada",
+      "motivo" : null,
+      "creadaEn" : "2026-11-07T22:05:45.834-03:00",
+      "empezo" : "2026-11-07T22:05:45.834-03:00",
+      "termino" : "2026-11-07T22:07:46.247-03:00",
+      "estimacionRealSegundos" : 125,
+      "progreso" : {
+        "virtualTranscurrido" : "2h",
+        "virtualTotal" : "2h",
+        "fraccion" : 1.0,
+        "pasos" : "0/0",
+        "realRestanteSegundos" : 0
+      },
+      "resultado" : "pasa",
+      "expectativas" : {
+        "contrato" : {
+          "cumplen" : 2,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "riesgo" : {
+          "cumplen" : 3,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "mejora" : {
+          "cumplen" : 3,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "obligatorias" : {
+          "cumplen" : 5,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "informativas" : {
+          "cumplen" : 3,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "observaciones" : {
+          "graves" : 0,
+          "menores" : 0
+        }
+      }
+    }
+  ]
+}

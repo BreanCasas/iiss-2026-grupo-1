@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import com.ioteste.engine.control.ControlService;
+import com.ioteste.engine.control.ControlStatus;
 import com.ioteste.engine.site.SiteInventory;
 import com.ioteste.engine.site.SiteService;
 
@@ -33,12 +35,14 @@ public class TemperatureSubscriber {
             LoggerFactory.getLogger(TemperatureSubscriber.class);
 
     private static final long TEMPERATURE_TIMEOUT_MS = 30_000L;
+    private static final long VIRTUAL_TEMPERATURE_TIMEOUT_MS = 300_000L;
 
     private final EnvironmentRegistration registration;
     private final SiteService siteService;
     private final ObjectMapper mapper;
     private final TemperatureReadingRepository readings;
     private final Clock clock;
+    private final ControlService control;
 
     private record Reading(long temperature, long receivedAtMillis) {
     }
@@ -57,9 +61,10 @@ public class TemperatureSubscriber {
             EnvironmentRegistration registration,
             SiteService siteService,
             ObjectMapper mapper,
-            TemperatureReadingRepository readings) {
+            TemperatureReadingRepository readings,
+            ControlService control) {
 
-        this(registration, siteService, mapper, readings, Clock.systemUTC());
+        this(registration, siteService, mapper, readings, Clock.systemUTC(), control);
     }
 
     TemperatureSubscriber(
@@ -69,11 +74,23 @@ public class TemperatureSubscriber {
             TemperatureReadingRepository readings,
             Clock clock) {
 
+        this(registration, siteService, mapper, readings, clock, new ControlService());
+    }
+
+    TemperatureSubscriber(
+            EnvironmentRegistration registration,
+            SiteService siteService,
+            ObjectMapper mapper,
+            TemperatureReadingRepository readings,
+            Clock clock,
+            ControlService control) {
+
         this.registration = registration;
         this.siteService = siteService;
         this.mapper = mapper;
         this.readings = readings;
         this.clock = clock;
+        this.control = control;
     }
 
     @Scheduled(initialDelay = 4000, fixedDelay = 2000)
@@ -284,7 +301,23 @@ public class TemperatureSubscriber {
         long elapsedMillis =
                 clock.millis() - reading.receivedAtMillis();
 
-        if (elapsedMillis >= TEMPERATURE_TIMEOUT_MS) {
+        ControlStatus status = control.status();
+        long timeoutMillis = TEMPERATURE_TIMEOUT_MS;
+
+        if (status.estado() == ControlStatus.State.EN_EJECUCION
+                && status.factorTiempo() != null
+                && status.factorTiempo() > 0) {
+
+            long virtualTimeoutMillis = Math.max(
+                    1L,
+                    VIRTUAL_TEMPERATURE_TIMEOUT_MS * 1000L
+                            / status.factorTiempo()
+            );
+
+            timeoutMillis = Math.min(timeoutMillis, virtualTimeoutMillis);
+        }
+
+        if (elapsedMillis >= timeoutMillis) {
             return null;
         }
 

@@ -341,7 +341,7 @@ class HeatingScenarioTest {
     }
 
     @Test
-    void startingThenStoppingControlTurnsHeatingOnThenOff() {
+    void startingThenStoppingControlStopsSendingCommands() {
         configureSite(3700L);
         useRealServices();
 
@@ -366,8 +366,7 @@ class HeatingScenarioTest {
 
         engine.tick();
 
-        verify(switches).command(room1, SwitchClient.State.OFF);
-        verify(switches, never()).command(any(), eq(SwitchClient.State.ON));
+        verifyNoInteractions(switches);
     }
 
     @Test

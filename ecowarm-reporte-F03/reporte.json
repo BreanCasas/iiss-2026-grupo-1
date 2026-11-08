@@ -1,0 +1,208 @@
+{
+  "herramienta" : "ecowarm-run c95d037",
+  "estandar" : "interop-v2",
+  "generadoEn" : "2026-11-07T21:17:49.100229700-03:00",
+  "controlador" : {
+    "etiqueta" : "grupo-1",
+    "baseUrl" : "http://localhost:8080"
+  },
+  "resumen" : {
+    "escenarios" : 1,
+    "pasan" : 1,
+    "noPasan" : 0,
+    "sinTerminar" : 0
+  },
+  "corridas" : [
+    {
+      "escenario" : {
+        "id" : "F03",
+        "nombre" : "Un termostato deja de publicar",
+        "origen" : "F03 (incluido)",
+        "sha256" : "8922387da4d52292469514d7ee6e72d000c671da182dc8fc3887c075800fa171"
+      },
+      "firma" : "válida",
+      "estado" : "terminada",
+      "motivo" : null,
+      "resultado" : "pasa",
+      "expectativas" : [
+        {
+          "cumple" : true,
+          "detalle" : "3 de 3 habitaciones a ±0,5 °C al menos el 70% del tiempo; la peor, room3, el 96,7%",
+          "medido" : {
+            "peor" : {
+              "id" : "room3",
+              "fraccion" : 0.967
+            },
+            "porHabitacion" : {
+              "room1" : 0.975,
+              "room3" : 0.967,
+              "room4" : 0.975
+            }
+          },
+          "tipo" : "enRango",
+          "nivel" : "mejora",
+          "obligatoria" : false,
+          "parametros" : {
+            "desde" : "0s",
+            "habitaciones" : [
+              "room1",
+              "room3",
+              "room4"
+            ],
+            "tolerancia" : 0.5,
+            "fraccion" : 0.7
+          },
+          "nota" : null
+        },
+        {
+          "cumple" : true,
+          "detalle" : "la potencia encendida nunca pasó la contratada + 0,10 kW",
+          "medido" : {
+            "veces" : 0,
+            "segundos" : 0.0,
+            "excesoMaxKW" : 0.0,
+            "primera" : null
+          },
+          "tipo" : "potenciaMaxima",
+          "nivel" : "riesgo",
+          "obligatoria" : true,
+          "parametros" : {
+            "tolerancia" : 0.1,
+            "gracia" : "2m"
+          },
+          "nota" : null
+        },
+        {
+          "cumple" : true,
+          "detalle" : "todos los comandos fueron a switches del sitio vigente",
+          "medido" : {
+            "comandos" : 0,
+            "switches" : [
+            ],
+            "primero" : null
+          },
+          "tipo" : "soloSwitchesDelSitio",
+          "nivel" : "contrato",
+          "obligatoria" : true,
+          "parametros" : {
+            "gracia" : "2m"
+          },
+          "nota" : null
+        },
+        {
+          "cumple" : true,
+          "detalle" : "ningún comando de encender a switches entre el DETENER del setup y el INICIAR",
+          "medido" : {
+            "comandos" : 0,
+            "switches" : [
+            ]
+          },
+          "tipo" : "noComandaDetenido",
+          "nivel" : "contrato",
+          "obligatoria" : true,
+          "parametros" : {
+            
+          },
+          "nota" : null
+        },
+        {
+          "cumple" : true,
+          "detalle" : "la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 1m59s (desde 1m)",
+          "medido" : {
+            "rachas" : 0,
+            "masLarga" : {
+              "desde" : "1m",
+              "duracion" : "1m59s",
+              "habitaciones" : [
+                "room1",
+                "room2",
+                "room3",
+                "room4"
+              ]
+            }
+          },
+          "tipo" : "actua",
+          "nivel" : "riesgo",
+          "obligatoria" : true,
+          "parametros" : {
+            "tolerancia" : 0.5,
+            "max" : "10m"
+          },
+          "nota" : null
+        },
+        {
+          "cumple" : true,
+          "detalle" : "1 habitación sin lecturas: apagada pasados 15m",
+          "medido" : {
+            "habitaciones" : 1,
+            "aCiegas" : {
+              
+            }
+          },
+          "tipo" : "apagaSinLecturas",
+          "nivel" : "mejora",
+          "obligatoria" : false,
+          "parametros" : {
+            "dentro" : "15m"
+          },
+          "nota" : null
+        }
+      ],
+      "observaciones" : [
+        {
+          "gravedad" : "grave",
+          "tipo" : "apagaDetenido",
+          "detalle" : "3 OFF a 3 switches con el controlador detenido (room3, room4): §5.2 pide dejar de comandar; apagar no es peligroso, pero tampoco le toca",
+          "medido" : {
+            "comandos" : 3,
+            "habitaciones" : [
+              "room3",
+              "room4"
+            ]
+          }
+        },
+        {
+          "gravedad" : "menor",
+          "tipo" : "formatoInstante",
+          "detalle" : "instantes con más precisión que milisegundos en iniciar, control-consultado (p. ej. 2026-11-03T13:00:00.004215300Z): interop-v2 los fija en ISO-8601 con milisegundos",
+          "medido" : {
+            "ejemplos" : [
+              "2026-11-03T13:00:00.004215300Z",
+              "2026-11-08T00:15:48.142095178Z",
+              "2026-11-03T13:00:00.698322300Z"
+            ]
+          }
+        },
+        {
+          "gravedad" : "menor",
+          "tipo" : "formatoNumero",
+          "detalle" : "números en notación exponencial en iniciar, control-consultado (p. ej. 6E+1)",
+          "medido" : {
+            "ejemplos" : [
+              "6E+1"
+            ]
+          }
+        }
+      ],
+      "metricas" : {
+        "desde" : "0s",
+        "hasta" : "2h",
+        "potenciaPicoKW" : 4.0,
+        "potenciaMediaKW" : 2.73,
+        "excesoMaxKW" : 0.0,
+        "segundosSobreContratada" : 0.0,
+        "kwh" : 5.432,
+        "kwhEnPunta" : 0.0,
+        "kwhFueraDePunta" : 5.432,
+        "aprovechamiento" : null,
+        "fraccionEnRango" : 0.973,
+        "brechaMedia" : 0.32,
+        "deficitMedio" : 0.31,
+        "comandos" : 11,
+        "conmutaciones" : 8,
+        "comandosASwitchesAjenos" : 0
+      },
+      "detalle" : "20261107-211547-1/20261107-211547-2-F03.json"
+    }
+  ]
+}

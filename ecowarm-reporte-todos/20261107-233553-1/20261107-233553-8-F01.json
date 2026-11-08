@@ -1,0 +1,567 @@
+{
+  "zonaHoraria" : "America/Montevideo",
+  "plan" : {
+    "id" : "F01",
+    "nombre" : "Se cae el broker y vuelve",
+    "descripcion" : "3 habitaciones que entran juntas. A la media hora el broker MQTT se cae diez minutos (diez segundos reales a ×60): se corta la conexión del controlador y no hay lecturas. Cuando vuelve, el controlador tiene que reconectarse, volver a suscribirse y seguir controlando, sin pasarse mientras no ve nada.",
+    "habitaciones" : 3,
+    "potenciaContratadaKW" : 3.8,
+    "potenciaInstaladaKW" : 3.0,
+    "temperaturaInicial" : {
+      "delta" : -0.5
+    },
+    "habitacionesIniciales" : null,
+    "inicio" : {
+      "fechaHora" : "2026-11-03T10:00-03:00",
+      "zonaHoraria" : "America/Montevideo",
+      "factorTiempo" : 60.0
+    },
+    "duracion" : "1h30m",
+    "duracionSegundos" : 5400,
+    "estimacionRealSegundos" : 95,
+    "pasos" : [
+    ],
+    "fallas" : [
+      {
+        "en" : "30m",
+        "durante" : "10m",
+        "tipo" : "mqtt",
+        "modo" : "caido",
+        "descripcion" : "el broker MQTT se cae durante 10m"
+      }
+    ],
+    "esperado" : [
+      {
+        "tipo" : "enRango",
+        "nivel" : "mejora",
+        "obligatoria" : false,
+        "parametros" : {
+          "desde" : "0s",
+          "tolerancia" : 0.5,
+          "fraccion" : 0.7
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "potenciaMaxima",
+        "nivel" : "riesgo",
+        "obligatoria" : true,
+        "parametros" : {
+          "tolerancia" : 0.1,
+          "gracia" : "2m"
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "soloSwitchesDelSitio",
+        "nivel" : "contrato",
+        "obligatoria" : true,
+        "parametros" : {
+          "gracia" : "2m"
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "noComandaDetenido",
+        "nivel" : "contrato",
+        "obligatoria" : true,
+        "parametros" : {
+          
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "actua",
+        "nivel" : "riesgo",
+        "obligatoria" : true,
+        "parametros" : {
+          "tolerancia" : 0.5,
+          "max" : "10m"
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "reconecta",
+        "nivel" : "riesgo",
+        "obligatoria" : true,
+        "parametros" : {
+          "dentroReal" : "1m"
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "apagaSinLecturas",
+        "nivel" : "mejora",
+        "obligatoria" : false,
+        "parametros" : {
+          "dentro" : "15m"
+        },
+        "nota" : null
+      }
+    ],
+    "hash" : "ec3749124231496947902277ccc37c49a6941869dea81109f3d748962d3d8493"
+  },
+  "eventos" : [
+    {
+      "real" : "2026-11-07T23:47:54.784-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "DETENER",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"DETENIDO\",\"fechaHora\":null,\"factorTiempo\":null,\"iniciadoEn\":null}"
+    },
+    {
+      "real" : "2026-11-07T23:47:54.785-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "sitio 'gen-3-holgado-s1' en el simulador (3 habitaciones, v10)",
+      "ok" : true,
+      "detalle" : null
+    },
+    {
+      "real" : "2026-11-07T23:47:54.790-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "PUT /sitio",
+      "ok" : true,
+      "detalle" : "200 {\"schemaVersion\":\"2.0\",\"sitio\":{\"id\":\"gen-3-holgado-s1\",\"nombre\":\"Sitio generado: 3 habitaciones, holgado\",\"potenciaContratadaKW\":3.8,\"tarifa\":{\"punta\":{\"desde\":\"17:00\",\"hasta\":\"23:00\",\"dias\":\"HABILES"
+    },
+    {
+      "real" : "2026-11-07T23:47:54.794-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "GET /sitio",
+      "ok" : true,
+      "detalle" : "200 {\"schemaVersion\":\"2.0\",\"sitio\":{\"id\":\"gen-3-holgado-s1\",\"nombre\":\"Sitio generado: 3 habitaciones, holgado\",\"potenciaContratadaKW\":3.8,\"tarifa\":{\"punta\":{\"desde\":\"17:00\",\"hasta\":\"23:00\",\"dias\":\"HABILES"
+    },
+    {
+      "real" : "2026-11-07T23:47:54.799-03:00",
+      "virtual" : "2026-11-03T10:00-03:00",
+      "t" : "0s",
+      "fase" : "inicio",
+      "que" : "INICIAR 2026-11-03T13:00:00.000Z ×60.0",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"EN_EJECUCION\",\"fechaHora\":\"2026-11-03T13:00:00.002662260Z\",\"factorTiempo\":6E+1,\"iniciadoEn\":\"2026-11-08T02:47:54.795646670Z\"}"
+    },
+    {
+      "real" : "2026-11-07T23:47:54.803-03:00",
+      "virtual" : "2026-11-03T10:00:00.240-03:00",
+      "t" : "0s",
+      "fase" : "inicio",
+      "que" : "GET /control",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"EN_EJECUCION\",\"fechaHora\":\"2026-11-03T13:00:00.241887Z\",\"factorTiempo\":6E+1,\"iniciadoEn\":\"2026-11-08T02:47:54.795646670Z\"}"
+    },
+    {
+      "real" : "2026-11-07T23:48:24.863-03:00",
+      "virtual" : "2026-11-03T10:30:03.840-03:00",
+      "t" : "30m3s",
+      "fase" : "falla",
+      "que" : "empieza: el broker MQTT se cae durante 10m",
+      "ok" : true,
+      "detalle" : null
+    },
+    {
+      "real" : "2026-11-07T23:48:34.837-03:00",
+      "virtual" : "2026-11-03T10:40:02.280-03:00",
+      "t" : "40m2s",
+      "fase" : "falla",
+      "que" : "termina: el broker MQTT se cae durante 10m",
+      "ok" : true,
+      "detalle" : null
+    },
+    {
+      "real" : "2026-11-07T23:49:24.808-03:00",
+      "virtual" : "2026-11-03T11:30:00.540-03:00",
+      "t" : "1h30m",
+      "fase" : "fin",
+      "que" : "fin del escenario (1h30m virtuales)",
+      "ok" : true,
+      "detalle" : null
+    },
+    {
+      "real" : "2026-11-07T23:49:24.820-03:00",
+      "virtual" : "2026-11-03T11:30:01.260-03:00",
+      "t" : "1h30m1s",
+      "fase" : "salida",
+      "que" : "no-pasa: 5 ✓, 1 ✗, 1 no aplican, 3 observaciones",
+      "ok" : false,
+      "detalle" : "soloSwitchesDelSitio: 2 comandos a 2 switches que no están en el sitio (sw-sim-room4, sw-sim-room5), el primero en 0s"
+    },
+    {
+      "real" : "2026-11-07T23:49:24.831-03:00",
+      "virtual" : "2026-11-03T11:30:01.920-03:00",
+      "t" : "1h30m1s",
+      "fase" : "fin",
+      "que" : "DETENER",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"DETENIDO\",\"fechaHora\":null,\"factorTiempo\":null,\"iniciadoEn\":null}"
+    }
+  ],
+  "final" : {
+    "instante" : "2026-11-03T11:30:00.540-03:00",
+    "sitio" : "gen-3-holgado-s1",
+    "consumoTotalKwh" : 4.349,
+    "habitaciones" : [
+      {
+        "id" : "room1",
+        "temperaturaEsperada" : 20.3,
+        "temperatura" : 20.293,
+        "switch" : "OFF",
+        "consumoKwh" : 1.68
+      },
+      {
+        "id" : "room2",
+        "temperaturaEsperada" : 21.8,
+        "temperatura" : 21.634,
+        "switch" : "ON",
+        "consumoKwh" : 1.335
+      },
+      {
+        "id" : "room3",
+        "temperaturaEsperada" : 22.1,
+        "temperatura" : 21.931,
+        "switch" : "ON",
+        "consumoKwh" : 1.335
+      }
+    ]
+  },
+  "metricas" : {
+    "global" : {
+      "desde" : "0s",
+      "hasta" : "1h30m",
+      "potenciaPicoKW" : 3.0,
+      "potenciaMediaKW" : 2.92,
+      "excesoMaxKW" : 0.0,
+      "segundosSobreContratada" : 0.0,
+      "kwh" : 4.349,
+      "kwhEnPunta" : 0.0,
+      "kwhFueraDePunta" : 4.349,
+      "aprovechamiento" : null,
+      "fraccionEnRango" : 1.0,
+      "brechaMedia" : 0.36,
+      "deficitMedio" : 0.36,
+      "comandos" : 8,
+      "conmutaciones" : 4,
+      "comandosASwitchesAjenos" : 2
+    },
+    "tramos" : [
+      {
+        "desde" : "0s",
+        "hasta" : "1h30m",
+        "potenciaPicoKW" : 3.0,
+        "potenciaMediaKW" : 2.92,
+        "excesoMaxKW" : 0.0,
+        "segundosSobreContratada" : 0.0,
+        "kwh" : 4.349,
+        "kwhEnPunta" : 0.0,
+        "kwhFueraDePunta" : 4.349,
+        "aprovechamiento" : null,
+        "fraccionEnRango" : 1.0,
+        "brechaMedia" : 0.36,
+        "deficitMedio" : 0.36,
+        "comandos" : 8,
+        "conmutaciones" : 4,
+        "comandosASwitchesAjenos" : 2
+      }
+    ],
+    "habitaciones" : [
+      {
+        "id" : "room1",
+        "temperaturaMin" : 19.8,
+        "temperaturaMax" : 20.29,
+        "temperaturaFinal" : 20.29,
+        "esperadaFinal" : 20.3,
+        "brechaMedia" : 0.31,
+        "fraccionEnRango" : 1.0,
+        "alcanzoEn" : "1h6m30s",
+        "kwh" : 1.68,
+        "comandos" : 2,
+        "conmutaciones" : 2,
+        "conmutacionesPorHora" : 1.3
+      },
+      {
+        "id" : "room2",
+        "temperaturaMin" : 21.3,
+        "temperaturaMax" : 21.63,
+        "temperaturaFinal" : 21.63,
+        "esperadaFinal" : 21.8,
+        "brechaMedia" : 0.37,
+        "fraccionEnRango" : 1.0,
+        "alcanzoEn" : "1h24m30s",
+        "kwh" : 1.335,
+        "comandos" : 2,
+        "conmutaciones" : 1,
+        "conmutacionesPorHora" : 0.7
+      },
+      {
+        "id" : "room3",
+        "temperaturaMin" : 21.6,
+        "temperaturaMax" : 21.93,
+        "temperaturaFinal" : 21.93,
+        "esperadaFinal" : 22.1,
+        "brechaMedia" : 0.38,
+        "fraccionEnRango" : 1.0,
+        "alcanzoEn" : "1h24m30s",
+        "kwh" : 1.335,
+        "comandos" : 2,
+        "conmutaciones" : 1,
+        "conmutacionesPorHora" : 0.7
+      }
+    ],
+    "toleranciaConfort" : 0.5
+  },
+  "expectativasDetalle" : [
+    {
+      "cumple" : true,
+      "detalle" : "3 de 3 habitaciones a ±0,5 °C al menos el 70% del tiempo; la peor, room1, el 100,0%",
+      "medido" : {
+        "peor" : {
+          "id" : "room1",
+          "fraccion" : 1.0
+        },
+        "porHabitacion" : {
+          "room1" : 1.0,
+          "room2" : 1.0,
+          "room3" : 1.0
+        }
+      },
+      "tipo" : "enRango",
+      "nivel" : "mejora",
+      "obligatoria" : false,
+      "parametros" : {
+        "desde" : "0s",
+        "tolerancia" : 0.5,
+        "fraccion" : 0.7
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "la potencia encendida nunca pasó la contratada + 0,10 kW",
+      "medido" : {
+        "veces" : 0,
+        "segundos" : 0.0,
+        "excesoMaxKW" : 0.0,
+        "primera" : null
+      },
+      "tipo" : "potenciaMaxima",
+      "nivel" : "riesgo",
+      "obligatoria" : true,
+      "parametros" : {
+        "tolerancia" : 0.1,
+        "gracia" : "2m"
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : false,
+      "detalle" : "2 comandos a 2 switches que no están en el sitio (sw-sim-room4, sw-sim-room5), el primero en 0s",
+      "medido" : {
+        "comandos" : 2,
+        "switches" : [
+          "sw-sim-room4",
+          "sw-sim-room5"
+        ],
+        "primero" : "0s"
+      },
+      "tipo" : "soloSwitchesDelSitio",
+      "nivel" : "contrato",
+      "obligatoria" : true,
+      "parametros" : {
+        "gracia" : "2m"
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "ningún comando de encender a switches entre el DETENER del setup y el INICIAR",
+      "medido" : {
+        "comandos" : 0,
+        "switches" : [
+        ]
+      },
+      "tipo" : "noComandaDetenido",
+      "nivel" : "contrato",
+      "obligatoria" : true,
+      "parametros" : {
+        
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "nunca hubo una habitación fría y apagada que entrara en lo libre de la contratada",
+      "medido" : {
+        "rachas" : 0,
+        "masLarga" : null
+      },
+      "tipo" : "actua",
+      "nivel" : "riesgo",
+      "obligatoria" : true,
+      "parametros" : {
+        "tolerancia" : 0.5,
+        "max" : "10m"
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "se volvió a suscribir una vez tras la vuelta del broker; lo más lento, 1,5 s reales",
+      "medido" : {
+        "vueltas" : 1,
+        "segundosReales" : [
+          1.5
+        ]
+      },
+      "tipo" : "reconecta",
+      "nivel" : "riesgo",
+      "obligatoria" : true,
+      "parametros" : {
+        "dentroReal" : "1m"
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : null,
+      "detalle" : "no aplica: ninguna habitación quedó sin lecturas más de 15m",
+      "medido" : {
+        
+      },
+      "tipo" : "apagaSinLecturas",
+      "nivel" : "mejora",
+      "obligatoria" : false,
+      "parametros" : {
+        "dentro" : "15m"
+      },
+      "nota" : null
+    }
+  ],
+  "observaciones" : [
+    {
+      "gravedad" : "grave",
+      "tipo" : "apagaDetenido",
+      "detalle" : "3 OFF a 3 switches con el controlador detenido (room2, room3): §5.2 pide dejar de comandar; apagar no es peligroso, pero tampoco le toca",
+      "medido" : {
+        "comandos" : 3,
+        "habitaciones" : [
+          "room2",
+          "room3"
+        ]
+      }
+    },
+    {
+      "gravedad" : "menor",
+      "tipo" : "formatoInstante",
+      "detalle" : "instantes con más precisión que milisegundos en iniciar, control-consultado (p. ej. 2026-11-03T13:00:00.002662260Z): interop-v2 los fija en ISO-8601 con milisegundos",
+      "medido" : {
+        "ejemplos" : [
+          "2026-11-03T13:00:00.002662260Z",
+          "2026-11-08T02:47:54.795646670Z",
+          "2026-11-03T13:00:00.241887Z"
+        ]
+      }
+    },
+    {
+      "gravedad" : "menor",
+      "tipo" : "formatoNumero",
+      "detalle" : "números en notación exponencial en iniciar, control-consultado (p. ej. 6E+1)",
+      "medido" : {
+        "ejemplos" : [
+          "6E+1"
+        ]
+      }
+    }
+  ],
+  "escenarioFuente" : {
+    "id" : "F01",
+    "nombre" : "Se cae el broker y vuelve",
+    "descripcion" : "3 habitaciones que entran juntas. A la media hora el broker MQTT se cae diez minutos (diez segundos reales a ×60): se corta la conexión del controlador y no hay lecturas. Cuando vuelve, el controlador tiene que reconectarse, volver a suscribirse y seguir controlando, sin pasarse mientras no ve nada.",
+    "setup" : {
+      "sitio" : {
+        "generado" : {
+          "habitaciones" : 3,
+          "presupuesto" : "holgado"
+        }
+      }
+    },
+    "inicio" : {
+      "fechaHora" : "2026-11-03T10:00",
+      "factorTiempo" : 60
+    },
+    "duracion" : "1h30m",
+    "fallas" : [
+      {
+        "en" : "30m",
+        "durante" : "10m",
+        "mqtt" : "caido"
+      }
+    ],
+    "esperado" : [
+      {
+        "enRango" : {
+          "tolerancia" : 0.5,
+          "fraccion" : 0.7
+        }
+      }
+    ]
+  },
+  "id" : "20261107-233553-8-F01",
+  "simulador" : "ecowarm-run",
+  "tanda" : "20261107-233553-1",
+  "escenario" : {
+    "id" : "F01",
+    "nombre" : "Se cae el broker y vuelve",
+    "hash" : "ec3749124231496947902277ccc37c49a6941869dea81109f3d748962d3d8493"
+  },
+  "controlador" : "grupo-1",
+  "estado" : "terminada",
+  "motivo" : null,
+  "creadaEn" : "2026-11-07T23:35:53.826-03:00",
+  "empezo" : "2026-11-07T23:47:54.780-03:00",
+  "termino" : "2026-11-07T23:49:24.832-03:00",
+  "estimacionRealSegundos" : 95,
+  "progreso" : {
+    "virtualTranscurrido" : "1h30m",
+    "virtualTotal" : "1h30m",
+    "fraccion" : 1.0,
+    "pasos" : "0/0",
+    "realRestanteSegundos" : 0
+  },
+  "resultado" : "no-pasa",
+  "expectativas" : {
+    "contrato" : {
+      "cumplen" : 1,
+      "fallan" : 1,
+      "noAplican" : 0
+    },
+    "riesgo" : {
+      "cumplen" : 3,
+      "fallan" : 0,
+      "noAplican" : 0
+    },
+    "mejora" : {
+      "cumplen" : 1,
+      "fallan" : 0,
+      "noAplican" : 1
+    },
+    "obligatorias" : {
+      "cumplen" : 4,
+      "fallan" : 1,
+      "noAplican" : 0
+    },
+    "informativas" : {
+      "cumplen" : 1,
+      "fallan" : 0,
+      "noAplican" : 1
+    },
+    "observaciones" : {
+      "graves" : 1,
+      "menores" : 2
+    }
+  }
+}

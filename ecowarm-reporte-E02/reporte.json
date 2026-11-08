@@ -1,0 +1,204 @@
+{
+  "herramienta" : "ecowarm-run c95d037",
+  "estandar" : "interop-v2",
+  "generadoEn" : "2026-11-07T23:26:29.260530400-03:00",
+  "controlador" : {
+    "etiqueta" : "grupo-1",
+    "baseUrl" : "http://localhost:8080"
+  },
+  "resumen" : {
+    "escenarios" : 1,
+    "pasan" : 1,
+    "noPasan" : 0,
+    "sinTerminar" : 0
+  },
+  "corridas" : [
+    {
+      "escenario" : {
+        "id" : "E02",
+        "nombre" : "1 habitación, entra todo",
+        "origen" : "E02 (incluido)",
+        "sha256" : "9b0d459cd684d9da14fdd0dd0a10b2981390cc30687fadbd3ffd5b2cd974f858"
+      },
+      "firma" : "válida",
+      "estado" : "terminada",
+      "motivo" : null,
+      "resultado" : "pasa",
+      "expectativas" : [
+        {
+          "cumple" : true,
+          "detalle" : "la potencia encendida nunca pasó la contratada + 0,10 kW",
+          "medido" : {
+            "veces" : 0,
+            "segundos" : 0.0,
+            "excesoMaxKW" : 0.0,
+            "primera" : null
+          },
+          "tipo" : "potenciaMaxima",
+          "nivel" : "riesgo",
+          "obligatoria" : true,
+          "parametros" : {
+            "tolerancia" : 0.1,
+            "gracia" : "2m"
+          },
+          "nota" : null
+        },
+        {
+          "cumple" : true,
+          "detalle" : "todos los comandos fueron a switches del sitio vigente",
+          "medido" : {
+            "comandos" : 0,
+            "switches" : [
+            ],
+            "primero" : null
+          },
+          "tipo" : "soloSwitchesDelSitio",
+          "nivel" : "contrato",
+          "obligatoria" : true,
+          "parametros" : {
+            "gracia" : "2m"
+          },
+          "nota" : null
+        },
+        {
+          "cumple" : true,
+          "detalle" : "conoció los 1 switches (consulta o comando); el último en 0s",
+          "medido" : {
+            "habitaciones" : 1,
+            "tomadas" : 1,
+            "ultima" : "0s",
+            "sinControl" : [
+            ]
+          },
+          "tipo" : "tomaControl",
+          "nivel" : "mejora",
+          "obligatoria" : false,
+          "parametros" : {
+            "dentro" : "5m"
+          },
+          "nota" : null
+        },
+        {
+          "cumple" : true,
+          "detalle" : "1 de 1 habitaciones a ±0,5 °C al menos el 80% del tiempo; la peor, room1, el 97,5%",
+          "medido" : {
+            "peor" : {
+              "id" : "room1",
+              "fraccion" : 0.975
+            },
+            "porHabitacion" : {
+              "room1" : 0.975
+            }
+          },
+          "tipo" : "enRango",
+          "nivel" : "mejora",
+          "obligatoria" : false,
+          "parametros" : {
+            "desde" : "0s",
+            "tolerancia" : 0.5,
+            "fraccion" : 0.8
+          },
+          "nota" : null
+        },
+        {
+          "cumple" : true,
+          "detalle" : "la que más conmutó, room1, 1,0 veces por hora (máximo 6,0)",
+          "medido" : {
+            "peor" : {
+              "id" : "room1",
+              "porHora" : 1.0
+            }
+          },
+          "tipo" : "conmutaciones",
+          "nivel" : "mejora",
+          "obligatoria" : false,
+          "parametros" : {
+            "maxPorHora" : 6.0
+          },
+          "nota" : null
+        },
+        {
+          "cumple" : true,
+          "detalle" : "ningún comando de encender a switches entre el DETENER del setup y el INICIAR",
+          "medido" : {
+            "comandos" : 0,
+            "switches" : [
+            ]
+          },
+          "tipo" : "noComandaDetenido",
+          "nivel" : "contrato",
+          "obligatoria" : true,
+          "parametros" : {
+            
+          },
+          "nota" : null
+        },
+        {
+          "cumple" : true,
+          "detalle" : "la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 2m (desde 1m22s)",
+          "medido" : {
+            "rachas" : 0,
+            "masLarga" : {
+              "desde" : "1m22s",
+              "duracion" : "2m",
+              "habitaciones" : [
+                "room1"
+              ]
+            }
+          },
+          "tipo" : "actua",
+          "nivel" : "riesgo",
+          "obligatoria" : true,
+          "parametros" : {
+            "tolerancia" : 0.5,
+            "max" : "10m"
+          },
+          "nota" : null
+        }
+      ],
+      "observaciones" : [
+        {
+          "gravedad" : "menor",
+          "tipo" : "formatoInstante",
+          "detalle" : "instantes con más precisión que milisegundos en iniciar, control-consultado (p. ej. 2026-11-03T13:00:00.004002180Z): interop-v2 los fija en ISO-8601 con milisegundos",
+          "medido" : {
+            "ejemplos" : [
+              "2026-11-03T13:00:00.004002180Z",
+              "2026-11-08T02:24:28.411035001Z",
+              "2026-11-03T13:00:00.927491340Z"
+            ]
+          }
+        },
+        {
+          "gravedad" : "menor",
+          "tipo" : "formatoNumero",
+          "detalle" : "números en notación exponencial en iniciar, control-consultado (p. ej. 6E+1)",
+          "medido" : {
+            "ejemplos" : [
+              "6E+1"
+            ]
+          }
+        }
+      ],
+      "metricas" : {
+        "desde" : "0s",
+        "hasta" : "2h",
+        "potenciaPicoKW" : 1.2,
+        "potenciaMediaKW" : 0.85,
+        "excesoMaxKW" : 0.0,
+        "segundosSobreContratada" : 0.0,
+        "kwh" : 1.7,
+        "kwhEnPunta" : 0.0,
+        "kwhFueraDePunta" : 1.7,
+        "aprovechamiento" : null,
+        "fraccionEnRango" : 0.975,
+        "brechaMedia" : 0.27,
+        "deficitMedio" : 0.25,
+        "comandos" : 2,
+        "conmutaciones" : 2,
+        "comandosASwitchesAjenos" : 0
+      },
+      "detalle" : "20261107-232428-3/20261107-232428-4-E02.json"
+    }
+  ]
+}

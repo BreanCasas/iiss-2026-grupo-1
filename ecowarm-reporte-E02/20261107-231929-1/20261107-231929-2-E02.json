@@ -1,0 +1,505 @@
+{
+  "zonaHoraria" : "America/Montevideo",
+  "plan" : {
+    "id" : "E02",
+    "nombre" : "1 habitación, entra todo",
+    "descripcion" : "Una sola habitación con potencia de sobra: tiene que calentarla hasta la esperada y sostenerla.",
+    "habitaciones" : 1,
+    "potenciaContratadaKW" : 1.7,
+    "potenciaInstaladaKW" : 1.2,
+    "temperaturaInicial" : {
+      "delta" : -0.5
+    },
+    "habitacionesIniciales" : null,
+    "inicio" : {
+      "fechaHora" : "2026-11-03T10:00-03:00",
+      "zonaHoraria" : "America/Montevideo",
+      "factorTiempo" : 60.0
+    },
+    "duracion" : "2h",
+    "duracionSegundos" : 7200,
+    "estimacionRealSegundos" : 125,
+    "pasos" : [
+    ],
+    "fallas" : null,
+    "esperado" : [
+      {
+        "tipo" : "potenciaMaxima",
+        "nivel" : "riesgo",
+        "obligatoria" : true,
+        "parametros" : {
+          "tolerancia" : 0.1,
+          "gracia" : "2m"
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "soloSwitchesDelSitio",
+        "nivel" : "contrato",
+        "obligatoria" : true,
+        "parametros" : {
+          "gracia" : "2m"
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "tomaControl",
+        "nivel" : "mejora",
+        "obligatoria" : false,
+        "parametros" : {
+          "dentro" : "5m"
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "enRango",
+        "nivel" : "mejora",
+        "obligatoria" : false,
+        "parametros" : {
+          "desde" : "0s",
+          "tolerancia" : 0.5,
+          "fraccion" : 0.8
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "conmutaciones",
+        "nivel" : "mejora",
+        "obligatoria" : false,
+        "parametros" : {
+          "maxPorHora" : 6.0
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "noComandaDetenido",
+        "nivel" : "contrato",
+        "obligatoria" : true,
+        "parametros" : {
+          
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "actua",
+        "nivel" : "riesgo",
+        "obligatoria" : true,
+        "parametros" : {
+          "tolerancia" : 0.5,
+          "max" : "10m"
+        },
+        "nota" : null
+      }
+    ],
+    "hash" : "9b0d459cd684d9da14fdd0dd0a10b2981390cc30687fadbd3ffd5b2cd974f858"
+  },
+  "eventos" : [
+    {
+      "real" : "2026-11-07T23:19:29.164-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "DETENER",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"DETENIDO\",\"fechaHora\":null,\"factorTiempo\":null,\"iniciadoEn\":null}"
+    },
+    {
+      "real" : "2026-11-07T23:19:29.175-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "sitio 'gen-1-holgado-s1' en el simulador (1 habitaciones, v2)",
+      "ok" : true,
+      "detalle" : null
+    },
+    {
+      "real" : "2026-11-07T23:19:29.230-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "PUT /sitio",
+      "ok" : true,
+      "detalle" : "200 {\"schemaVersion\":\"2.0\",\"sitio\":{\"id\":\"gen-1-holgado-s1\",\"nombre\":\"Sitio generado: 1 habitaciones, holgado\",\"potenciaContratadaKW\":1.7,\"tarifa\":{\"punta\":{\"desde\":\"17:00\",\"hasta\":\"23:00\",\"dias\":\"HABILES"
+    },
+    {
+      "real" : "2026-11-07T23:19:29.237-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "GET /sitio",
+      "ok" : true,
+      "detalle" : "200 {\"schemaVersion\":\"2.0\",\"sitio\":{\"id\":\"gen-1-holgado-s1\",\"nombre\":\"Sitio generado: 1 habitaciones, holgado\",\"potenciaContratadaKW\":1.7,\"tarifa\":{\"punta\":{\"desde\":\"17:00\",\"hasta\":\"23:00\",\"dias\":\"HABILES"
+    },
+    {
+      "real" : "2026-11-07T23:19:29.249-03:00",
+      "virtual" : "2026-11-03T10:00-03:00",
+      "t" : "0s",
+      "fase" : "inicio",
+      "que" : "INICIAR 2026-11-03T13:00:00.000Z ×60.0",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"EN_EJECUCION\",\"fechaHora\":\"2026-11-03T13:00:00.003800520Z\",\"factorTiempo\":6E+1,\"iniciadoEn\":\"2026-11-08T02:19:29.245121126Z\"}"
+    },
+    {
+      "real" : "2026-11-07T23:19:29.260-03:00",
+      "virtual" : "2026-11-03T10:00:00.660-03:00",
+      "t" : "0s",
+      "fase" : "inicio",
+      "que" : "GET /control",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"EN_EJECUCION\",\"fechaHora\":\"2026-11-03T13:00:00.709530240Z\",\"factorTiempo\":6E+1,\"iniciadoEn\":\"2026-11-08T02:19:29.245121126Z\"}"
+    },
+    {
+      "real" : "2026-11-07T23:21:29.312-03:00",
+      "virtual" : "2026-11-03T12:00:03.780-03:00",
+      "t" : "2h3s",
+      "fase" : "fin",
+      "que" : "fin del escenario (2h virtuales)",
+      "ok" : true,
+      "detalle" : null
+    },
+    {
+      "real" : "2026-11-07T23:21:29.367-03:00",
+      "virtual" : "2026-11-03T12:00:07.080-03:00",
+      "t" : "2h7s",
+      "fase" : "salida",
+      "que" : "no-pasa: 4 ✓, 3 ✗, 3 observaciones",
+      "ok" : false,
+      "detalle" : "tomaControl: 1 de 1 switches sin consultar ni comandar antes de 5m: room1 · enRango: 0 de 1 habitaciones a ±0,5 °C al menos el 80% del tiempo; la peor, room1, el 0,8% · actua: una vez hubo potencia libre y habitaciones frías apagadas más de 10m sin que el controlador hiciera nada; la más larga, 1h58m15s desde 1m44s (room1)"
+    },
+    {
+      "real" : "2026-11-07T23:21:29.383-03:00",
+      "virtual" : "2026-11-03T12:00:08.040-03:00",
+      "t" : "2h8s",
+      "fase" : "fin",
+      "que" : "DETENER",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"DETENIDO\",\"fechaHora\":null,\"factorTiempo\":null,\"iniciadoEn\":null}"
+    }
+  ],
+  "final" : {
+    "instante" : "2026-11-03T12:00:03.720-03:00",
+    "sitio" : "gen-1-holgado-s1",
+    "consumoTotalKwh" : 0.0,
+    "habitaciones" : [
+      {
+        "id" : "room1",
+        "temperaturaEsperada" : 20.3,
+        "temperatura" : 19.654,
+        "switch" : "OFF",
+        "consumoKwh" : 0.0
+      }
+    ]
+  },
+  "metricas" : {
+    "global" : {
+      "desde" : "0s",
+      "hasta" : "2h",
+      "potenciaPicoKW" : 0.0,
+      "potenciaMediaKW" : 0.0,
+      "excesoMaxKW" : 0.0,
+      "segundosSobreContratada" : 0.0,
+      "kwh" : 0.0,
+      "kwhEnPunta" : 0.0,
+      "kwhFueraDePunta" : 0.0,
+      "aprovechamiento" : null,
+      "fraccionEnRango" : 0.008,
+      "brechaMedia" : 0.56,
+      "deficitMedio" : 0.56,
+      "comandos" : 0,
+      "conmutaciones" : 0,
+      "comandosASwitchesAjenos" : 0
+    },
+    "tramos" : [
+      {
+        "desde" : "0s",
+        "hasta" : "2h",
+        "potenciaPicoKW" : 0.0,
+        "potenciaMediaKW" : 0.0,
+        "excesoMaxKW" : 0.0,
+        "segundosSobreContratada" : 0.0,
+        "kwh" : 0.0,
+        "kwhEnPunta" : 0.0,
+        "kwhFueraDePunta" : 0.0,
+        "aprovechamiento" : null,
+        "fraccionEnRango" : 0.008,
+        "brechaMedia" : 0.56,
+        "deficitMedio" : 0.56,
+        "comandos" : 0,
+        "conmutaciones" : 0,
+        "comandosASwitchesAjenos" : 0
+      }
+    ],
+    "habitaciones" : [
+      {
+        "id" : "room1",
+        "temperaturaMin" : 19.65,
+        "temperaturaMax" : 19.8,
+        "temperaturaFinal" : 19.65,
+        "esperadaFinal" : 20.3,
+        "brechaMedia" : 0.56,
+        "fraccionEnRango" : 0.008,
+        "alcanzoEn" : null,
+        "kwh" : 0.0,
+        "comandos" : 0,
+        "conmutaciones" : 0,
+        "conmutacionesPorHora" : 0.0
+      }
+    ],
+    "toleranciaConfort" : 0.5
+  },
+  "expectativasDetalle" : [
+    {
+      "cumple" : true,
+      "detalle" : "la potencia encendida nunca pasó la contratada + 0,10 kW",
+      "medido" : {
+        "veces" : 0,
+        "segundos" : 0.0,
+        "excesoMaxKW" : 0.0,
+        "primera" : null
+      },
+      "tipo" : "potenciaMaxima",
+      "nivel" : "riesgo",
+      "obligatoria" : true,
+      "parametros" : {
+        "tolerancia" : 0.1,
+        "gracia" : "2m"
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "todos los comandos fueron a switches del sitio vigente",
+      "medido" : {
+        "comandos" : 0,
+        "switches" : [
+        ],
+        "primero" : null
+      },
+      "tipo" : "soloSwitchesDelSitio",
+      "nivel" : "contrato",
+      "obligatoria" : true,
+      "parametros" : {
+        "gracia" : "2m"
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : false,
+      "detalle" : "1 de 1 switches sin consultar ni comandar antes de 5m: room1",
+      "medido" : {
+        "habitaciones" : 1,
+        "tomadas" : 0,
+        "ultima" : null,
+        "sinControl" : [
+          "room1"
+        ]
+      },
+      "tipo" : "tomaControl",
+      "nivel" : "mejora",
+      "obligatoria" : false,
+      "parametros" : {
+        "dentro" : "5m"
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : false,
+      "detalle" : "0 de 1 habitaciones a ±0,5 °C al menos el 80% del tiempo; la peor, room1, el 0,8%",
+      "medido" : {
+        "peor" : {
+          "id" : "room1",
+          "fraccion" : 0.008
+        },
+        "porHabitacion" : {
+          "room1" : 0.008
+        }
+      },
+      "tipo" : "enRango",
+      "nivel" : "mejora",
+      "obligatoria" : false,
+      "parametros" : {
+        "desde" : "0s",
+        "tolerancia" : 0.5,
+        "fraccion" : 0.8
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "la que más conmutó, room1, 0,0 veces por hora (máximo 6,0)",
+      "medido" : {
+        "peor" : {
+          "id" : "room1",
+          "porHora" : 0.0
+        }
+      },
+      "tipo" : "conmutaciones",
+      "nivel" : "mejora",
+      "obligatoria" : false,
+      "parametros" : {
+        "maxPorHora" : 6.0
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "ningún comando de encender a switches entre el DETENER del setup y el INICIAR",
+      "medido" : {
+        "comandos" : 0,
+        "switches" : [
+        ]
+      },
+      "tipo" : "noComandaDetenido",
+      "nivel" : "contrato",
+      "obligatoria" : true,
+      "parametros" : {
+        
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : false,
+      "detalle" : "una vez hubo potencia libre y habitaciones frías apagadas más de 10m sin que el controlador hiciera nada; la más larga, 1h58m15s desde 1m44s (room1)",
+      "medido" : {
+        "rachas" : 1,
+        "masLarga" : {
+          "desde" : "1m44s",
+          "duracion" : "1h58m15s",
+          "habitaciones" : [
+            "room1"
+          ]
+        }
+      },
+      "tipo" : "actua",
+      "nivel" : "riesgo",
+      "obligatoria" : true,
+      "parametros" : {
+        "tolerancia" : 0.5,
+        "max" : "10m"
+      },
+      "nota" : null
+    }
+  ],
+  "observaciones" : [
+    {
+      "gravedad" : "menor",
+      "tipo" : "estadoSinConocer",
+      "detalle" : "1 de 1 switches que el controlador nunca consultó ni comandó: no supo cómo estaban (room1)",
+      "medido" : {
+        "habitaciones" : [
+          "room1"
+        ]
+      }
+    },
+    {
+      "gravedad" : "menor",
+      "tipo" : "formatoInstante",
+      "detalle" : "instantes con más precisión que milisegundos en iniciar, control-consultado (p. ej. 2026-11-03T13:00:00.003800520Z): interop-v2 los fija en ISO-8601 con milisegundos",
+      "medido" : {
+        "ejemplos" : [
+          "2026-11-03T13:00:00.003800520Z",
+          "2026-11-08T02:19:29.245121126Z",
+          "2026-11-03T13:00:00.709530240Z"
+        ]
+      }
+    },
+    {
+      "gravedad" : "menor",
+      "tipo" : "formatoNumero",
+      "detalle" : "números en notación exponencial en iniciar, control-consultado (p. ej. 6E+1)",
+      "medido" : {
+        "ejemplos" : [
+          "6E+1"
+        ]
+      }
+    }
+  ],
+  "escenarioFuente" : {
+    "id" : "E02",
+    "nombre" : "1 habitación, entra todo",
+    "descripcion" : "Una sola habitación con potencia de sobra: tiene que calentarla hasta la esperada y sostenerla.",
+    "setup" : {
+      "sitio" : {
+        "generado" : {
+          "habitaciones" : 1,
+          "presupuesto" : "holgado"
+        }
+      }
+    },
+    "inicio" : {
+      "fechaHora" : "2026-11-03T10:00",
+      "factorTiempo" : 60
+    },
+    "duracion" : "2h",
+    "esperado" : [
+      "potenciaMaxima",
+      "soloSwitchesDelSitio",
+      "tomaControl",
+      {
+        "enRango" : {
+          "tolerancia" : 0.5,
+          "fraccion" : 0.8
+        }
+      },
+      {
+        "conmutaciones" : {
+          "maxPorHora" : 6
+        }
+      }
+    ]
+  },
+  "id" : "20261107-231929-2-E02",
+  "simulador" : "ecowarm-run",
+  "tanda" : "20261107-231929-1",
+  "escenario" : {
+    "id" : "E02",
+    "nombre" : "1 habitación, entra todo",
+    "hash" : "9b0d459cd684d9da14fdd0dd0a10b2981390cc30687fadbd3ffd5b2cd974f858"
+  },
+  "controlador" : "grupo-1",
+  "estado" : "terminada",
+  "motivo" : null,
+  "creadaEn" : "2026-11-07T23:19:29.011-03:00",
+  "empezo" : "2026-11-07T23:19:29.012-03:00",
+  "termino" : "2026-11-07T23:21:29.383-03:00",
+  "estimacionRealSegundos" : 125,
+  "progreso" : {
+    "virtualTranscurrido" : "2h",
+    "virtualTotal" : "2h",
+    "fraccion" : 1.0,
+    "pasos" : "0/0",
+    "realRestanteSegundos" : 0
+  },
+  "resultado" : "no-pasa",
+  "expectativas" : {
+    "contrato" : {
+      "cumplen" : 2,
+      "fallan" : 0,
+      "noAplican" : 0
+    },
+    "riesgo" : {
+      "cumplen" : 1,
+      "fallan" : 1,
+      "noAplican" : 0
+    },
+    "mejora" : {
+      "cumplen" : 1,
+      "fallan" : 2,
+      "noAplican" : 0
+    },
+    "obligatorias" : {
+      "cumplen" : 3,
+      "fallan" : 1,
+      "noAplican" : 0
+    },
+    "informativas" : {
+      "cumplen" : 1,
+      "fallan" : 2,
+      "noAplican" : 0
+    },
+    "observaciones" : {
+      "graves" : 0,
+      "menores" : 3
+    }
+  }
+}

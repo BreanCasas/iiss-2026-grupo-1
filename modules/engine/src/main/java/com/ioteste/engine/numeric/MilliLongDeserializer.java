@@ -11,11 +11,15 @@ public final class MilliLongDeserializer extends JsonDeserializer<Long> {
     public Long deserialize(JsonParser parser, DeserializationContext context)
             throws IOException {
         try {
-            return parser.getDecimalValue().movePointRight(3).longValueExact();
+            return parser.getDecimalValue()
+                    .movePointRight(3)
+                    .longValueExact();
         } catch (ArithmeticException exception) {
             return (Long) context.handleWeirdNumberValue(
-                    Long.class, parser.getDecimalValue(),
-                    "El número debe tener como máximo tres decimales y caber en long escalado");
+                    Long.class,
+                    parser.getDecimalValue(),
+                    "El número debe tener como máximo tres decimales y caber en long escalado"
+            );
         }
     }
 }

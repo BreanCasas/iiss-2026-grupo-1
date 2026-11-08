@@ -1,0 +1,243 @@
+{
+  "id" : "20261107-213834-1",
+  "simulador" : "ecowarm-run",
+  "controlador" : "grupo-1",
+  "creadaEn" : "2026-11-07T21:38:34.835-03:00",
+  "terminada" : true,
+  "conteo" : {
+    "corridas" : 4,
+    "pendientes" : 0,
+    "pasan" : 4,
+    "noPasan" : 0,
+    "sinExpectativas" : 0,
+    "abortadas" : 0,
+    "fallidas" : 0,
+    "canceladas" : 0
+  },
+  "corridas" : [
+    {
+      "id" : "20261107-213834-2-E19",
+      "simulador" : "ecowarm-run",
+      "tanda" : "20261107-213834-1",
+      "escenario" : {
+        "id" : "E19",
+        "nombre" : "Un switch ya encendido",
+        "hash" : "a0b251bea03055afbd26b527d1dc2c3119eb0963c45cc5ee04ca0dfffcb415a9"
+      },
+      "controlador" : "grupo-1",
+      "estado" : "terminada",
+      "motivo" : null,
+      "creadaEn" : "2026-11-07T21:38:34.835-03:00",
+      "empezo" : "2026-11-07T21:38:34.835-03:00",
+      "termino" : "2026-11-07T21:39:35.248-03:00",
+      "estimacionRealSegundos" : 65,
+      "progreso" : {
+        "virtualTranscurrido" : "1h",
+        "virtualTotal" : "1h",
+        "fraccion" : 1.0,
+        "pasos" : "0/0",
+        "realRestanteSegundos" : 0
+      },
+      "resultado" : "pasa",
+      "expectativas" : {
+        "contrato" : {
+          "cumplen" : 2,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "riesgo" : {
+          "cumplen" : 2,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "mejora" : {
+          "cumplen" : 2,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "obligatorias" : {
+          "cumplen" : 4,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "informativas" : {
+          "cumplen" : 2,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "observaciones" : {
+          "graves" : 0,
+          "menores" : 2
+        }
+      }
+    },
+    {
+      "id" : "20261107-213834-3-F01",
+      "simulador" : "ecowarm-run",
+      "tanda" : "20261107-213834-1",
+      "escenario" : {
+        "id" : "F01",
+        "nombre" : "Se cae el broker y vuelve",
+        "hash" : "ec3749124231496947902277ccc37c49a6941869dea81109f3d748962d3d8493"
+      },
+      "controlador" : "grupo-1",
+      "estado" : "terminada",
+      "motivo" : null,
+      "creadaEn" : "2026-11-07T21:38:34.835-03:00",
+      "empezo" : "2026-11-07T21:39:35.285-03:00",
+      "termino" : "2026-11-07T21:41:05.413-03:00",
+      "estimacionRealSegundos" : 95,
+      "progreso" : {
+        "virtualTranscurrido" : "1h30m",
+        "virtualTotal" : "1h30m",
+        "fraccion" : 1.0,
+        "pasos" : "0/0",
+        "realRestanteSegundos" : 0
+      },
+      "resultado" : "pasa",
+      "expectativas" : {
+        "contrato" : {
+          "cumplen" : 2,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "riesgo" : {
+          "cumplen" : 3,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "mejora" : {
+          "cumplen" : 1,
+          "fallan" : 0,
+          "noAplican" : 1
+        },
+        "obligatorias" : {
+          "cumplen" : 5,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "informativas" : {
+          "cumplen" : 1,
+          "fallan" : 0,
+          "noAplican" : 1
+        },
+        "observaciones" : {
+          "graves" : 0,
+          "menores" : 2
+        }
+      }
+    },
+    {
+      "id" : "20261107-213834-4-F03",
+      "simulador" : "ecowarm-run",
+      "tanda" : "20261107-213834-1",
+      "escenario" : {
+        "id" : "F03",
+        "nombre" : "Un termostato deja de publicar",
+        "hash" : "8922387da4d52292469514d7ee6e72d000c671da182dc8fc3887c075800fa171"
+      },
+      "controlador" : "grupo-1",
+      "estado" : "terminada",
+      "motivo" : null,
+      "creadaEn" : "2026-11-07T21:38:34.835-03:00",
+      "empezo" : "2026-11-07T21:41:05.422-03:00",
+      "termino" : "2026-11-07T21:43:05.524-03:00",
+      "estimacionRealSegundos" : 125,
+      "progreso" : {
+        "virtualTranscurrido" : "2h",
+        "virtualTotal" : "2h",
+        "fraccion" : 1.0,
+        "pasos" : "0/0",
+        "realRestanteSegundos" : 0
+      },
+      "resultado" : "pasa",
+      "expectativas" : {
+        "contrato" : {
+          "cumplen" : 2,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "riesgo" : {
+          "cumplen" : 2,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "mejora" : {
+          "cumplen" : 2,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "obligatorias" : {
+          "cumplen" : 4,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "informativas" : {
+          "cumplen" : 2,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "observaciones" : {
+          "graves" : 0,
+          "menores" : 2
+        }
+      }
+    },
+    {
+      "id" : "20261107-213834-5-F05",
+      "simulador" : "ecowarm-run",
+      "tanda" : "20261107-213834-1",
+      "escenario" : {
+        "id" : "F05",
+        "nombre" : "Se pierden los OFF",
+        "hash" : "e0190c3302f95ff6efddb657ab98daecb705233bc7b8dd987f08a13108104f84"
+      },
+      "controlador" : "grupo-1",
+      "estado" : "terminada",
+      "motivo" : null,
+      "creadaEn" : "2026-11-07T21:38:34.835-03:00",
+      "empezo" : "2026-11-07T21:43:05.533-03:00",
+      "termino" : "2026-11-07T21:45:05.626-03:00",
+      "estimacionRealSegundos" : 125,
+      "progreso" : {
+        "virtualTranscurrido" : "2h",
+        "virtualTotal" : "2h",
+        "fraccion" : 1.0,
+        "pasos" : "0/0",
+        "realRestanteSegundos" : 0
+      },
+      "resultado" : "pasa",
+      "expectativas" : {
+        "contrato" : {
+          "cumplen" : 2,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "riesgo" : {
+          "cumplen" : 3,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "mejora" : {
+          "cumplen" : 1,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "obligatorias" : {
+          "cumplen" : 5,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "informativas" : {
+          "cumplen" : 1,
+          "fallan" : 0,
+          "noAplican" : 0
+        },
+        "observaciones" : {
+          "graves" : 0,
+          "menores" : 2
+        }
+      }
+    }
+  ]
+}
