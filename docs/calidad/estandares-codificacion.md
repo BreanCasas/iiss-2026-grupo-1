@@ -55,6 +55,9 @@ legibilidad, el mantenimiento y la confiabilidad del sistema.
   y segura.
 - Los errores de comunicación con sistemas externos no deben provocar
   fallos silenciosos ni dejar el controlador en un estado incoherente.
+- Los valores decimales de temperatura, potencia y factor deben conservar
+  su representación interna mediante enteros escalados a milésimas.
+- Los formatos externos deben respetar el contrato de interoperabilidad.
 
 ## 6. Excepciones y robustez
 
@@ -80,6 +83,10 @@ legibilidad, el mantenimiento y la confiabilidad del sistema.
 - Los nombres de las pruebas deben describir el comportamiento que verifican.
 - Antes de entregar cambios, se deben ejecutar las pruebas automatizadas
   mediante Maven o el mecanismo de construcción establecido por el proyecto.
+- Las pruebas temporales deben utilizar fuentes de tiempo controladas
+  cuando sea posible, evitando esperas reales innecesarias.
+- La validación con el simulador debe conservar sus reportes y distinguirse
+  de las pruebas automatizadas del código.
 
 ## 8. Cobertura
 
@@ -101,6 +108,10 @@ legibilidad, el mantenimiento y la confiabilidad del sistema.
   arquitectura.
 - Los archivos entregados no contienen credenciales, secretos ni archivos
   temporales innecesarios.
+- Se conserva la evidencia de los escenarios ejecutados y se revisan
+  sus fallos y observaciones.
+- Se comprueba el resultado de integración continua correspondiente
+  a los últimos cambios.
 
 ## 10. Verificación del cumplimiento
 
@@ -114,10 +125,14 @@ no implica una comprobación automática de todas las reglas del documento.
 |---|---|
 | Separación entre lógica e integraciones | Las clases de producción de core importan únicamente tipos de Java. Las comunicaciones MQTT, REST y MongoDB se implementan en engine. |
 | Validación del inventario | SiteValidator comprueba campos obligatorios, potencias positivas, identificadores únicos, horarios y URLs de switches. |
-| Nombres descriptivos | Las clases revisadas incluyen HeatingController, SiteValidator y TemperatureSubscriber. La constante TEMPERATURE_TIMEOUT_MS expresa el plazo y su unidad. |
+| Nombres descriptivos | Las clases revisadas incluyen HeatingController, SiteValidator y TemperatureSubscriber. Las constantes temporales expresan sus unidades. |
 | Precisión numérica | Los adaptadores convierten valores decimales a long escalado mediante operaciones exactas. |
+| Formato externo | ControlStatus publica fechaHora e iniciadoEn con milisegundos. MilliLongSerializer escribe números decimales sin notación exponencial. |
 | Tratamiento de fallos | HeatingEngine registra fallos de switches y continúa intentando los demás apagados. TemperatureSubscriber registra problemas de recepción y persistencia. |
-| Vigencia de observaciones | TemperatureSubscriber devuelve null cuando una lectura cumple 30 segundos sin renovación válida. |
+| Vigencia de observaciones | TemperatureSubscriber devuelve null al vencer la lectura según el factor vigente y el máximo de 30 segundos reales. |
+| Control detenido | HeatingEngine no consulta ni comanda switches con el control detenido. |
+| Cambios de inventario | Antes de cada comando se comprueba la revisión y la sesión. Los pendientes ajenos al sitio se descartan sin contactar al dispositivo. |
+| Prevención de consumo en punta | HeatingEngine utiliza un margen preventivo de 2000 milisegundos reales y vuelve a comprobarlo antes de encender. |
 | Pruebas temporales repetibles | Las pruebas de vencimiento utilizan un Clock simulado, sin esperas reales. |
 | Dependencias de pruebas | Testcontainers se declara con alcance test en modules/engine/pom.xml y no modifica las dependencias de producción. |
 
@@ -130,34 +145,47 @@ duplicaciones, comentarios, accesos o posibles secretos del repositorio.
 Se ejecutó desde la raíz del proyecto, en PowerShell, con Docker Desktop
 activo:
 
-    docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" --mount "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock" -e TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal --workdir /workspace maven:3.9-eclipse-temurin-25 mvn -B clean verify
+```powershell
+docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" --mount "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock" -e TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal --workdir /workspace maven:3.9-eclipse-temurin-25 mvn -B clean verify
+```
 
 También se verificó la ejecución mediante:
 
-    & "C:\Program Files\Git\bin\bash.exe" ./scripts/test.sh
+```powershell
+& "C:\Program Files\Git\bin\bash.exe" ./scripts/test.sh
+```
 
 Resultado comprobado:
 
 - Core: 34 pruebas.
-- Engine: 86 pruebas.
-- Total: 120 pruebas.
+- Engine: 107 pruebas.
+- Total: 141 pruebas.
 - Fallos: 0.
 - Errores: 0.
 - Pruebas omitidas: 0.
 - Resultado final: BUILD SUCCESS.
 
 Las pruebas incluyen vencimiento y recuperación de lecturas, rechazo de
-mensajes inválidos sin renovar la vigencia, inicio y parada del control,
+mensajes inválidos sin renovar la vigencia, inicio y detención del control,
 y modificación de la temperatura esperada durante la ejecución.
 
-También se verifica que una ausencia de mensajes de 20 segundos conserva
-válida la lectura y que una lectura nueva renueva su plazo de vigencia.
+Se verifica que DETENER interrumpe los comandos a switches y no representa
+una orden de apagado general.
+
+También se comprueba que una ausencia de mensajes de 20 segundos conserva
+válida la lectura con factor 1 y que una lectura nueva renueva su plazo.
 Este caso simula ausencia de recepción, no pérdida de paquetes en la red.
+
+Las pruebas de vigencia incluyen el factor acelerado: con factor 60,
+la lectura vence al cumplirse 5 segundos reales.
+
+Las pruebas del motor verifican pendientes, reintentos, cambios de revisión
+o sesión y el margen preventivo de entrada en punta.
 
 Las pruebas de integración MQTT incorporan un broker real mediante
 Testcontainers y eclipse-mosquitto:2.0.22. La suite completa requiere
-un motor Docker accesible, pero no requiere que MongoDB ni el checker
-estén ejecutándose.
+un motor Docker accesible, pero no requiere que MongoDB ni el simulador
+docente estén ejecutándose.
 
 El archivo modules/engine/src/test/resources/docker-java.properties
 contiene api.version=1.44 para la compatibilidad del cliente Docker
@@ -167,7 +195,9 @@ de las pruebas con el Docker Engine 29 del entorno probado.
 
 Se ejecutó:
 
-    docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" --workdir /workspace maven:3.9-eclipse-temurin-25 mvn -B -pl modules/core -am clean verify
+```powershell
+docker run --rm --mount "type=bind,source=$($PWD.Path),target=/workspace" --workdir /workspace maven:3.9-eclipse-temurin-25 mvn -B -pl modules/core -am clean verify
+```
 
 El reporte JaCoCo generado y copiado a docs/calidad/cobertura/core
 mostró:
@@ -179,16 +209,18 @@ Ambos porcentajes superan el mínimo requerido del 85 %.
 
 Reporte HTML: [Cobertura del core](cobertura/core/index.html).
 
-### Recuperación de comunicaciones
+### Recuperación histórica de comunicaciones
 
-Se verificó manualmente la recuperación del entorno deteniendo y
-reiniciando el checker sin reiniciar el controlador.
+Durante la iteración 5 se verificó manualmente la recuperación
+de comunicaciones deteniendo y reiniciando el checker sin reiniciar
+el controlador.
 
 Los logs mostraron reconexión MQTT, renovación de suscripciones,
 recepción de nuevas temperaturas y reanudación del control.
 
 El checker reúne MQTT, termostatos y switches REST. Esta primera
-prueba corresponde a la recuperación del entorno completo.
+prueba corresponde a la recuperación de las comunicaciones del entorno,
+sin implicar un nuevo registro del controlador.
 
 Además, se verificó una interrupción aislada de la comunicación MQTT,
 bloqueando el tráfico TCP saliente hacia el puerto 1883 desde la red
@@ -212,7 +244,8 @@ se observaron:
 El procedimiento de bloqueo y restauración figura en README.md.
 Los horarios de la evidencia se registran en docs/arquitectura/4mas1.md.
 
-Esta prueba manual simula una falla de red hacia MQTT.
+Esta prueba manual simula una falla de red hacia MQTT y corresponde
+a los plazos verificados durante la iteración 5.
 
 ### Detención y recuperación del servidor MQTT
 
@@ -247,7 +280,39 @@ inicial y la nueva.
 Este caso verifica pérdida de entrega de publicaciones por ausencia
 de suscripción; no inyecta pérdidas individuales de paquetes TCP.
 
-### Interoperabilidad
+### Validación de la iteración 6 con ecowarm-run
+
+La corrida completa del 8 de noviembre de 2026, hora de Uruguay,
+utilizó ecowarm-run c95d037 e interop-v2.
+
+| Escenario | Resultado |
+|---|---|
+| E02: calefacción de una habitación | Pasa |
+| E04: alternancia con potencia limitada | Pasa |
+| E11: entrada en horario punta | Pasa |
+| E14: aumento de temperatura esperada en ejecución | Pasa |
+| E18: reducción de potencia contratada en ejecución | Pasa |
+| E19: switch inicialmente encendido | Pasa |
+| F01: caída y recuperación del broker | Pasa |
+| F03: termostato sin publicaciones | Pasa |
+| F05: apagados fallidos | Pasa |
+
+Resultado: 9 de 9 escenarios aprobados, sin observaciones.
+
+En F01 se recuperaron las suscripciones en 0,7 segundos reales.
+En F03 se verificó el apagado ante ausencia prolongada de lecturas.
+En E11 no hubo calefactores encendidos durante punta.
+F05 verificó el reintento posterior a la falla.
+
+La evidencia se conserva en ecowarm-reporte-validacion/, incluyendo
+reportes, detalles, series e interacciones.
+
+La corrida completa se repitió manteniendo la misma base de datos.
+
+Estos resultados respaldan los escenarios ejecutados; no demuestran
+el comportamiento de todas las variantes posibles.
+
+### Interoperabilidad histórica
 
 El checker obtuvo 8/8 comprobaciones aprobadas el 28 de octubre de 2026,
 hora de Uruguay, con 18 comandos y 156 consultas de estado.
@@ -258,8 +323,8 @@ no sustituye las pruebas unitarias ni las pruebas específicas de fallas.
 ### Integración continua
 
 El archivo .github/workflows/maven.yml configura Java 25 y ejecuta
-mvn clean verify para los eventos definidos, incluidos los pushes
-a iteracion5. También configura la conservación de reportes de pruebas.
+mvn clean verify para los eventos definidos. También configura
+la conservación de reportes de pruebas.
 
 La suite completa requiere Docker accesible en el entorno de ejecución
 para crear los brokers temporales de Testcontainers.
@@ -276,3 +341,6 @@ convenciones de estilo.
 
 No se ha incorporado un verificador automático de estilo. Queda pendiente
 la revisión final de los cambios antes de la entrega.
+
+Las limitaciones conocidas y las prioridades de evolución se describen
+en [roadmap](../arquitectura/roadmap.md).

@@ -1,4 +1,4 @@
-# Arquitectura 4+1 - Iteración 5
+# Arquitectura 4+1 - Iteración 6
 
 ## Alcance y vista lógica
 
@@ -23,6 +23,7 @@ flowchart TD
     ENGINE --> CORE["HeatingController"]
     ENGINE --> MQTT["TemperatureSubscriber"]
     ENGINE --> SWITCH["SwitchClient"]
+    MQTT --> CONTROL
     MQTT --> READINGS["TemperatureReadingRepository"]
     READINGS --> DB
     MQTT --> REG["EnvironmentRegistration"]
@@ -61,6 +62,17 @@ decide(configuración, hora, estado) devuelve Decision sin realizar IO.
 
 ## Decisiones de diseño
 
+### Separación entre decisión e integración
+
+El core recibe valores y devuelve acciones sin acceder a la red,
+al reloj del sistema ni a la base de datos.
+
+Engine reúne las observaciones, obtiene la hora virtual y ejecuta
+las acciones. Esto permite probar las reglas sin infraestructura externa
+y verificar por separado las comunicaciones.
+
+### Selección de habitaciones
+
 La selección prioriza:
 
 temperatura objetivo - temperatura actual
@@ -82,8 +94,82 @@ Engine confirma los comandos y trata los fallos por habitación.
 Un apagado fallido no impide intentar los demás apagados. Los encendidos
 solo se permiten si, considerando las habitaciones que no se pudieron
 apagar como posibles consumidoras, no se supera la potencia máxima.
+
 Los ciclos posteriores vuelven a consultar el estado y reintentan las
 acciones que sigan siendo necesarias.
+
+### Detención del control
+
+DETENER interrumpe el envío de comandos a switches.
+No representa una orden de apagado general.
+
+HeatingEngine finaliza el ciclo si el control está detenido y no procesa
+apagados pendientes en ese estado.
+
+Aunque el core puede producir acciones OFF al recibir un estado detenido,
+el motor no las ejecuta.
+
+### Vigencia de las observaciones
+
+La última temperatura se conserva en memoria con su instante de recepción.
+El vencimiento impide continuar calentando indefinidamente con una
+observación antigua.
+
+Se considera el factor de tiempo vigente y se mantiene un límite máximo
+de 30 segundos reales. Las lecturas inválidas no renuevan la vigencia.
+
+### Cambios concurrentes
+
+Cada evaluación utiliza una instantánea del inventario y una sesión
+de ejecución.
+
+Antes de cada comando se comprueba que ambos sigan vigentes.
+La comprobación y la llamada al switch se realizan bajo los bloqueos
+de ControlService y SiteService, en ese orden.
+
+Esto evita que una actualización del sitio o del control se interponga
+entre la comprobación y el envío del comando. Como contrapartida,
+una llamada HTTP lenta puede retrasar esas operaciones de la API.
+
+No constituye una transacción distribuida con los dispositivos.
+
+### Anticipación del horario punta
+
+El motor utiliza un margen de 2000 milisegundos reales antes del inicio
+de punta para iniciar el apagado y evitar nuevos encendidos.
+
+Dentro de ese margen puede evaluar la decisión usando el instante
+de inicio de punta. No modifica VirtualClock ni la hora publicada
+por la API.
+
+La anticipación reduce el riesgo de consumo en punta, pero no garantiza
+el cumplimiento ante demoras superiores al margen disponible.
+
+### Persistencia y sitio activo
+
+Inventario y apagados pendientes se guardan juntos antes de actualizar
+el estado en memoria.
+
+Se utiliza una base fija con un único sitio activo.
+Cada PUT /sitio reemplaza su configuración.
+
+No es necesario cambiar la base para repetir los escenarios.
+La separación de configuraciones e históricos por entorno sería
+una evolución adicional.
+
+Los pendientes ajenos al sitio vigente se descartan sin contactar
+a los dispositivos retirados. Ese descarte no confirma su apagado físico.
+
+### Representación numérica
+
+Las temperaturas, potencias y el factor de aceleración se representan
+internamente con long escalado a milésimas.
+
+Los adaptadores JSON/MQTT convierten los números decimales en la frontera
+de entrada y salida, evitando cálculos mediante coma flotante binaria.
+
+MilliLongSerializer escribe números JSON decimales sin notación
+exponencial.
 
 ## Tiempo e inventario
 
@@ -91,28 +177,41 @@ El reloj conserva su factor numérico y calcula tiempo virtual desde
 el instante inicial y el tiempo real transcurrido.
 
 INICIAR resincroniza el reloj. La hora local se calcula siempre con la
-zona única del sitio (America/Montevideo, configurable con ECOWARM_ZONE),
+zona única del sitio, America/Montevideo, configurable con ECOWARM_ZONE,
 sin depender del offset de la fecha recibida.
 
 La franja es [desde, hasta).
 HABILES representa lunes a viernes.
 
-El factor del controlador no acelera la simulación térmica del checker.
+El factor del controlador no acelera por sí mismo la simulación térmica
+del entorno.
+
+Los campos fechaHora e iniciadoEn de ControlStatus se serializan
+en UTC con precisión de milisegundos. Esto no elimina la precisión
+interna del reloj.
 
 SiteService guarda inventory y pendingShutdowns en site_config,
 documento con _id active, antes de modificar la memoria.
 
-Mantiene las direcciones de los switches anteriores.
+Mantiene las direcciones de los switches anteriores en los pendientes.
 
 PUT /sitio no llama a switches.
 Un inventario idéntico no agrega pendientes.
 
-HeatingEngine procesa pendientes incluso detenido.
+HeatingEngine procesa pendientes únicamente con el control en ejecución.
 
-Los conserva si falla un apagado.
-Solo retira pendientes cuando su revisión sigue vigente.
+Comprueba si cada pendiente corresponde a un switch del sitio vigente,
+considerando su identificador y su URL.
+
+Los pendientes ajenos al sitio se descartan sin enviar comandos.
+Si falla un apagado de un dispositivo vigente, el pendiente se conserva.
+
+La confirmación de pendientes comprueba que la revisión siga vigente.
+Los pendientes completados pueden confirmarse aunque otros apagados
+hayan fallado.
 
 Inventario y pendientes se recuperan después de un reinicio.
+El controlador arranca detenido.
 
 ## Temperaturas y timestamp
 
@@ -132,22 +231,37 @@ No hay reintentos históricos automáticos.
 
 Tras reiniciar se espera una nueva lectura MQTT.
 
-Cada lectura válida se almacena junto con el instante de recepción en
-milisegundos. Su vigencia se define mediante TEMPERATURE_TIMEOUT_MS,
-con un valor fijo de 30.000 milisegundos reales, independiente del
-factor de aceleración del controlador.
+Cada lectura válida se almacena junto con el instante de recepción
+en milisegundos.
+
+La vigencia utiliza:
+
+- TEMPERATURE_TIMEOUT_MS: máximo de 30000 milisegundos reales.
+- VIRTUAL_TEMPERATURE_TIMEOUT_MS: 300000 milisegundos virtuales.
+
+Con el control en ejecución, se convierte el plazo virtual a tiempo real
+según el factor vigente y se aplica el máximo de 30 segundos reales,
+con un mínimo de 1 milisegundo.
+
+Con factor 1, la vigencia es de 30 segundos reales.
+Con factor 60, es de 5 segundos reales.
+
+Con el control detenido se utiliza el límite de 30 segundos reales.
 
 TemperatureSubscriber utiliza un Clock: en producción obtiene la hora
 actual mediante Clock.systemUTC() y en las pruebas permite simular
 el paso del tiempo en milisegundos.
 
-Al cumplirse 30 segundos sin una nueva lectura válida, temperature()
-devuelve null. El core interpreta la temperatura como desconocida y
-ordena apagar esa habitación si su estado lo requiere en el próximo
-ciclo de control.
+Al cumplirse el plazo, temperature() devuelve null.
+El core interpreta la temperatura como desconocida y ordena apagar
+esa habitación si su estado lo requiere. Engine ejecuta la acción
+en el siguiente ciclo con el control en marcha.
 
-Una nueva lectura válida restablece la temperatura disponible. Los
-mensajes inválidos no renuevan el plazo de vigencia.
+Una nueva lectura válida restablece la temperatura disponible.
+Los mensajes inválidos no renuevan el plazo de vigencia.
+
+Si cambia el factor, la antigüedad acumulada se evalúa con el factor
+actual. No se integra el historial de factores anteriores.
 
 ## Concurrencia e integración
 
@@ -157,36 +271,48 @@ HeatingEngine evita ciclos propios simultáneos.
 
 El ciclo de control no usa una espera fija. TickLoop ejecuta tick() y
 vuelve a programarlo con la espera que calcula HeatingEngine.nextDelay():
-normalmente 1 s reales, pero menos si el reloj virtual llega antes al
-próximo cambio de franja (TickPlanner, con PeakSchedule.nextChange).
-Con tiempo acelerado, una espera fija de 1 s equivaldría a factor × 1 s
-virtuales y el corte de la franja punta llegaría tarde.
+normalmente 1 segundo real, pero menos si el reloj virtual llega antes
+al próximo cambio de franja mediante TickPlanner y PeakSchedule.nextChange.
 
-El ciclo arranca cuando la aplicación está lista, sin espera inicial, y se
-despierta de inmediato cuando el control se inicia, resincroniza o detiene.
+Con tiempo acelerado, una espera fija de 1 segundo equivaldría a
+factor × 1 segundo virtual y podría retrasar la reacción ante la punta.
+
+El ciclo arranca cuando la aplicación está lista, sin espera inicial,
+y se despierta cuando el control se inicia, resincroniza o detiene.
 Si durante un ciclo el reloj cruza un límite de franja, se repite enseguida.
 
-Las tareas programadas usan un scheduler de 4 hilos (SchedulingConfig).
-Con el valor por defecto de Spring, de 1 hilo, el registro, las
-suscripciones MQTT y el ciclo de control se bloqueaban entre sí.
+El margen preventivo de apagado complementa esta planificación.
+
+Las tareas programadas usan un scheduler de 4 hilos, configurado
+en SchedulingConfig. Esto permite que el registro, la sincronización
+de suscripciones MQTT y el ciclo de control progresen sin depender
+de un único hilo programado.
 
 En cada ciclo la hora virtual se lee después de consultar los switches,
 que es la parte lenta, para decidir con la hora más reciente.
 
 Cada habitación se consulta y se comanda por separado: un switch sin
-respuesta se trata como estado desconocido y no impide apagar los
-demás. Si un apagado falla, los encendidos solo se hacen si, contando esa
+respuesta se trata como estado desconocido y no impide intentar apagar
+los demás.
+
+Si un apagado falla, los encendidos solo se hacen si, contando esa
 habitación como encendida, no se supera la potencia máxima del sitio.
 
-Las llamadas REST a switches no mantienen bloqueados
-los servicios de sitio y control.
+Antes de cada comando, commandIfCurrent comprueba revisión y sesión
+de ejecución bajo los bloqueos de ControlService y SiteService,
+manteniéndolos durante la llamada REST.
 
-Antes de cada ON se comprueba revisión, ejecución y resincronización.
+Antes de encender también se vuelve a comprobar el horario punta
+y el margen preventivo.
 
 No es una transacción distribuida:
-los ciclos posteriores reconcilian los cambios.
+los ciclos posteriores reconcilian las observaciones y acciones necesarias.
 
 El registro POST /controladores obtiene el broker.
+
+Después de un registro exitoso, la aplicación no renueva automáticamente
+el registro ante otro proceso del runner. En ese caso se reinicia control
+mientras el nuevo runner espera el registro.
 
 Las suscripciones se adaptan al inventario.
 
@@ -266,14 +392,17 @@ flowchart TD
 
 SiteService y ControlService sincronizan el acceso a sus estados.
 HeatingEngine utiliza una instantánea del inventario y comprueba su
-revisión antes de encender.
+revisión y la sesión de ejecución antes de cada comando.
 
 Las lecturas MQTT se conservan en un ConcurrentHashMap. Cada entrada
 contiene la temperatura y su instante de recepción.
 
-Las comunicaciones REST no mantienen bloqueados los servicios de sitio
-y control. Los cambios concurrentes se reconcilian en los ciclos
-posteriores; no existe una transacción distribuida.
+La comprobación previa y el comando REST se protegen con los bloqueos
+de los servicios. Esta coordinación evita ejecutar comandos de una
+evaluación invalidada por un cambio de sitio o sesión, a costa de
+poder retrasar solicitudes concurrentes durante la llamada.
+
+No existe una transacción distribuida con los switches.
 
 ## Vista física o de despliegue
 
@@ -284,18 +413,18 @@ Docker Compose despliega dos servicios:
 - mongodb: persistencia de configuración, apagados pendientes e histórico
   de temperaturas, con volumen mongodb-data.
 
-El checker se ejecuta como un proceso Java en el host. Proporciona la
+ecowarm-run se ejecuta como un proceso Java en el host. Proporciona la
 API del entorno y los switches REST en el puerto 9090, además del broker
 MQTT en el puerto 1883.
 
 ```mermaid
 flowchart TD
     subgraph HOST["Equipo anfitrión"]
-        CHECKER["ecowarm-check.jar"]
+        RUNNER["ecowarm-run.jar"]
         REST["API del entorno y switches: 9090"]
         MQTT["Broker MQTT: 1883"]
-        CHECKER --> REST
-        CHECKER --> MQTT
+        RUNNER --> REST
+        RUNNER --> MQTT
 
         subgraph DOCKER["Docker Compose: ioteste-net"]
             CONTROL["control: Spring Boot, puerto 8080"]
@@ -306,15 +435,22 @@ flowchart TD
         end
     end
 
-    CHECKER -->|HTTP: localhost:8080| CONTROL
+    RUNNER -->|HTTP: localhost:8080| CONTROL
     CONTROL -->|HTTP: host.docker.internal:9090| REST
-    CONTROL -->|MQTT: dirección anunciada por el checker| MQTT
+    CONTROL -->|MQTT: dirección anunciada por el runner| MQTT
 ```
 
-El checker se inicia con:
+El runner se inicia con:
 
 ```powershell
-java -jar ".\ecowarm-check.jar" --anunciar host.docker.internal
+java -jar ".\ecowarm-run.jar" todos --host host.docker.internal --salida ".\ecowarm-reporte-validacion"
+```
+
+Mientras espera el registro, se reinicia el servicio control desde
+otra terminal:
+
+```powershell
+docker compose --env-file .env -f docker/docker-compose.yml restart control
 ```
 
 El controlador se registra mediante POST /controladores y obtiene la
@@ -324,9 +460,16 @@ El contenedor control accede al entorno del host mediante
 host.docker.internal. La configuración del volumen permite conservar
 los datos de MongoDB al recrear los contenedores.
 
+MONGODB_DATABASE mantiene una base fija. No se cambia entre escenarios
+ni para repetir la batería.
+
+Si el simulador se ejecuta en otra computadora, se ajustan la URL
+del entorno y la URL pública del controlador a las direcciones accesibles
+en la red.
+
 Los brokers creados por Testcontainers pertenecen únicamente al entorno
 de pruebas. Utilizan puertos publicados dinámicamente y no reemplazan
-al broker del checker en el despliegue de la aplicación.
+al broker del runner en el despliegue de la aplicación.
 
 ## Vista de escenarios (+1)
 
@@ -346,11 +489,11 @@ flowchart TD
     TEMPERATURE["Recibir temperatura válida"] --> SUBSCRIBER["TemperatureSubscriber"]
     SUBSCRIBER --> ENGINE
 
-    SILENCE["Termostato sin lecturas durante 30 segundos"] --> UNKNOWN["Temperatura desconocida"]
+    SILENCE["Termostato sin lecturas vigentes"] --> UNKNOWN["Temperatura desconocida"]
     UNKNOWN --> ENGINE
 
     ENGINE --> CORE["HeatingController"]
-    CORE --> COMMANDS["Acciones sobre switches REST"]
+    CORE --> COMMANDS["Acciones REST con el control en ejecución"]
 ```
 
 ### Control sin limitación efectiva de potencia
@@ -371,14 +514,29 @@ Engine ejecuta los apagados antes de los encendidos. Si un apagado falla,
 considera que esa habitación puede seguir consumiendo y evita los
 encendidos que superarían la potencia máxima.
 
+### Entrada en horario punta
+
+Antes del comienzo de punta, el motor utiliza el margen preventivo
+de 2000 milisegundos reales para iniciar el apagado.
+
+También comprueba el margen antes de cada nuevo encendido.
+
+Durante punta no se seleccionan habitaciones para calentar.
+Al finalizar, pueden volver a seleccionarse según sus temperaturas
+y la potencia disponible.
+
 ### Vencimiento y recuperación de un termostato
 
 Una lectura válida permite evaluar la necesidad de calefacción.
-Al cumplirse 30 segundos reales sin otra lectura válida,
-TemperatureSubscriber devuelve null.
+Al cumplirse su plazo de vigencia, TemperatureSubscriber devuelve null.
+
+Con factor 1, el plazo es de 30 segundos reales.
+Con factor 60, es de 5 segundos reales.
 
 El core excluye la habitación de la selección y ordena apagar si su
-estado lo requiere. Una nueva lectura válida permite reanudar el control.
+estado lo requiere. Engine ejecuta la acción con el control en marcha.
+
+Una nueva lectura válida permite reanudar el control.
 
 Los mensajes inválidos no renuevan el plazo de vigencia.
 
@@ -399,8 +557,9 @@ Ante una falla REST, Engine trata el estado del switch como desconocido
 si no puede consultarlo. Los fallos de comandos se registran y los ciclos
 posteriores vuelven a intentar las acciones necesarias.
 
-La recuperación del entorno completo se verificó manualmente reiniciando
-el checker, sin reiniciar el controlador.
+La recuperación de las comunicaciones del entorno se verificó
+manualmente durante la iteración 5 reiniciando el checker, sin reiniciar
+el controlador. Esto no implica haber repetido el registro.
 
 También se verificó una interrupción aislada de la comunicación MQTT
 bloqueando el puerto 1883 desde la red del contenedor del controlador,
@@ -421,27 +580,34 @@ restablecer la suscripción, una publicación nueva recupera la temperatura.
 SiteService valida y persiste el nuevo inventario junto con los apagados
 pendientes de dispositivos anteriores.
 
-Engine procesa esos pendientes antes de tomar nuevas decisiones.
-Antes de ejecutar un encendido comprueba que la revisión de la
-configuración siga vigente.
+Con el control en marcha, Engine procesa esos pendientes antes de tomar
+nuevas decisiones.
+
+Si un pendiente corresponde a un dispositivo retirado, se descarta
+sin enviarle comandos. Para dispositivos vigentes, los apagados fallidos
+se conservan para reintentar.
+
+Antes de cada comando se comprueba que la revisión y la sesión
+de ejecución sigan vigentes.
 
 Una prueba con SiteService y ControlService reales verifica que reducir
 la temperatura esperada durante la ejecución provoca el apagado,
-resuelve los pendientes y conserva el control en marcha.
+resuelve los pendientes correspondientes y conserva el control en marcha.
 
 ### Arranque y parada del controlador
 
 Al quedar lista la aplicación, TickLoop comienza a ejecutar ciclos.
 
+El controlador arranca detenido.
+
 INICIAR establece o resincroniza el reloj virtual y despierta el ciclo.
-DETENER cambia el estado del control y también despierta el ciclo para
-reconciliar el estado de los switches.
+DETENER cambia el estado y también despierta el ciclo.
 
-Con el control detenido, el core no selecciona habitaciones para calentar.
-Los apagados pendientes del inventario se procesan incluso en ese estado.
+Con el control detenido, HeatingEngine termina sin consultar ni comandar
+switches y no procesa apagados pendientes.
 
-Una prueba con servicios reales y comunicaciones simuladas verifica
-el recorrido INICIAR, encender, DETENER y apagar.
+Las pruebas comprueban que, después de DETENER, no se envían comandos
+a los switches.
 
 ## Secuencia de actualización del inventario
 
@@ -459,23 +625,38 @@ sequenceDiagram
     M-->>S: Escritura confirmada
     S-->>A: HTTP 200
 
+    Note over E: Procesamiento con el control en ejecución
     E->>S: Obtener instantánea
     S-->>E: Inventario, pendientes y revisión
 
     loop Apagados pendientes
-        E->>W: OFF
-        W-->>E: Confirmación OFF
+        alt Dispositivo ajeno al sitio vigente
+            E->>E: Descartar sin enviar comandos
+        else Dispositivo vigente
+            E->>E: Comprobar revisión y sesión
+            E->>W: OFF si siguen vigentes
+            alt Apagado confirmado
+                W-->>E: Estado OFF
+                E->>E: Marcar pendiente completado
+            else Fallo de apagado
+                W-->>E: Error
+                E->>E: Conservar pendiente
+            end
+        end
     end
 
-    E->>S: Confirmar pendientes de la revisión
+    E->>S: Confirmar pendientes completados
 
     alt Revisión vigente
-        S->>M: Guardar sin pendientes
+        S->>M: Guardar pendientes restantes
         S-->>E: Continuar
     else Otra actualización
         S-->>E: Finalizar y reintentar
     end
 ```
+
+La comprobación previa a cada comando también puede cancelar
+la evaluación si cambió el sitio o la sesión de ejecución.
 
 ## Secuencia de temperatura y decisión
 
@@ -505,19 +686,20 @@ sequenceDiagram
         W-->>E: Estado actual
     end
 
-    E->>C: decide(configuración, hora, estado)
+    E->>E: Leer hora y evaluar margen de punta
+    E->>C: decide(configuración, hora de evaluación, estado)
     C-->>E: Acciones OFF antes de ON
 
     loop Apagados
-        E->>W: OFF
-        W-->>E: Confirmación
+        E->>E: Comprobar revisión y sesión
+        E->>W: OFF si siguen vigentes
+        W-->>E: Confirmación o fallo
     end
 
-    E->>E: Verificar revisión y ejecución antes de ON
-
     loop Encendidos
-        E->>W: ON
-        W-->>E: Confirmación
+        E->>E: Comprobar revisión, sesión, punta y potencia
+        E->>W: ON si corresponde
+        W-->>E: Confirmación o fallo
     end
 ```
 
@@ -532,24 +714,29 @@ anteriores dejan de estar disponibles al vencer su plazo de vigencia.
 Pruebas ejecutadas:
 
 - Core: 34 pruebas.
-- Engine: 86 pruebas.
-- Total: 120 pruebas.
+- Engine: 107 pruebas.
+- Total: 141 pruebas.
 
-Las pruebas incorporadas verifican el vencimiento de las lecturas a los
-30 segundos reales, la recuperación con una lectura válida y que los
-mensajes inválidos no renuevan la vigencia. También comprueban que
-HeatingEngine ordena apagar por vencimiento y permite volver a encender
-al recibir una nueva lectura válida.
+Las pruebas verifican el vencimiento de lecturas con tiempo real
+y acelerado, la recuperación con una lectura válida y que los mensajes
+inválidos no renuevan la vigencia.
 
-Se verifica además una ausencia de mensajes de 20 segundos, durante
-la cual la lectura sigue vigente, y su renovación con una lectura nueva.
+También comprueban que HeatingEngine ordena apagar por vencimiento
+y permite volver a encender al recibir una nueva lectura válida.
+
+Se verifica una ausencia de mensajes de 20 segundos con factor 1,
+durante la cual la lectura sigue vigente, y su renovación con una
+lectura nueva.
 
 Las pruebas de vigencia utilizan un reloj simulado, sin esperar
-30 segundos reales.
+los plazos reales.
 
-Las pruebas de integración comprueban el recorrido INICIAR, encender,
-DETENER y apagar, y la reducción de la temperatura esperada durante
-la ejecución utilizando SiteService y ControlService reales.
+Las pruebas de integración comprueban el cese de comandos después
+de DETENER y la reducción de la temperatura esperada durante la ejecución
+utilizando SiteService y ControlService reales.
+
+También se prueban los pendientes ajenos al sitio, los reintentos,
+la invalidación de evaluaciones y el margen de entrada en punta.
 
 Resultado comprobado con Java 25: BUILD SUCCESS,
 sin fallos, errores ni pruebas omitidas.
@@ -568,20 +755,49 @@ Cobertura del core medida con JaCoCo:
 
 El reporte se conserva en docs/calidad/cobertura/core/.
 
-### Recuperación del entorno completo
+### Escenarios de ecowarm-run
 
-Se realizó una prueba manual deteniendo y reiniciando el checker mientras
-el controlador permanecía en ejecución. Los logs mostraron la reconexión
-MQTT, la renovación de ambas suscripciones, la recepción de temperaturas
-y la reanudación de los comandos de calefacción.
+La corrida completa del 8 de noviembre de 2026, hora de Uruguay,
+utilizó ecowarm-run c95d037 e interop-v2.
 
-El checker reúne MQTT, termostatos y switches REST. Por lo tanto, esta
-prueba verifica la recuperación del entorno completo.
+| Escenario | Comportamiento | Resultado |
+|---|---|---|
+| E02 | Calefacción de una habitación | Pasa |
+| E04 | Alternancia con potencia limitada | Pasa |
+| E11 | Entrada en horario punta | Pasa |
+| E14 | Aumento de temperatura esperada en ejecución | Pasa |
+| E18 | Reducción de potencia contratada en ejecución | Pasa |
+| E19 | Switch inicialmente encendido | Pasa |
+| F01 | Caída y recuperación del broker | Pasa |
+| F03 | Termostato sin publicaciones | Pasa |
+| F05 | Apagados fallidos | Pasa |
 
-### Interrupción aislada de la comunicación MQTT
+Resultado: 9 de 9 escenarios aprobados, sin observaciones.
 
-Se bloqueó el tráfico TCP saliente hacia el puerto 1883 desde la red
-del contenedor ioteste-control, manteniendo REST disponible en 9090.
+En E11 no hubo calefactores encendidos durante punta.
+En F01 la recuperación de suscripciones demoró 0,7 segundos reales.
+En F03 se comprobó el apagado ante la ausencia prolongada de lecturas.
+En F05 se comprobó el reintento posterior a la falla.
+
+La evidencia se conserva en ecowarm-reporte-validacion/, incluyendo
+reportes, detalles, series e interacciones.
+
+### Recuperación histórica del entorno completo
+
+Durante la iteración 5 se realizó una prueba manual deteniendo
+y reiniciando el checker mientras el controlador permanecía en ejecución.
+Los logs mostraron la reconexión MQTT, la renovación de ambas
+suscripciones, la recepción de temperaturas y la reanudación de los
+comandos de calefacción.
+
+El checker reúne MQTT, termostatos y switches REST. Esta prueba verificó
+la recuperación de las comunicaciones, sin repetir el registro.
+
+### Interrupción histórica aislada de la comunicación MQTT
+
+Durante la iteración 5 se bloqueó el tráfico TCP saliente hacia
+el puerto 1883 desde la red del contenedor ioteste-control,
+manteniendo REST disponible en 9090.
 
 La interrupción se mantuvo durante más de 30 segundos y luego se retiró
 el bloqueo. No se reiniciaron el controlador ni el checker.
@@ -630,8 +846,8 @@ El procedimiento verifica:
 El contenedor permanece activo durante la detención de Mosquitto.
 Se conserva el puerto publicado y no se reinicia el suscriptor.
 
-La prueba pasó junto con las otras ocho pruebas de
-TemperatureSubscriberTest y posteriormente en la suite completa.
+La prueba pasó junto con el resto de TemperatureSubscriberTest
+y posteriormente en la suite completa.
 
 ### Publicaciones no entregadas
 
@@ -649,7 +865,7 @@ repositorio recibió únicamente la lectura inicial y la nueva.
 Esta prueba verifica pérdida de entrega de publicaciones por ausencia
 de suscripción. No inyecta pérdidas individuales de paquetes TCP.
 
-### Checker e inspección de persistencia
+### Checker histórico e inspección de persistencia
 
 El 28 de octubre de 2026, hora de Uruguay, el checker obtuvo 8/8,
 con 18 comandos y 156 consultas de estado.
@@ -666,6 +882,13 @@ La recuperación de pendientes se prueba con colaboradores simulados.
 La inyección de pérdidas individuales de paquetes TCP y la comprobación
 del histórico antiguo de MongoDB no se realizaron en estas pruebas.
 
-Las temperaturas, potencias y el factor de aceleración se representan
-internamente con `long` escalado a milésimas. Los adaptadores JSON/MQTT
-convierten los números decimales en la frontera de entrada y salida.
+## Limitaciones y evolución
+
+Las limitaciones operativas, las decisiones pendientes y las mejoras
+futuras se documentan en [roadmap](roadmap.md).
+
+El funcionamiento del reloj se desarrolla en
+[VirtualClock](virtualclock.md).
+
+Las instrucciones de ejecución y reproducción de la validación
+se encuentran en [README](../../README.md).

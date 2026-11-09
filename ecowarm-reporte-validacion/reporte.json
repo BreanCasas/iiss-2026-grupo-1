@@ -1,7 +1,7 @@
 {
   "herramienta" : "ecowarm-run c95d037",
   "estandar" : "interop-v2",
-  "generadoEn" : "2026-11-07T23:39:42.166893800-03:00",
+  "generadoEn" : "2026-11-08T22:58:14.724656800-03:00",
   "controlador" : {
     "etiqueta" : "grupo-1",
     "baseUrl" : "http://localhost:8080"
@@ -135,11 +135,11 @@
         },
         {
           "cumple" : true,
-          "detalle" : "la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 1m (desde 1m32s)",
+          "detalle" : "la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 1m (desde 1m52s)",
           "medido" : {
             "rachas" : 0,
             "masLarga" : {
-              "desde" : "1m32s",
+              "desde" : "1m52s",
               "duracion" : "1m",
               "habitaciones" : [
                 "room1"
@@ -162,7 +162,7 @@
         "desde" : "0s",
         "hasta" : "2h",
         "potenciaPicoKW" : 1.2,
-        "potenciaMediaKW" : 0.84,
+        "potenciaMediaKW" : 0.85,
         "excesoMaxKW" : 0.0,
         "segundosSobreContratada" : 0.0,
         "kwh" : 1.68,
@@ -172,11 +172,11 @@
         "fraccionEnRango" : 0.992,
         "brechaMedia" : 0.26,
         "deficitMedio" : 0.24,
-        "comandos" : 3,
+        "comandos" : 2,
         "conmutaciones" : 2,
         "comandosASwitchesAjenos" : 0
       },
-      "detalle" : "20261107-232210-21/20261107-232210-22-E02.json"
+      "detalle" : "20261108-224043-32/20261108-224043-33-E02.json"
     },
     {
       "escenario" : {
@@ -245,9 +245,9 @@
         },
         {
           "cumple" : true,
-          "detalle" : "cuando no entraba todo, usó en promedio el 86,3% de lo que podía encender (mínimo 80%)",
+          "detalle" : "cuando no entraba todo, usó en promedio el 86,0% de lo que podía encender (mínimo 80%)",
           "medido" : {
-            "aprovechamiento" : 0.863,
+            "aprovechamiento" : 0.86,
             "muestras" : 120
           },
           "tipo" : "aprovechamiento",
@@ -261,11 +261,11 @@
         },
         {
           "cumple" : true,
-          "detalle" : "la que más conmutó, room1, 2,5 veces por hora (máximo 6,0)",
+          "detalle" : "la que más conmutó, room1, 3,0 veces por hora (máximo 6,0)",
           "medido" : {
             "peor" : {
               "id" : "room1",
-              "porHora" : 2.5
+              "porHora" : 3.0
             }
           },
           "tipo" : "conmutaciones",
@@ -315,21 +315,21 @@
         "desde" : "0s",
         "hasta" : "2h",
         "potenciaPicoKW" : 1.2,
-        "potenciaMediaKW" : 1.04,
+        "potenciaMediaKW" : 1.03,
         "excesoMaxKW" : 0.0,
         "segundosSobreContratada" : 0.0,
-        "kwh" : 2.07,
+        "kwh" : 2.065,
         "kwhEnPunta" : 0.0,
-        "kwhFueraDePunta" : 2.07,
-        "aprovechamiento" : 0.863,
+        "kwhFueraDePunta" : 2.065,
+        "aprovechamiento" : 0.86,
         "fraccionEnRango" : 0.817,
-        "brechaMedia" : 0.41,
-        "deficitMedio" : 0.41,
-        "comandos" : 10,
-        "conmutaciones" : 9,
+        "brechaMedia" : 0.4,
+        "deficitMedio" : 0.4,
+        "comandos" : 12,
+        "conmutaciones" : 11,
         "comandosASwitchesAjenos" : 0
       },
-      "detalle" : "20261107-232210-21/20261107-232210-23-E04.json"
+      "detalle" : "20261108-224043-32/20261108-224043-34-E04.json"
     },
     {
       "escenario" : {
@@ -380,11 +380,11 @@
         },
         {
           "cumple" : true,
-          "detalle" : "conoció los 5 switches (consulta o comando); el último en 1s",
+          "detalle" : "conoció los 5 switches (consulta o comando); el último en 0s",
           "medido" : {
             "habitaciones" : 5,
             "tomadas" : 5,
-            "ultima" : "1s",
+            "ultima" : "0s",
             "sinControl" : [
             ]
           },
@@ -444,7 +444,7 @@
           "detalle" : "en punta no hubo nada encendido",
           "medido" : {
             "kwhEnPunta" : 0.0,
-            "kwhTotal" : 4.611,
+            "kwhTotal" : 4.61,
             "fraccion" : 0.0,
             "segundosEncendidoEnPunta" : 0,
             "primeraVez" : null
@@ -475,12 +475,12 @@
         },
         {
           "cumple" : true,
-          "detalle" : "la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 59s (desde 1m16s)",
+          "detalle" : "la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 1m (desde 1m36s)",
           "medido" : {
             "rachas" : 0,
             "masLarga" : {
-              "desde" : "1m16s",
-              "duracion" : "59s",
+              "desde" : "1m36s",
+              "duracion" : "1m",
               "habitaciones" : [
                 "room3",
                 "room4",
@@ -518,7 +518,7 @@
         "conmutaciones" : 10,
         "comandosASwitchesAjenos" : 0
       },
-      "detalle" : "20261107-232210-21/20261107-232210-24-E11.json"
+      "detalle" : "20261108-224043-32/20261108-224043-35-E11.json"
     },
     {
       "escenario" : {
@@ -631,9 +631,9 @@
         },
         {
           "cumple" : true,
-          "detalle" : "2 reacciones dentro de 5m desde el ack (1h3s)",
+          "detalle" : "2 reacciones dentro de 5m desde el ack (1h)",
           "medido" : {
-            "ack" : "1h3s",
+            "ack" : "1h",
             "chequeos" : 2,
             "fallan" : [
             ]
@@ -687,7 +687,7 @@
         "desde" : "0s",
         "hasta" : "3h",
         "potenciaPicoKW" : 4.8,
-        "potenciaMediaKW" : 3.71,
+        "potenciaMediaKW" : 3.72,
         "excesoMaxKW" : 0.0,
         "segundosSobreContratada" : 0.0,
         "kwh" : 11.09,
@@ -701,7 +701,7 @@
         "conmutaciones" : 18,
         "comandosASwitchesAjenos" : 0
       },
-      "detalle" : "20261107-232210-21/20261107-232210-25-E14.json"
+      "detalle" : "20261108-224043-32/20261108-224043-36-E14.json"
     },
     {
       "escenario" : {
@@ -859,9 +859,9 @@
         "desde" : "0s",
         "hasta" : "2h",
         "potenciaPicoKW" : 4.8,
-        "potenciaMediaKW" : 3.65,
+        "potenciaMediaKW" : 3.66,
         "excesoMaxKW" : 1.8,
-        "segundosSobreContratada" : 35.7,
+        "segundosSobreContratada" : 36.9,
         "kwh" : 7.328,
         "kwhEnPunta" : 0.0,
         "kwhFueraDePunta" : 7.328,
@@ -873,7 +873,7 @@
         "conmutaciones" : 28,
         "comandosASwitchesAjenos" : 0
       },
-      "detalle" : "20261107-232210-21/20261107-232210-26-E18.json"
+      "detalle" : "20261108-224043-32/20261108-224043-37-E18.json"
     },
     {
       "escenario" : {
@@ -924,9 +924,9 @@
         },
         {
           "cumple" : true,
-          "detalle" : "cuando no entraba todo, usó en promedio el 98,8% de lo que podía encender (mínimo 80%)",
+          "detalle" : "cuando no entraba todo, usó en promedio el 99,6% de lo que podía encender (mínimo 80%)",
           "medido" : {
-            "aprovechamiento" : 0.988,
+            "aprovechamiento" : 0.996,
             "muestras" : 60
           },
           "tipo" : "aprovechamiento",
@@ -940,11 +940,11 @@
         },
         {
           "cumple" : true,
-          "detalle" : "la que más conmutó, room1, 1,0 veces por hora (máximo 6,0)",
+          "detalle" : "la que más conmutó, room5, 3,1 veces por hora (máximo 6,0)",
           "medido" : {
             "peor" : {
-              "id" : "room1",
-              "porHora" : 1.0
+              "id" : "room5",
+              "porHora" : 3.1
             }
           },
           "tipo" : "conmutaciones",
@@ -973,17 +973,15 @@
         },
         {
           "cumple" : true,
-          "detalle" : "la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 1m (desde 0s)",
+          "detalle" : "la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 59s (desde 19s)",
           "medido" : {
             "rachas" : 0,
             "masLarga" : {
-              "desde" : "0s",
-              "duracion" : "1m",
+              "desde" : "19s",
+              "duracion" : "59s",
               "habitaciones" : [
-                "room1",
                 "room2",
-                "room3",
-                "room4"
+                "room3"
               ]
             }
           },
@@ -1003,21 +1001,21 @@
         "desde" : "0s",
         "hasta" : "1h",
         "potenciaPicoKW" : 4.0,
-        "potenciaMediaKW" : 4.0,
+        "potenciaMediaKW" : 3.98,
         "excesoMaxKW" : 0.0,
         "segundosSobreContratada" : 0.0,
         "kwh" : 3.933,
         "kwhEnPunta" : 0.0,
         "kwhFueraDePunta" : 3.933,
-        "aprovechamiento" : 0.988,
+        "aprovechamiento" : 0.996,
         "fraccionEnRango" : 0.2,
         "brechaMedia" : 0.65,
         "deficitMedio" : 0.65,
-        "comandos" : 9,
-        "conmutaciones" : 5,
+        "comandos" : 11,
+        "conmutaciones" : 7,
         "comandosASwitchesAjenos" : 0
       },
-      "detalle" : "20261107-232210-21/20261107-232210-27-E19.json"
+      "detalle" : "20261108-224043-32/20261108-224043-38-E19.json"
     },
     {
       "escenario" : {
@@ -1124,11 +1122,11 @@
         },
         {
           "cumple" : true,
-          "detalle" : "se volvió a suscribir una vez tras la vuelta del broker; lo más lento, 0,6 s reales",
+          "detalle" : "se volvió a suscribir una vez tras la vuelta del broker; lo más lento, 0,7 s reales",
           "medido" : {
             "vueltas" : 1,
             "segundosReales" : [
-              0.6
+              0.7
             ]
           },
           "tipo" : "reconecta",
@@ -1160,12 +1158,12 @@
         "desde" : "0s",
         "hasta" : "1h30m",
         "potenciaPicoKW" : 3.0,
-        "potenciaMediaKW" : 2.78,
+        "potenciaMediaKW" : 2.75,
         "excesoMaxKW" : 0.0,
         "segundosSobreContratada" : 0.0,
-        "kwh" : 4.15,
+        "kwh" : 4.1,
         "kwhEnPunta" : 0.0,
-        "kwhFueraDePunta" : 4.15,
+        "kwhFueraDePunta" : 4.1,
         "aprovechamiento" : null,
         "fraccionEnRango" : 1.0,
         "brechaMedia" : 0.37,
@@ -1174,7 +1172,7 @@
         "conmutaciones" : 9,
         "comandosASwitchesAjenos" : 0
       },
-      "detalle" : "20261107-232210-21/20261107-232210-28-F01.json"
+      "detalle" : "20261108-224043-32/20261108-224043-39-F01.json"
     },
     {
       "escenario" : {
@@ -1190,16 +1188,16 @@
       "expectativas" : [
         {
           "cumple" : true,
-          "detalle" : "3 de 3 habitaciones a ±0,5 °C al menos el 70% del tiempo; la peor, room1, el 100,0%",
+          "detalle" : "3 de 3 habitaciones a ±0,5 °C al menos el 70% del tiempo; la peor, room4, el 99,2%",
           "medido" : {
             "peor" : {
-              "id" : "room1",
-              "fraccion" : 1.0
+              "id" : "room4",
+              "fraccion" : 0.992
             },
             "porHabitacion" : {
               "room1" : 1.0,
               "room3" : 1.0,
-              "room4" : 1.0
+              "room4" : 0.992
             }
           },
           "tipo" : "enRango",
@@ -1270,10 +1268,16 @@
         },
         {
           "cumple" : true,
-          "detalle" : "nunca hubo una habitación fría y apagada que entrara en lo libre de la contratada",
+          "detalle" : "la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 59s (desde 1m10s)",
           "medido" : {
             "rachas" : 0,
-            "masLarga" : null
+            "masLarga" : {
+              "desde" : "1m10s",
+              "duracion" : "59s",
+              "habitaciones" : [
+                "room4"
+              ]
+            }
           },
           "tipo" : "actua",
           "nivel" : "riesgo",
@@ -1308,21 +1312,21 @@
         "desde" : "0s",
         "hasta" : "2h",
         "potenciaPicoKW" : 4.0,
-        "potenciaMediaKW" : 2.75,
+        "potenciaMediaKW" : 2.73,
         "excesoMaxKW" : 0.0,
         "segundosSobreContratada" : 0.0,
         "kwh" : 5.442,
         "kwhEnPunta" : 0.0,
         "kwhFueraDePunta" : 5.442,
         "aprovechamiento" : null,
-        "fraccionEnRango" : 1.0,
+        "fraccionEnRango" : 0.998,
         "brechaMedia" : 0.31,
         "deficitMedio" : 0.3,
         "comandos" : 11,
         "conmutaciones" : 8,
         "comandosASwitchesAjenos" : 0
       },
-      "detalle" : "20261107-232210-21/20261107-232210-29-F03.json"
+      "detalle" : "20261108-224043-32/20261108-224043-40-F03.json"
     },
     {
       "escenario" : {
@@ -1405,11 +1409,11 @@
         },
         {
           "cumple" : true,
-          "detalle" : "la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 59s (desde 45s)",
+          "detalle" : "la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 59s (desde 6s)",
           "medido" : {
             "rachas" : 0,
             "masLarga" : {
-              "desde" : "45s",
+              "desde" : "6s",
               "duracion" : "59s",
               "habitaciones" : [
                 "room1",
@@ -1451,7 +1455,7 @@
         "desde" : "0s",
         "hasta" : "2h",
         "potenciaPicoKW" : 1.9,
-        "potenciaMediaKW" : 1.64,
+        "potenciaMediaKW" : 1.65,
         "excesoMaxKW" : 0.0,
         "segundosSobreContratada" : 0.0,
         "kwh" : 3.292,
@@ -1465,7 +1469,7 @@
         "conmutaciones" : 19,
         "comandosASwitchesAjenos" : 0
       },
-      "detalle" : "20261107-232210-21/20261107-232210-30-F05.json"
+      "detalle" : "20261108-224043-32/20261108-224043-41-F05.json"
     }
   ]
 }

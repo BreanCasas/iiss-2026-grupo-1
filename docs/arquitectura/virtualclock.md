@@ -146,6 +146,10 @@ Aunque otras partes del sistema trabajan en milisegundos, VirtualClock
 mantiene nanosegundos para el cálculo del tiempo transcurrido y la
 construcción del Instant.
 
+Los campos fechaHora e iniciadoEn de ControlStatus se serializan
+en UTC con precisión de milisegundos. El formato de salida no modifica
+la precisión interna del reloj.
+
 ## Uso de BigInteger
 
 La multiplicación entre el tiempo transcurrido y el factor podría superar
@@ -180,6 +184,9 @@ para informar el instante virtual actual.
 Al recibir DETENER, ControlService elimina la referencia al reloj
 y cambia el estado del controlador a detenido.
 
+Con el control detenido, HeatingEngine no envía comandos a switches.
+DETENER no representa una orden de apagado general.
+
 ## Zona horaria y tarifa punta
 
 VirtualClock no decide la zona horaria ni evalúa tarifas.
@@ -211,16 +218,59 @@ Esta coordinación evita depender únicamente de una espera fija cuando
 el tiempo está acelerado. Los tiempos efectivos también dependen de
 la ejecución de las tareas y de las comunicaciones externas.
 
+### Margen preventivo de entrada en punta
+
+HeatingEngine utiliza un margen de 2000 milisegundos reales antes
+del inicio de punta para iniciar los apagados y evitar nuevos encendidos.
+
+El tiempo virtual restante se compara con el margen real convertido
+mediante el factor vigente.
+
+Por ejemplo, con factor 60, un margen de 2000 milisegundos reales
+equivale a 120 segundos virtuales.
+
+Dentro del margen, el motor puede evaluar la decisión del core usando
+el instante de inicio de punta. Esto no adelanta VirtualClock ni cambia
+la hora informada por GET /control.
+
+El margen reduce el riesgo de llegar a punta con calefactores encendidos,
+pero no constituye una garantía de tiempo real ante latencias superiores
+al margen disponible.
+
 ## Diferencia con el vencimiento de temperaturas
 
 El reloj virtual determina el tiempo utilizado para evaluar las reglas
 horarias del controlador.
 
 La vigencia de las temperaturas se mide por separado en
-TemperatureSubscriber, mediante Clock y milisegundos.
+TemperatureSubscriber, mediante Clock y milisegundos desde la recepción.
 
-El plazo de 30 segundos de una lectura corresponde a tiempo real:
-no se multiplica por el factor de aceleración de VirtualClock.
+Mientras el control está en ejecución, el plazo considera 5 minutos
+virtuales y un máximo de 30 segundos reales.
+
+Para un factor f expresado como número del protocolo:
+
+```text
+vigencia en milisegundos reales =
+    mínimo(30000, máximo(1, parte entera de 300000 / f))
+```
+
+| Factor | Vigencia real |
+|---:|---|
+| 1 | 30 segundos |
+| 10 | 30 segundos |
+| 60 | 5 segundos |
+
+Con el control detenido se utiliza el límite de 30 segundos reales.
+
+El plazo se calcula con el factor vigente. Si cambia, la antigüedad
+acumulada se evalúa con ese factor; no se integra el historial de factores.
+
+El instante ts enviado por el termostato se conserva en el histórico,
+pero no se utiliza para renovar ni calcular la vigencia local.
+
+Una lectura inválida no renueva el instante de recepción de la última
+lectura válida.
 
 ## Pruebas
 
@@ -240,6 +290,15 @@ Las pruebas relacionadas se encuentran en:
 Estas pruebas verifican el reloj y su colaboración con el control
 y la planificación temporal.
 
+TemperatureExpiryTest verifica el vencimiento de temperaturas,
+incluyendo el factor de aceleración. HeatingEngineTest comprueba
+el comportamiento del motor ante la entrada en punta y su margen
+preventivo.
+
+La validación con ecowarm-run incluye E11, entrada en punta, y F03,
+ausencia prolongada de publicaciones de un termostato. Ambos escenarios
+pasaron en la batería completa de la iteración 6, sin observaciones.
+
 ## Límites de la implementación
 
 - El factor debe ser positivo.
@@ -253,3 +312,8 @@ y la planificación temporal.
   numéricos o temporales admitidos.
 - El reloj no se persiste. Después de reiniciar la aplicación,
   el controlador requiere una nueva orden INICIAR para establecerlo.
+- El cálculo del instante no garantiza que los comandos externos se
+  ejecuten exactamente en ese momento.
+
+Las limitaciones generales y las mejoras futuras se describen
+en [roadmap](roadmap.md).

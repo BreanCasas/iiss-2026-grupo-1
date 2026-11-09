@@ -1,0 +1,3769 @@
+{
+  "corrida" : "20261108-224043-37-E18",
+  "inicio" : "2026-11-03T10:00-03:00",
+  "zonaHoraria" : "America/Montevideo",
+  "habitaciones" : [
+    "room1",
+    "room2",
+    "room3",
+    "room4",
+    "room5"
+  ],
+  "muestras" : [
+    {
+      "t" : 24.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 0.0,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.8,
+        "room2" : 21.3,
+        "room3" : 21.6,
+        "room4" : 19.9,
+        "room5" : 20.4
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "OFF",
+        "room3" : "OFF",
+        "room4" : "OFF",
+        "room5" : "OFF"
+      }
+    },
+    {
+      "t" : 84.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.8,
+        "room2" : 21.3,
+        "room3" : 21.6,
+        "room4" : 19.9,
+        "room5" : 20.4
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 144.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.8,
+        "room2" : 21.3,
+        "room3" : 21.6,
+        "room4" : 19.9,
+        "room5" : 20.4
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 204.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.8,
+        "room2" : 21.3,
+        "room3" : 21.6,
+        "room4" : 19.9,
+        "room5" : 20.4
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 264.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.8,
+        "room2" : 21.3,
+        "room3" : 21.6,
+        "room4" : 19.9,
+        "room5" : 20.4
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 324.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.8,
+        "room2" : 21.3,
+        "room3" : 21.6,
+        "room4" : 19.9,
+        "room5" : 20.4
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 384.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.8,
+        "room2" : 21.3,
+        "room3" : 21.6,
+        "room4" : 19.9,
+        "room5" : 20.4
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 444.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.8,
+        "room2" : 21.3,
+        "room3" : 21.6,
+        "room4" : 19.9,
+        "room5" : 20.4
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 504.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.81,
+        "room2" : 21.3,
+        "room3" : 21.6,
+        "room4" : 19.9,
+        "room5" : 20.4
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 564.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.81,
+        "room2" : 21.31,
+        "room3" : 21.61,
+        "room4" : 19.91,
+        "room5" : 20.4
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 624.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.81,
+        "room2" : 21.31,
+        "room3" : 21.61,
+        "room4" : 19.91,
+        "room5" : 20.41
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 684.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.81,
+        "room2" : 21.31,
+        "room3" : 21.61,
+        "room4" : 19.91,
+        "room5" : 20.41
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 744.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.81,
+        "room2" : 21.31,
+        "room3" : 21.61,
+        "room4" : 19.91,
+        "room5" : 20.41
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 804.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.82,
+        "room2" : 21.31,
+        "room3" : 21.61,
+        "room4" : 19.91,
+        "room5" : 20.41
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 864.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.82,
+        "room2" : 21.31,
+        "room3" : 21.61,
+        "room4" : 19.91,
+        "room5" : 20.41
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 924.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.82,
+        "room2" : 21.31,
+        "room3" : 21.61,
+        "room4" : 19.92,
+        "room5" : 20.41
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 984.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.82,
+        "room2" : 21.32,
+        "room3" : 21.62,
+        "room4" : 19.92,
+        "room5" : 20.41
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1044.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.83,
+        "room2" : 21.32,
+        "room3" : 21.62,
+        "room4" : 19.92,
+        "room5" : 20.42
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1104.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.83,
+        "room2" : 21.32,
+        "room3" : 21.62,
+        "room4" : 19.92,
+        "room5" : 20.42
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1164.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.83,
+        "room2" : 21.32,
+        "room3" : 21.62,
+        "room4" : 19.93,
+        "room5" : 20.42
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1224.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.84,
+        "room2" : 21.32,
+        "room3" : 21.62,
+        "room4" : 19.93,
+        "room5" : 20.42
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1284.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.84,
+        "room2" : 21.33,
+        "room3" : 21.63,
+        "room4" : 19.93,
+        "room5" : 20.42
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1344.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.84,
+        "room2" : 21.33,
+        "room3" : 21.63,
+        "room4" : 19.93,
+        "room5" : 20.43
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1404.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.85,
+        "room2" : 21.33,
+        "room3" : 21.63,
+        "room4" : 19.94,
+        "room5" : 20.43
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1464.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.85,
+        "room2" : 21.33,
+        "room3" : 21.63,
+        "room4" : 19.94,
+        "room5" : 20.43
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1524.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.85,
+        "room2" : 21.34,
+        "room3" : 21.64,
+        "room4" : 19.94,
+        "room5" : 20.43
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1584.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.86,
+        "room2" : 21.34,
+        "room3" : 21.64,
+        "room4" : 19.95,
+        "room5" : 20.43
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1644.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.86,
+        "room2" : 21.34,
+        "room3" : 21.64,
+        "room4" : 19.95,
+        "room5" : 20.44
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1704.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.87,
+        "room2" : 21.34,
+        "room3" : 21.64,
+        "room4" : 19.95,
+        "room5" : 20.44
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1764.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.87,
+        "room2" : 21.35,
+        "room3" : 21.65,
+        "room4" : 19.96,
+        "room5" : 20.44
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1824.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.88,
+        "room2" : 21.35,
+        "room3" : 21.65,
+        "room4" : 19.96,
+        "room5" : 20.44
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1884.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.88,
+        "room2" : 21.35,
+        "room3" : 21.65,
+        "room4" : 19.96,
+        "room5" : 20.45
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 1944.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.89,
+        "room2" : 21.36,
+        "room3" : 21.66,
+        "room4" : 19.97,
+        "room5" : 20.45
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2004.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.89,
+        "room2" : 21.36,
+        "room3" : 21.66,
+        "room4" : 19.97,
+        "room5" : 20.45
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2064.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.9,
+        "room2" : 21.36,
+        "room3" : 21.66,
+        "room4" : 19.98,
+        "room5" : 20.46
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2124.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.9,
+        "room2" : 21.37,
+        "room3" : 21.67,
+        "room4" : 19.98,
+        "room5" : 20.46
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2184.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.91,
+        "room2" : 21.37,
+        "room3" : 21.67,
+        "room4" : 19.98,
+        "room5" : 20.46
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2244.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.91,
+        "room2" : 21.37,
+        "room3" : 21.67,
+        "room4" : 19.99,
+        "room5" : 20.47
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2304.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.92,
+        "room2" : 21.38,
+        "room3" : 21.68,
+        "room4" : 19.99,
+        "room5" : 20.47
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2364.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.92,
+        "room2" : 21.38,
+        "room3" : 21.68,
+        "room4" : 20.0,
+        "room5" : 20.47
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2424.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.93,
+        "room2" : 21.39,
+        "room3" : 21.69,
+        "room4" : 20.0,
+        "room5" : 20.48
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2484.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.93,
+        "room2" : 21.39,
+        "room3" : 21.69,
+        "room4" : 20.01,
+        "room5" : 20.48
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2544.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.94,
+        "room2" : 21.39,
+        "room3" : 21.69,
+        "room4" : 20.01,
+        "room5" : 20.48
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2604.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.95,
+        "room2" : 21.4,
+        "room3" : 21.7,
+        "room4" : 20.02,
+        "room5" : 20.49
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2664.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.95,
+        "room2" : 21.4,
+        "room3" : 21.7,
+        "room4" : 20.02,
+        "room5" : 20.49
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2724.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.96,
+        "room2" : 21.41,
+        "room3" : 21.71,
+        "room4" : 20.03,
+        "room5" : 20.49
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2784.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.96,
+        "room2" : 21.41,
+        "room3" : 21.71,
+        "room4" : 20.03,
+        "room5" : 20.5
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2844.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.97,
+        "room2" : 21.41,
+        "room3" : 21.71,
+        "room4" : 20.04,
+        "room5" : 20.5
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2904.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.98,
+        "room2" : 21.42,
+        "room3" : 21.72,
+        "room4" : 20.04,
+        "room5" : 20.5
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 2964.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.98,
+        "room2" : 21.42,
+        "room3" : 21.72,
+        "room4" : 20.05,
+        "room5" : 20.51
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 3024.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 19.99,
+        "room2" : 21.43,
+        "room3" : 21.73,
+        "room4" : 20.05,
+        "room5" : 20.51
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 3084.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.0,
+        "room2" : 21.43,
+        "room3" : 21.73,
+        "room4" : 20.06,
+        "room5" : 20.52
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 3144.7,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.0,
+        "room2" : 21.44,
+        "room3" : 21.74,
+        "room4" : 20.06,
+        "room5" : 20.52
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 3204.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.01,
+        "room2" : 21.44,
+        "room3" : 21.74,
+        "room4" : 20.07,
+        "room5" : 20.52
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 3264.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.02,
+        "room2" : 21.45,
+        "room3" : 21.74,
+        "room4" : 20.07,
+        "room5" : 20.53
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 3324.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.02,
+        "room2" : 21.45,
+        "room3" : 21.75,
+        "room4" : 20.08,
+        "room5" : 20.53
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 3384.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.03,
+        "room2" : 21.46,
+        "room3" : 21.75,
+        "room4" : 20.08,
+        "room5" : 20.54
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 3444.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.04,
+        "room2" : 21.46,
+        "room3" : 21.76,
+        "room4" : 20.09,
+        "room5" : 20.54
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 3504.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.04,
+        "room2" : 21.46,
+        "room3" : 21.76,
+        "room4" : 20.1,
+        "room5" : 20.54
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 3564.8,
+      "enPunta" : false,
+      "contratadaKW" : 6.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.05,
+        "room2" : 21.47,
+        "room3" : 21.77,
+        "room4" : 20.1,
+        "room5" : 20.55
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 3624.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 4.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.06,
+        "room2" : 21.47,
+        "room3" : 21.77,
+        "room4" : 20.11,
+        "room5" : 20.55
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 3684.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.07,
+        "room2" : 21.48,
+        "room3" : 21.78,
+        "room4" : 20.11,
+        "room5" : 20.56
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "OFF"
+      }
+    },
+    {
+      "t" : 3744.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.07,
+        "room2" : 21.48,
+        "room3" : 21.78,
+        "room4" : 20.12,
+        "room5" : 20.56
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "OFF"
+      }
+    },
+    {
+      "t" : 3804.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.08,
+        "room2" : 21.49,
+        "room3" : 21.79,
+        "room4" : 20.13,
+        "room5" : 20.57
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "OFF"
+      }
+    },
+    {
+      "t" : 3864.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.09,
+        "room2" : 21.49,
+        "room3" : 21.79,
+        "room4" : 20.13,
+        "room5" : 20.57
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "OFF"
+      }
+    },
+    {
+      "t" : 3924.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.09,
+        "room2" : 21.5,
+        "room3" : 21.8,
+        "room4" : 20.14,
+        "room5" : 20.57
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "OFF"
+      }
+    },
+    {
+      "t" : 3984.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.1,
+        "room2" : 21.51,
+        "room3" : 21.8,
+        "room4" : 20.14,
+        "room5" : 20.58
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "OFF"
+      }
+    },
+    {
+      "t" : 4044.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.11,
+        "room2" : 21.51,
+        "room3" : 21.81,
+        "room4" : 20.15,
+        "room5" : 20.58
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "OFF"
+      }
+    },
+    {
+      "t" : 4104.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.11,
+        "room2" : 21.52,
+        "room3" : 21.81,
+        "room4" : 20.16,
+        "room5" : 20.58
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "OFF"
+      }
+    },
+    {
+      "t" : 4164.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.12,
+        "room2" : 21.52,
+        "room3" : 21.82,
+        "room4" : 20.16,
+        "room5" : 20.59
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4224.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.12,
+        "room2" : 21.53,
+        "room3" : 21.82,
+        "room4" : 20.17,
+        "room5" : 20.59
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4284.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.13,
+        "room2" : 21.53,
+        "room3" : 21.83,
+        "room4" : 20.17,
+        "room5" : 20.6
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4344.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.14,
+        "room2" : 21.54,
+        "room3" : 21.83,
+        "room4" : 20.18,
+        "room5" : 20.6
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4404.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.14,
+        "room2" : 21.54,
+        "room3" : 21.84,
+        "room4" : 20.19,
+        "room5" : 20.6
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4464.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.15,
+        "room2" : 21.55,
+        "room3" : 21.85,
+        "room4" : 20.19,
+        "room5" : 20.61
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4524.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.15,
+        "room2" : 21.55,
+        "room3" : 21.85,
+        "room4" : 20.2,
+        "room5" : 20.61
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4584.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.16,
+        "room2" : 21.56,
+        "room3" : 21.86,
+        "room4" : 20.2,
+        "room5" : 20.61
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4644.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.16,
+        "room2" : 21.56,
+        "room3" : 21.86,
+        "room4" : 20.21,
+        "room5" : 20.62
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4704.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.17,
+        "room2" : 21.57,
+        "room3" : 21.87,
+        "room4" : 20.21,
+        "room5" : 20.62
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4764.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.17,
+        "room2" : 21.58,
+        "room3" : 21.87,
+        "room4" : 20.22,
+        "room5" : 20.63
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4824.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.18,
+        "room2" : 21.58,
+        "room3" : 21.88,
+        "room4" : 20.22,
+        "room5" : 20.63
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4884.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.18,
+        "room2" : 21.59,
+        "room3" : 21.88,
+        "room4" : 20.23,
+        "room5" : 20.63
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 4944.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.18,
+        "room2" : 21.59,
+        "room3" : 21.89,
+        "room4" : 20.23,
+        "room5" : 20.64
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5004.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.19,
+        "room2" : 21.6,
+        "room3" : 21.9,
+        "room4" : 20.23,
+        "room5" : 20.64
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5064.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.19,
+        "room2" : 21.6,
+        "room3" : 21.9,
+        "room4" : 20.24,
+        "room5" : 20.65
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5124.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.2,
+        "room2" : 21.61,
+        "room3" : 21.91,
+        "room4" : 20.24,
+        "room5" : 20.65
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5184.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.2,
+        "room2" : 21.62,
+        "room3" : 21.91,
+        "room4" : 20.25,
+        "room5" : 20.65
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "OFF"
+      }
+    },
+    {
+      "t" : 5244.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.2,
+        "room2" : 21.62,
+        "room3" : 21.92,
+        "room4" : 20.25,
+        "room5" : 20.66
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "OFF"
+      }
+    },
+    {
+      "t" : 5304.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.21,
+        "room2" : 21.63,
+        "room3" : 21.93,
+        "room4" : 20.26,
+        "room5" : 20.66
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5364.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.21,
+        "room2" : 21.63,
+        "room3" : 21.93,
+        "room4" : 20.26,
+        "room5" : 20.67
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5424.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.21,
+        "room2" : 21.64,
+        "room3" : 21.94,
+        "room4" : 20.26,
+        "room5" : 20.67
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5484.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.22,
+        "room2" : 21.65,
+        "room3" : 21.94,
+        "room4" : 20.27,
+        "room5" : 20.68
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5544.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.22,
+        "room2" : 21.65,
+        "room3" : 21.95,
+        "room4" : 20.27,
+        "room5" : 20.68
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5604.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.9,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.22,
+        "room2" : 21.66,
+        "room3" : 21.96,
+        "room4" : 20.27,
+        "room5" : 20.68
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "OFF",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5664.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.9,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.23,
+        "room2" : 21.66,
+        "room3" : 21.96,
+        "room4" : 20.28,
+        "room5" : 20.69
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "OFF",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5724.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.9,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.23,
+        "room2" : 21.67,
+        "room3" : 21.97,
+        "room4" : 20.28,
+        "room5" : 20.69
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "OFF",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5784.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.9,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.24,
+        "room2" : 21.68,
+        "room3" : 21.97,
+        "room4" : 20.28,
+        "room5" : 20.7
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "OFF",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5844.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.9,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.24,
+        "room2" : 21.68,
+        "room3" : 21.98,
+        "room4" : 20.29,
+        "room5" : 20.7
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "OFF",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5904.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.9,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.24,
+        "room2" : 21.69,
+        "room3" : 21.98,
+        "room4" : 20.29,
+        "room5" : 20.71
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "OFF",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 5964.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.9,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.25,
+        "room2" : 21.69,
+        "room3" : 21.99,
+        "room4" : 20.29,
+        "room5" : 20.71
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "OFF",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6024.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.9,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.25,
+        "room2" : 21.7,
+        "room3" : 21.99,
+        "room4" : 20.3,
+        "room5" : 20.72
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "ON",
+        "room2" : "ON",
+        "room3" : "OFF",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6084.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.26,
+        "room2" : 21.71,
+        "room3" : 22.0,
+        "room4" : 20.3,
+        "room5" : 20.72
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6144.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.26,
+        "room2" : 21.71,
+        "room3" : 22.0,
+        "room4" : 20.3,
+        "room5" : 20.72
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6204.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.26,
+        "room2" : 21.72,
+        "room3" : 22.01,
+        "room4" : 20.31,
+        "room5" : 20.73
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6264.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.27,
+        "room2" : 21.73,
+        "room3" : 22.01,
+        "room4" : 20.31,
+        "room5" : 20.73
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6324.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.27,
+        "room2" : 21.73,
+        "room3" : 22.02,
+        "room4" : 20.31,
+        "room5" : 20.74
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6384.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.27,
+        "room2" : 21.74,
+        "room3" : 22.03,
+        "room4" : 20.31,
+        "room5" : 20.74
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6444.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.28,
+        "room2" : 21.74,
+        "room3" : 22.03,
+        "room4" : 20.32,
+        "room5" : 20.75
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6504.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.6,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.28,
+        "room2" : 21.75,
+        "room3" : 22.04,
+        "room4" : 20.32,
+        "room5" : 20.75
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "ON",
+        "room3" : "ON",
+        "room4" : "OFF",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6564.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.7,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.29,
+        "room2" : 21.76,
+        "room3" : 22.04,
+        "room4" : 20.32,
+        "room5" : 20.76
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "OFF",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6624.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.7,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.29,
+        "room2" : 21.76,
+        "room3" : 22.05,
+        "room4" : 20.32,
+        "room5" : 20.76
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "OFF",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6684.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 2.7,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.29,
+        "room2" : 21.77,
+        "room3" : 22.05,
+        "room4" : 20.32,
+        "room5" : 20.77
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "OFF",
+        "room3" : "ON",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6744.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 1.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.29,
+        "room2" : 21.77,
+        "room3" : 22.06,
+        "room4" : 20.33,
+        "room5" : 20.77
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "OFF",
+        "room3" : "OFF",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6804.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 1.8,
+      "demandaKW" : 4.8,
+      "temperatura" : {
+        "room1" : 20.3,
+        "room2" : 21.78,
+        "room3" : 22.06,
+        "room4" : 20.33,
+        "room5" : 20.78
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "OFF",
+        "room3" : "OFF",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6864.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 1.8,
+      "demandaKW" : 3.6,
+      "temperatura" : {
+        "room1" : 20.3,
+        "room2" : 21.79,
+        "room3" : 22.07,
+        "room4" : 20.33,
+        "room5" : 20.78
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "OFF",
+        "room3" : "OFF",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6924.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 1.8,
+      "demandaKW" : 3.6,
+      "temperatura" : {
+        "room1" : 20.3,
+        "room2" : 21.79,
+        "room3" : 22.07,
+        "room4" : 20.34,
+        "room5" : 20.79
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "OFF",
+        "room3" : "OFF",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 6984.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 1.8,
+      "demandaKW" : 3.6,
+      "temperatura" : {
+        "room1" : 20.31,
+        "room2" : 21.8,
+        "room3" : 22.08,
+        "room4" : 20.34,
+        "room5" : 20.79
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "OFF",
+        "room3" : "OFF",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 7044.7,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 1.8,
+      "demandaKW" : 2.7,
+      "temperatura" : {
+        "room1" : 20.31,
+        "room2" : 21.8,
+        "room3" : 22.08,
+        "room4" : 20.34,
+        "room5" : 20.8
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "OFF",
+        "room3" : "OFF",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 7104.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 1.8,
+      "demandaKW" : 2.7,
+      "temperatura" : {
+        "room1" : 20.31,
+        "room2" : 21.81,
+        "room3" : 22.09,
+        "room4" : 20.35,
+        "room5" : 20.8
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "OFF",
+        "room3" : "OFF",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    },
+    {
+      "t" : 7164.8,
+      "enPunta" : false,
+      "contratadaKW" : 3.0,
+      "potenciaKW" : 1.8,
+      "demandaKW" : 2.7,
+      "temperatura" : {
+        "room1" : 20.31,
+        "room2" : 21.81,
+        "room3" : 22.09,
+        "room4" : 20.35,
+        "room5" : 20.81
+      },
+      "esperada" : {
+        "room1" : 20.3,
+        "room2" : 21.8,
+        "room3" : 22.1,
+        "room4" : 20.4,
+        "room5" : 20.9
+      },
+      "switch" : {
+        "room1" : "OFF",
+        "room2" : "OFF",
+        "room3" : "OFF",
+        "room4" : "ON",
+        "room5" : "ON"
+      }
+    }
+  ],
+  "potencia" : [
+    {
+      "t" : 0.0,
+      "kW" : 0.0,
+      "contratadaKW" : 6.0
+    },
+    {
+      "t" : 61.9,
+      "kW" : 1.2,
+      "contratadaKW" : 6.0
+    },
+    {
+      "t" : 62.0,
+      "kW" : 2.1,
+      "contratadaKW" : 6.0
+    },
+    {
+      "t" : 62.2,
+      "kW" : 3.0,
+      "contratadaKW" : 6.0
+    },
+    {
+      "t" : 62.3,
+      "kW" : 4.0,
+      "contratadaKW" : 6.0
+    },
+    {
+      "t" : 62.5,
+      "kW" : 4.8,
+      "contratadaKW" : 6.0
+    },
+    {
+      "t" : 3601.4,
+      "kW" : 4.8,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 3638.1,
+      "kW" : 3.6,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 3638.3,
+      "kW" : 2.7,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 3638.5,
+      "kW" : 1.8,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 3638.6,
+      "kW" : 0.8,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 3638.8,
+      "kW" : 0.0,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 3639.5,
+      "kW" : 0.9,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 3639.6,
+      "kW" : 1.8,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 3639.8,
+      "kW" : 2.8,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 4125.0,
+      "kW" : 1.8,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 4125.2,
+      "kW" : 2.6,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 5155.9,
+      "kW" : 1.8,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 5156.0,
+      "kW" : 2.8,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 5277.4,
+      "kW" : 1.8,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 5277.5,
+      "kW" : 2.6,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 5580.8,
+      "kW" : 1.7,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 5581.0,
+      "kW" : 2.9,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 5641.8,
+      "kW" : 2.0,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 5642.0,
+      "kW" : 2.9,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 6066.2,
+      "kW" : 1.7,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 6066.4,
+      "kW" : 2.6,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 6551.8,
+      "kW" : 1.7,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 6552.0,
+      "kW" : 2.7,
+      "contratadaKW" : 3.0
+    },
+    {
+      "t" : 6733.9,
+      "kW" : 1.8,
+      "contratadaKW" : 3.0
+    }
+  ],
+  "comandos" : [
+    {
+      "t" : 0.0,
+      "switch" : "sw-sim-room1",
+      "habitacion" : "room1",
+      "accion" : "OFF",
+      "cambio" : false
+    },
+    {
+      "t" : 0.2,
+      "switch" : "sw-sim-room2",
+      "habitacion" : "room2",
+      "accion" : "OFF",
+      "cambio" : false
+    },
+    {
+      "t" : 0.4,
+      "switch" : "sw-sim-room3",
+      "habitacion" : "room3",
+      "accion" : "OFF",
+      "cambio" : false
+    },
+    {
+      "t" : 0.5,
+      "switch" : "sw-sim-room4",
+      "habitacion" : "room4",
+      "accion" : "OFF",
+      "cambio" : false
+    },
+    {
+      "t" : 0.6,
+      "switch" : "sw-sim-room5",
+      "habitacion" : "room5",
+      "accion" : "OFF",
+      "cambio" : false
+    },
+    {
+      "t" : 61.9,
+      "switch" : "sw-sim-room1",
+      "habitacion" : "room1",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 62.0,
+      "switch" : "sw-sim-room2",
+      "habitacion" : "room2",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 62.2,
+      "switch" : "sw-sim-room3",
+      "habitacion" : "room3",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 62.3,
+      "switch" : "sw-sim-room4",
+      "habitacion" : "room4",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 62.5,
+      "switch" : "sw-sim-room5",
+      "habitacion" : "room5",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 3638.1,
+      "switch" : "sw-sim-room1",
+      "habitacion" : "room1",
+      "accion" : "OFF",
+      "cambio" : true
+    },
+    {
+      "t" : 3638.3,
+      "switch" : "sw-sim-room2",
+      "habitacion" : "room2",
+      "accion" : "OFF",
+      "cambio" : true
+    },
+    {
+      "t" : 3638.5,
+      "switch" : "sw-sim-room3",
+      "habitacion" : "room3",
+      "accion" : "OFF",
+      "cambio" : true
+    },
+    {
+      "t" : 3638.6,
+      "switch" : "sw-sim-room4",
+      "habitacion" : "room4",
+      "accion" : "OFF",
+      "cambio" : true
+    },
+    {
+      "t" : 3638.8,
+      "switch" : "sw-sim-room5",
+      "habitacion" : "room5",
+      "accion" : "OFF",
+      "cambio" : true
+    },
+    {
+      "t" : 3639.5,
+      "switch" : "sw-sim-room2",
+      "habitacion" : "room2",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 3639.6,
+      "switch" : "sw-sim-room3",
+      "habitacion" : "room3",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 3639.8,
+      "switch" : "sw-sim-room4",
+      "habitacion" : "room4",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 4125.0,
+      "switch" : "sw-sim-room4",
+      "habitacion" : "room4",
+      "accion" : "OFF",
+      "cambio" : true
+    },
+    {
+      "t" : 4125.2,
+      "switch" : "sw-sim-room5",
+      "habitacion" : "room5",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 5155.9,
+      "switch" : "sw-sim-room5",
+      "habitacion" : "room5",
+      "accion" : "OFF",
+      "cambio" : true
+    },
+    {
+      "t" : 5156.0,
+      "switch" : "sw-sim-room4",
+      "habitacion" : "room4",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 5277.4,
+      "switch" : "sw-sim-room4",
+      "habitacion" : "room4",
+      "accion" : "OFF",
+      "cambio" : true
+    },
+    {
+      "t" : 5277.5,
+      "switch" : "sw-sim-room5",
+      "habitacion" : "room5",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 5580.8,
+      "switch" : "sw-sim-room2",
+      "habitacion" : "room2",
+      "accion" : "OFF",
+      "cambio" : true
+    },
+    {
+      "t" : 5581.0,
+      "switch" : "sw-sim-room1",
+      "habitacion" : "room1",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 5641.8,
+      "switch" : "sw-sim-room3",
+      "habitacion" : "room3",
+      "accion" : "OFF",
+      "cambio" : true
+    },
+    {
+      "t" : 5642.0,
+      "switch" : "sw-sim-room2",
+      "habitacion" : "room2",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 6066.2,
+      "switch" : "sw-sim-room1",
+      "habitacion" : "room1",
+      "accion" : "OFF",
+      "cambio" : true
+    },
+    {
+      "t" : 6066.4,
+      "switch" : "sw-sim-room3",
+      "habitacion" : "room3",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 6551.8,
+      "switch" : "sw-sim-room2",
+      "habitacion" : "room2",
+      "accion" : "OFF",
+      "cambio" : true
+    },
+    {
+      "t" : 6552.0,
+      "switch" : "sw-sim-room4",
+      "habitacion" : "room4",
+      "accion" : "ON",
+      "cambio" : true
+    },
+    {
+      "t" : 6733.9,
+      "switch" : "sw-sim-room3",
+      "habitacion" : "room3",
+      "accion" : "OFF",
+      "cambio" : true
+    }
+  ],
+  "pasos" : [
+    {
+      "paso" : 1,
+      "tipo" : "contratada",
+      "descripcion" : "potencia contratada 6,0 → 3,0 kW",
+      "aplicado" : 3601.4,
+      "ack" : 3602.1,
+      "aceptado" : true
+    }
+  ]
+}

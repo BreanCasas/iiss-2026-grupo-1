@@ -1,0 +1,479 @@
+{
+  "zonaHoraria" : "America/Montevideo",
+  "plan" : {
+    "id" : "E04",
+    "nombre" : "2 habitaciones, no entran juntas",
+    "descripcion" : "Entra la mayor de las dos, pero no las dos a la vez: hay que alternar sin pasarse de la contratada.",
+    "habitaciones" : 2,
+    "potenciaContratadaKW" : 1.2,
+    "potenciaInstaladaKW" : 2.1,
+    "temperaturaInicial" : {
+      "delta" : -0.5
+    },
+    "habitacionesIniciales" : null,
+    "inicio" : {
+      "fechaHora" : "2026-11-03T10:00-03:00",
+      "zonaHoraria" : "America/Montevideo",
+      "factorTiempo" : 60.0
+    },
+    "duracion" : "2h",
+    "duracionSegundos" : 7200,
+    "estimacionRealSegundos" : 125,
+    "pasos" : [
+    ],
+    "fallas" : null,
+    "esperado" : [
+      {
+        "tipo" : "potenciaMaxima",
+        "nivel" : "riesgo",
+        "obligatoria" : true,
+        "parametros" : {
+          "tolerancia" : 0.1,
+          "gracia" : "2m"
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "soloSwitchesDelSitio",
+        "nivel" : "contrato",
+        "obligatoria" : true,
+        "parametros" : {
+          "gracia" : "2m"
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "tomaControl",
+        "nivel" : "mejora",
+        "obligatoria" : false,
+        "parametros" : {
+          "dentro" : "5m"
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "aprovechamiento",
+        "nivel" : "mejora",
+        "obligatoria" : false,
+        "parametros" : {
+          "desde" : "0s",
+          "min" : 0.8
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "conmutaciones",
+        "nivel" : "mejora",
+        "obligatoria" : false,
+        "parametros" : {
+          "maxPorHora" : 6.0
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "noComandaDetenido",
+        "nivel" : "contrato",
+        "obligatoria" : true,
+        "parametros" : {
+          
+        },
+        "nota" : null
+      },
+      {
+        "tipo" : "actua",
+        "nivel" : "riesgo",
+        "obligatoria" : true,
+        "parametros" : {
+          "tolerancia" : 0.5,
+          "max" : "10m"
+        },
+        "nota" : null
+      }
+    ],
+    "hash" : "73b851b2b13c36676b4656400fe156b7a2e2271e5732beee70eed140e2c2a832"
+  },
+  "eventos" : [
+    {
+      "real" : "2026-11-08T22:42:43.541-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "DETENER",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"DETENIDO\",\"fechaHora\":null,\"factorTiempo\":null,\"iniciadoEn\":null}"
+    },
+    {
+      "real" : "2026-11-08T22:42:43.541-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "sitio 'gen-2-limitante-s1' en el simulador (2 habitaciones, v3)",
+      "ok" : true,
+      "detalle" : null
+    },
+    {
+      "real" : "2026-11-08T22:42:43.548-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "PUT /sitio",
+      "ok" : true,
+      "detalle" : "200 {\"schemaVersion\":\"2.0\",\"sitio\":{\"id\":\"gen-2-limitante-s1\",\"nombre\":\"Sitio generado: 2 habitaciones, limitante\",\"potenciaContratadaKW\":1.2,\"tarifa\":{\"punta\":{\"desde\":\"17:00\",\"hasta\":\"23:00\",\"dias\":\"HAB"
+    },
+    {
+      "real" : "2026-11-08T22:42:43.551-03:00",
+      "virtual" : null,
+      "t" : null,
+      "fase" : "setup",
+      "que" : "GET /sitio",
+      "ok" : true,
+      "detalle" : "200 {\"schemaVersion\":\"2.0\",\"sitio\":{\"id\":\"gen-2-limitante-s1\",\"nombre\":\"Sitio generado: 2 habitaciones, limitante\",\"potenciaContratadaKW\":1.2,\"tarifa\":{\"punta\":{\"desde\":\"17:00\",\"hasta\":\"23:00\",\"dias\":\"HAB"
+    },
+    {
+      "real" : "2026-11-08T22:42:43.558-03:00",
+      "virtual" : "2026-11-03T10:00:00.060-03:00",
+      "t" : "0s",
+      "fase" : "inicio",
+      "que" : "INICIAR 2026-11-03T13:00:00.000Z ×60.0",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"EN_EJECUCION\",\"fechaHora\":\"2026-11-03T13:00:00.003Z\",\"factorTiempo\":60,\"iniciadoEn\":\"2026-11-09T01:42:43.555Z\"}"
+    },
+    {
+      "real" : "2026-11-08T22:42:43.563-03:00",
+      "virtual" : "2026-11-03T10:00:00.360-03:00",
+      "t" : "0s",
+      "fase" : "inicio",
+      "que" : "GET /control",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"EN_EJECUCION\",\"fechaHora\":\"2026-11-03T13:00:00.306Z\",\"factorTiempo\":60,\"iniciadoEn\":\"2026-11-09T01:42:43.555Z\"}"
+    },
+    {
+      "real" : "2026-11-08T22:44:43.580-03:00",
+      "virtual" : "2026-11-03T12:00:01.380-03:00",
+      "t" : "2h1s",
+      "fase" : "fin",
+      "que" : "fin del escenario (2h virtuales)",
+      "ok" : true,
+      "detalle" : null
+    },
+    {
+      "real" : "2026-11-08T22:44:43.604-03:00",
+      "virtual" : "2026-11-03T12:00:02.820-03:00",
+      "t" : "2h2s",
+      "fase" : "salida",
+      "que" : "pasa: 7 ✓, 0 ✗",
+      "ok" : true,
+      "detalle" : null
+    },
+    {
+      "real" : "2026-11-08T22:44:43.617-03:00",
+      "virtual" : "2026-11-03T12:00:03.600-03:00",
+      "t" : "2h3s",
+      "fase" : "fin",
+      "que" : "DETENER",
+      "ok" : true,
+      "detalle" : "200 {\"estado\":\"DETENIDO\",\"fechaHora\":null,\"factorTiempo\":null,\"iniciadoEn\":null}"
+    }
+  ],
+  "final" : {
+    "instante" : "2026-11-03T12:00:01.380-03:00",
+    "sitio" : "gen-2-limitante-s1",
+    "consumoTotalKwh" : 2.065,
+    "habitaciones" : [
+      {
+        "id" : "room1",
+        "temperaturaEsperada" : 20.3,
+        "temperatura" : 20.061,
+        "switch" : "OFF",
+        "consumoKwh" : 1.12
+      },
+      {
+        "id" : "room2",
+        "temperaturaEsperada" : 21.8,
+        "temperatura" : 21.519,
+        "switch" : "ON",
+        "consumoKwh" : 0.945
+      }
+    ]
+  },
+  "metricas" : {
+    "global" : {
+      "desde" : "0s",
+      "hasta" : "2h",
+      "potenciaPicoKW" : 1.2,
+      "potenciaMediaKW" : 1.03,
+      "excesoMaxKW" : 0.0,
+      "segundosSobreContratada" : 0.0,
+      "kwh" : 2.065,
+      "kwhEnPunta" : 0.0,
+      "kwhFueraDePunta" : 2.065,
+      "aprovechamiento" : 0.86,
+      "fraccionEnRango" : 0.817,
+      "brechaMedia" : 0.4,
+      "deficitMedio" : 0.4,
+      "comandos" : 12,
+      "conmutaciones" : 11,
+      "comandosASwitchesAjenos" : 0
+    },
+    "tramos" : [
+      {
+        "desde" : "0s",
+        "hasta" : "2h",
+        "potenciaPicoKW" : 1.2,
+        "potenciaMediaKW" : 1.03,
+        "excesoMaxKW" : 0.0,
+        "segundosSobreContratada" : 0.0,
+        "kwh" : 2.065,
+        "kwhEnPunta" : 0.0,
+        "kwhFueraDePunta" : 2.065,
+        "aprovechamiento" : 0.86,
+        "fraccionEnRango" : 0.817,
+        "brechaMedia" : 0.4,
+        "deficitMedio" : 0.4,
+        "comandos" : 12,
+        "conmutaciones" : 11,
+        "comandosASwitchesAjenos" : 0
+      }
+    ],
+    "habitaciones" : [
+      {
+        "id" : "room1",
+        "temperaturaMin" : 19.8,
+        "temperaturaMax" : 20.06,
+        "temperaturaFinal" : 20.06,
+        "esperadaFinal" : 20.3,
+        "brechaMedia" : 0.37,
+        "fraccionEnRango" : 1.0,
+        "alcanzoEn" : null,
+        "kwh" : 1.12,
+        "comandos" : 7,
+        "conmutaciones" : 6,
+        "conmutacionesPorHora" : 3.0
+      },
+      {
+        "id" : "room2",
+        "temperaturaMin" : 21.29,
+        "temperaturaMax" : 21.52,
+        "temperaturaFinal" : 21.52,
+        "esperadaFinal" : 21.8,
+        "brechaMedia" : 0.44,
+        "fraccionEnRango" : 0.633,
+        "alcanzoEn" : null,
+        "kwh" : 0.945,
+        "comandos" : 5,
+        "conmutaciones" : 5,
+        "conmutacionesPorHora" : 2.5
+      }
+    ],
+    "toleranciaConfort" : 0.5
+  },
+  "expectativasDetalle" : [
+    {
+      "cumple" : true,
+      "detalle" : "la potencia encendida nunca pasó la contratada + 0,10 kW",
+      "medido" : {
+        "veces" : 0,
+        "segundos" : 0.0,
+        "excesoMaxKW" : 0.0,
+        "primera" : null
+      },
+      "tipo" : "potenciaMaxima",
+      "nivel" : "riesgo",
+      "obligatoria" : true,
+      "parametros" : {
+        "tolerancia" : 0.1,
+        "gracia" : "2m"
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "todos los comandos fueron a switches del sitio vigente",
+      "medido" : {
+        "comandos" : 0,
+        "switches" : [
+        ],
+        "primero" : null
+      },
+      "tipo" : "soloSwitchesDelSitio",
+      "nivel" : "contrato",
+      "obligatoria" : true,
+      "parametros" : {
+        "gracia" : "2m"
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "conoció los 2 switches (consulta o comando); el último en 0s",
+      "medido" : {
+        "habitaciones" : 2,
+        "tomadas" : 2,
+        "ultima" : "0s",
+        "sinControl" : [
+        ]
+      },
+      "tipo" : "tomaControl",
+      "nivel" : "mejora",
+      "obligatoria" : false,
+      "parametros" : {
+        "dentro" : "5m"
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "cuando no entraba todo, usó en promedio el 86,0% de lo que podía encender (mínimo 80%)",
+      "medido" : {
+        "aprovechamiento" : 0.86,
+        "muestras" : 120
+      },
+      "tipo" : "aprovechamiento",
+      "nivel" : "mejora",
+      "obligatoria" : false,
+      "parametros" : {
+        "desde" : "0s",
+        "min" : 0.8
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "la que más conmutó, room1, 3,0 veces por hora (máximo 6,0)",
+      "medido" : {
+        "peor" : {
+          "id" : "room1",
+          "porHora" : 3.0
+        }
+      },
+      "tipo" : "conmutaciones",
+      "nivel" : "mejora",
+      "obligatoria" : false,
+      "parametros" : {
+        "maxPorHora" : 6.0
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "ningún comando de encender a switches entre el DETENER del setup y el INICIAR",
+      "medido" : {
+        "comandos" : 0,
+        "switches" : [
+        ]
+      },
+      "tipo" : "noComandaDetenido",
+      "nivel" : "contrato",
+      "obligatoria" : true,
+      "parametros" : {
+        
+      },
+      "nota" : null
+    },
+    {
+      "cumple" : true,
+      "detalle" : "nunca hubo una habitación fría y apagada que entrara en lo libre de la contratada",
+      "medido" : {
+        "rachas" : 0,
+        "masLarga" : null
+      },
+      "tipo" : "actua",
+      "nivel" : "riesgo",
+      "obligatoria" : true,
+      "parametros" : {
+        "tolerancia" : 0.5,
+        "max" : "10m"
+      },
+      "nota" : null
+    }
+  ],
+  "observaciones" : [
+  ],
+  "escenarioFuente" : {
+    "id" : "E04",
+    "nombre" : "2 habitaciones, no entran juntas",
+    "descripcion" : "Entra la mayor de las dos, pero no las dos a la vez: hay que alternar sin pasarse de la contratada.",
+    "setup" : {
+      "sitio" : {
+        "generado" : {
+          "habitaciones" : 2,
+          "presupuesto" : "limitante"
+        }
+      }
+    },
+    "inicio" : {
+      "fechaHora" : "2026-11-03T10:00",
+      "factorTiempo" : 60
+    },
+    "duracion" : "2h",
+    "esperado" : [
+      "potenciaMaxima",
+      "soloSwitchesDelSitio",
+      "tomaControl",
+      {
+        "aprovechamiento" : {
+          "min" : 0.8
+        }
+      },
+      {
+        "conmutaciones" : {
+          "maxPorHora" : 6
+        }
+      }
+    ]
+  },
+  "id" : "20261108-224043-34-E04",
+  "simulador" : "ecowarm-run",
+  "tanda" : "20261108-224043-32",
+  "escenario" : {
+    "id" : "E04",
+    "nombre" : "2 habitaciones, no entran juntas",
+    "hash" : "73b851b2b13c36676b4656400fe156b7a2e2271e5732beee70eed140e2c2a832"
+  },
+  "controlador" : "grupo-1",
+  "estado" : "terminada",
+  "motivo" : null,
+  "creadaEn" : "2026-11-08T22:40:43.153-03:00",
+  "empezo" : "2026-11-08T22:42:43.535-03:00",
+  "termino" : "2026-11-08T22:44:43.617-03:00",
+  "estimacionRealSegundos" : 125,
+  "progreso" : {
+    "virtualTranscurrido" : "2h",
+    "virtualTotal" : "2h",
+    "fraccion" : 1.0,
+    "pasos" : "0/0",
+    "realRestanteSegundos" : 0
+  },
+  "resultado" : "pasa",
+  "expectativas" : {
+    "contrato" : {
+      "cumplen" : 2,
+      "fallan" : 0,
+      "noAplican" : 0
+    },
+    "riesgo" : {
+      "cumplen" : 2,
+      "fallan" : 0,
+      "noAplican" : 0
+    },
+    "mejora" : {
+      "cumplen" : 3,
+      "fallan" : 0,
+      "noAplican" : 0
+    },
+    "obligatorias" : {
+      "cumplen" : 4,
+      "fallan" : 0,
+      "noAplican" : 0
+    },
+    "informativas" : {
+      "cumplen" : 3,
+      "fallan" : 0,
+      "noAplican" : 0
+    },
+    "observaciones" : {
+      "graves" : 0,
+      "menores" : 0
+    }
+  }
+}

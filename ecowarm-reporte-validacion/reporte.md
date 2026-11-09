@@ -1,7 +1,7 @@
 # Reporte ecowarm-run
 
 - **Controlador:** grupo-1 (http://localhost:8080)
-- **Fecha:** 2026-11-07T23:39:42.167901300-03:00
+- **Fecha:** 2026-11-08T22:58:14.726658100-03:00
 - **Herramienta:** ecowarm-run c95d037, interop-v2
 
 | escenario | resultado | lo que falló |
@@ -30,9 +30,9 @@
 | ✓ | enRango | mejora | 1 de 1 habitaciones a ±0,5 °C al menos el 80% del tiempo; la peor, room1, el 99,2% |
 | ✓ | conmutaciones | mejora | la que más conmutó, room1, 1,0 veces por hora (máximo 6,0) |
 | ✓ | noComandaDetenido | contrato | ningún comando de encender a switches entre el DETENER del setup y el INICIAR |
-| ✓ | actua | riesgo | la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 1m (desde 1m32s) |
+| ✓ | actua | riesgo | la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 1m (desde 1m52s) |
 
-Detalle: `20261107-232210-21/20261107-232210-22-E02.json` (serie e interacciones al lado)
+Detalle: `20261108-224043-32/20261108-224043-33-E02.json` (serie e interacciones al lado)
 
 ## E04 2 habitaciones, no entran juntas
 
@@ -45,12 +45,12 @@ Detalle: `20261107-232210-21/20261107-232210-22-E02.json` (serie e interacciones
 | ✓ | potenciaMaxima | riesgo | la potencia encendida nunca pasó la contratada + 0,10 kW |
 | ✓ | soloSwitchesDelSitio | contrato | todos los comandos fueron a switches del sitio vigente |
 | ✓ | tomaControl | mejora | conoció los 2 switches (consulta o comando); el último en 0s |
-| ✓ | aprovechamiento | mejora | cuando no entraba todo, usó en promedio el 86,3% de lo que podía encender (mínimo 80%) |
-| ✓ | conmutaciones | mejora | la que más conmutó, room1, 2,5 veces por hora (máximo 6,0) |
+| ✓ | aprovechamiento | mejora | cuando no entraba todo, usó en promedio el 86,0% de lo que podía encender (mínimo 80%) |
+| ✓ | conmutaciones | mejora | la que más conmutó, room1, 3,0 veces por hora (máximo 6,0) |
 | ✓ | noComandaDetenido | contrato | ningún comando de encender a switches entre el DETENER del setup y el INICIAR |
 | ✓ | actua | riesgo | nunca hubo una habitación fría y apagada que entrara en lo libre de la contratada |
 
-Detalle: `20261107-232210-21/20261107-232210-23-E04.json` (serie e interacciones al lado)
+Detalle: `20261108-224043-32/20261108-224043-34-E04.json` (serie e interacciones al lado)
 
 ## E11 Entrar en punta
 
@@ -62,14 +62,14 @@ Detalle: `20261107-232210-21/20261107-232210-23-E04.json` (serie e interacciones
 |---|---|---|---|
 | ✓ | potenciaMaxima | riesgo | la potencia encendida nunca pasó la contratada + 0,10 kW |
 | ✓ | soloSwitchesDelSitio | contrato | todos los comandos fueron a switches del sitio vigente |
-| ✓ | tomaControl | mejora | conoció los 5 switches (consulta o comando); el último en 1s |
+| ✓ | tomaControl | mejora | conoció los 5 switches (consulta o comando); el último en 0s |
 | ✓ | enRango | mejora | 5 de 5 habitaciones a ±0,5 °C al menos el 80% del tiempo; la peor, room3, el 98,3% |
 | ✓ | conmutaciones | mejora | la que más conmutó, room1, 1,0 veces por hora (máximo 6,0) |
 | ✓ | consumoEnPunta | riesgo | en punta no hubo nada encendido |
 | ✓ | noComandaDetenido | contrato | ningún comando de encender a switches entre el DETENER del setup y el INICIAR |
-| ✓ | actua | riesgo | la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 59s (desde 1m16s) |
+| ✓ | actua | riesgo | la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 1m (desde 1m36s) |
 
-Detalle: `20261107-232210-21/20261107-232210-24-E11.json` (serie e interacciones al lado)
+Detalle: `20261108-224043-32/20261108-224043-35-E11.json` (serie e interacciones al lado)
 
 ## E14 Subir la temperatura de 2 habitaciones
 
@@ -84,11 +84,11 @@ Detalle: `20261107-232210-21/20261107-232210-24-E11.json` (serie e interacciones
 | ✓ | tomaControl | mejora | conoció los 5 switches (consulta o comando); el último en 0s |
 | ✓ | enRango | mejora | 5 de 5 habitaciones a ±0,5 °C al menos el 80% del tiempo; la peor, room1, el 100,0% |
 | ✓ | conmutaciones | mejora | la que más conmutó, room3, 1,3 veces por hora (máximo 6,0) |
-| ✓ | reacciona | riesgo | 2 reacciones dentro de 5m desde el ack (1h3s) |
+| ✓ | reacciona | riesgo | 2 reacciones dentro de 5m desde el ack (1h) |
 | ✓ | noComandaDetenido | contrato | ningún comando de encender a switches entre el DETENER del setup y el INICIAR |
 | ✓ | actua | riesgo | nunca hubo una habitación fría y apagada que entrara en lo libre de la contratada |
 
-Detalle: `20261107-232210-21/20261107-232210-25-E14.json` (serie e interacciones al lado)
+Detalle: `20261108-224043-32/20261108-224043-36-E14.json` (serie e interacciones al lado)
 
 ## E18 Bajar la contratada
 
@@ -107,7 +107,7 @@ Detalle: `20261107-232210-21/20261107-232210-25-E14.json` (serie e interacciones
 | ✓ | noComandaDetenido | contrato | ningún comando de encender a switches entre el DETENER del setup y el INICIAR |
 | ✓ | actua | riesgo | nunca hubo una habitación fría y apagada que entrara en lo libre de la contratada |
 
-Detalle: `20261107-232210-21/20261107-232210-26-E18.json` (serie e interacciones al lado)
+Detalle: `20261108-224043-32/20261108-224043-37-E18.json` (serie e interacciones al lado)
 
 ## E19 Un switch ya encendido
 
@@ -119,12 +119,12 @@ Detalle: `20261107-232210-21/20261107-232210-26-E18.json` (serie e interacciones
 |---|---|---|---|
 | ✓ | potenciaMaxima | riesgo | la potencia encendida nunca pasó la contratada + 0,10 kW |
 | ✓ | soloSwitchesDelSitio | contrato | todos los comandos fueron a switches del sitio vigente |
-| ✓ | aprovechamiento | mejora | cuando no entraba todo, usó en promedio el 98,8% de lo que podía encender (mínimo 80%) |
-| ✓ | conmutaciones | mejora | la que más conmutó, room1, 1,0 veces por hora (máximo 6,0) |
+| ✓ | aprovechamiento | mejora | cuando no entraba todo, usó en promedio el 99,6% de lo que podía encender (mínimo 80%) |
+| ✓ | conmutaciones | mejora | la que más conmutó, room5, 3,1 veces por hora (máximo 6,0) |
 | ✓ | noComandaDetenido | contrato | ningún comando de encender a switches entre el DETENER del setup y el INICIAR |
-| ✓ | actua | riesgo | la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 1m (desde 0s) |
+| ✓ | actua | riesgo | la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 59s (desde 19s) |
 
-Detalle: `20261107-232210-21/20261107-232210-27-E19.json` (serie e interacciones al lado)
+Detalle: `20261108-224043-32/20261108-224043-38-E19.json` (serie e interacciones al lado)
 
 ## F01 Se cae el broker y vuelve
 
@@ -139,10 +139,10 @@ Detalle: `20261107-232210-21/20261107-232210-27-E19.json` (serie e interacciones
 | ✓ | soloSwitchesDelSitio | contrato | todos los comandos fueron a switches del sitio vigente |
 | ✓ | noComandaDetenido | contrato | ningún comando de encender a switches entre el DETENER del setup y el INICIAR |
 | ✓ | actua | riesgo | nunca hubo una habitación fría y apagada que entrara en lo libre de la contratada |
-| ✓ | reconecta | riesgo | se volvió a suscribir una vez tras la vuelta del broker; lo más lento, 0,6 s reales |
+| ✓ | reconecta | riesgo | se volvió a suscribir una vez tras la vuelta del broker; lo más lento, 0,7 s reales |
 | — | apagaSinLecturas | mejora | no aplica: ninguna habitación quedó sin lecturas más de 15m |
 
-Detalle: `20261107-232210-21/20261107-232210-28-F01.json` (serie e interacciones al lado)
+Detalle: `20261108-224043-32/20261108-224043-39-F01.json` (serie e interacciones al lado)
 
 ## F03 Un termostato deja de publicar
 
@@ -152,14 +152,14 @@ Detalle: `20261107-232210-21/20261107-232210-28-F01.json` (serie e interacciones
 
 | | expectativa | nivel | qué pasó |
 |---|---|---|---|
-| ✓ | enRango | mejora | 3 de 3 habitaciones a ±0,5 °C al menos el 70% del tiempo; la peor, room1, el 100,0% |
+| ✓ | enRango | mejora | 3 de 3 habitaciones a ±0,5 °C al menos el 70% del tiempo; la peor, room4, el 99,2% |
 | ✓ | potenciaMaxima | riesgo | la potencia encendida nunca pasó la contratada + 0,10 kW |
 | ✓ | soloSwitchesDelSitio | contrato | todos los comandos fueron a switches del sitio vigente |
 | ✓ | noComandaDetenido | contrato | ningún comando de encender a switches entre el DETENER del setup y el INICIAR |
-| ✓ | actua | riesgo | nunca hubo una habitación fría y apagada que entrara en lo libre de la contratada |
+| ✓ | actua | riesgo | la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 59s (desde 1m10s) |
 | ✓ | apagaSinLecturas | mejora | 1 habitación sin lecturas: apagada pasados 15m |
 
-Detalle: `20261107-232210-21/20261107-232210-29-F03.json` (serie e interacciones al lado)
+Detalle: `20261108-224043-32/20261108-224043-40-F03.json` (serie e interacciones al lado)
 
 ## F05 Se pierden los OFF
 
@@ -173,7 +173,7 @@ Detalle: `20261107-232210-21/20261107-232210-29-F03.json` (serie e interacciones
 | ✓ | potenciaMaxima | riesgo | la potencia encendida nunca pasó la contratada + 0,10 kW |
 | ✓ | soloSwitchesDelSitio | contrato | todos los comandos fueron a switches del sitio vigente |
 | ✓ | noComandaDetenido | contrato | ningún comando de encender a switches entre el DETENER del setup y el INICIAR |
-| ✓ | actua | riesgo | la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 59s (desde 45s) |
+| ✓ | actua | riesgo | la potencia libre con habitaciones frías apagadas nunca duró más de 10m; lo más largo, 59s (desde 6s) |
 | ✓ | reintenta | riesgo | retomó 1 switch después de la falla, antes de 10m |
 
-Detalle: `20261107-232210-21/20261107-232210-30-F05.json` (serie e interacciones al lado)
+Detalle: `20261108-224043-32/20261108-224043-41-F05.json` (serie e interacciones al lado)
